@@ -1,0 +1,142 @@
+﻿using Mefino.LightJson;
+using Mefino.LightJson.Serialization;
+using Mefino.Loader.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mefino.Loader.Manifests
+{
+    public class PackageManifest
+    {
+        /// <summary>
+        /// Unique ID for this package, which is generated from: 'Author.PackageName'
+        /// </summary>
+        public string GUID => $"{Author}.{PackageName}";
+
+        /// <summary>Your GitHub username where the package repository is hosted.</summary>
+        public string Author;
+        /// <summary>Name of the package, and must also be the name of the repository.</summary>
+        public string PackageName;
+
+        /// <summary>
+        /// [OPTIONAL] You can set this to the name of the folder in BepInEx\plugins\ that your package uses.<br />
+        /// You only need to use this if your BepInEx\plugins folder is NOT the same as the name of your repository (PackageName).
+        /// </summary>
+        public string OverrideFolderName;
+
+        /// <summary>Version of the package</summary>
+        public string Version;
+        /// <summary>Short description of the package</summary>
+        public string Description;
+        /// <summary>List of dependency GUIDs for this package</summary>
+        public string[] Dependencies = new string[0];
+
+        public string m_manifestCachedTime;
+
+        public string GithubURL => $"https://github.com/{Author}/{PackageName}";
+
+        public bool IsGreaterVersionThan(PackageManifest other, bool greaterOrEqual = false)
+        {
+            Version otherVersion;
+            try
+            {
+                otherVersion = new Version(other.Version);
+            }
+            catch { return true; }
+
+            Version thisVersion;
+            try
+            {
+                thisVersion = new Version(this.Version);
+            }
+            catch { return false; }
+
+            return greaterOrEqual
+                    ? thisVersion >= otherVersion
+                    : thisVersion > otherVersion;
+        }
+
+        internal bool IsManifestCachedSince(string utcTimeString)
+        {
+            DateTime timeToCheck;
+            try
+            {
+                timeToCheck = DateTime.Parse(utcTimeString);
+            }
+            catch
+            {
+                // default to true if unable to parse the string to check against
+                return true;
+            }
+
+            try
+            {
+                var thisTime = DateTime.Parse(this.m_manifestCachedTime);
+                return timeToCheck <= thisTime;
+            }
+            catch
+            {
+                // default to false if unable to parse existing manifest time
+                return false;
+            }
+        }
+
+        public JsonObject ToJsonObject()
+        {
+            return new JsonObject
+            {
+                { nameof(GUID),         this.GUID },
+                { nameof(Author),       this.Author },
+                { nameof(PackageName),  this.PackageName },
+                { nameof(Version),      this.Version },
+                { nameof(Description),  this.Description },
+                {
+                    nameof(Dependencies),
+                    new JsonArray(this.Dependencies.Select(it => new JsonValue(it))
+                                                   .ToArray())
+                },
+                { nameof(OverrideFolderName), this.OverrideFolderName },
+                { nameof(m_manifestCachedTime), this.m_manifestCachedTime },
+            };
+        }
+
+        internal static PackageManifest FromManifestJson(string jsonString)
+        {
+            try
+            {
+                var json = JsonReader.Parse(jsonString);
+
+                var ret = new PackageManifest
+                {
+                    Author = json[nameof(Author)].AsString,
+                    PackageName = json[nameof(PackageName)].AsString,
+                    Version = json[nameof(Version)].AsString
+                };
+
+                if (json[nameof(Description)].AsString is string desc)
+                    ret.Description = desc;
+
+                if (json[nameof(Dependencies)].AsJsonArray is JsonArray deps)
+                    ret.Dependencies = deps.Select(it => it.AsString)?.ToArray();
+
+                if (json[nameof(OverrideFolderName)].AsString is string folder)
+                    ret.OverrideFolderName = folder;
+
+                if (json[nameof(m_manifestCachedTime)].AsString is string cachetime)
+                    ret.m_manifestCachedTime = cachetime;
+
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception parsing PackageManifest from Json!");
+                Console.WriteLine(ex);
+                Console.WriteLine("Json string: " + jsonString);
+                return default;
+            }
+        }
+    }
+}

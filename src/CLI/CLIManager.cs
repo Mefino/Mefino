@@ -36,19 +36,19 @@ namespace Mefino.Loader.CLI
 
         public static void Execute(params string[] args)
         {
-            var joined = string.Join("", args);
-            var parsed = CreateArgs(joined);
+            //var joined = string.Join(" ", args);
+            //var parsed = CreateArgs(joined);
 
             foreach (var entry in s_commands)
             {
-                if (entry.IsMatch(parsed[0]))
+                if (entry.IsMatch(args[0]))
                 {
                     string[] subArgs = null;
-                    if (parsed.Length > 1)
+                    if (args.Length > 1)
                     {
-                        subArgs = new string[parsed.Length - 1];
-                        for (int i = 1; i < parsed.Length; i++)
-                            subArgs[i - 1] = parsed[i];
+                        subArgs = new string[args.Length - 1];
+                        for (int i = 1; i < args.Length; i++)
+                            subArgs[i - 1] = args[i];
                     }
 
                     entry.Invoke(subArgs);

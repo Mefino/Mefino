@@ -50,7 +50,9 @@ namespace Mefino.Loader.CLI
                         for (int i = 1; i < parsed.Length; i++)
                             subArgs[i - 1] = parsed[i];
                     }
+
                     entry.Invoke(subArgs);
+
                     return;
                 }
             }
@@ -85,33 +87,33 @@ namespace Mefino.Loader.CLI
 
             new ConsoleCommand("install", 
                 "i", 
-                "Install the specific package GUID, eg. 'install sinai-dev.Outward-SideLoader'", 
+                "Install and/or enable the specific package GUID, eg. 'install sinai-dev.Outward-SideLoader'", 
                 Cmd_Install),
 
-            new ConsoleCommand("uninstall", 
-                "u", 
-                "Uninstall the specified package GUID, eg. 'uninstall sinai-dev.Outward-SideLoader'", 
-                Cmd_Uninstall),
-
-            new ConsoleCommand("uninstallall", 
-                "", 
-                "Uninstall all packages (not disabling, actually uninstalling).", 
-                Cmd_UninstallAll),
-
-            new ConsoleCommand("enable", 
-                "e", 
-                "Enable the specific package GUID, if it is installed and disabled. eg. 'enable sinai-dev.Outward-SideLoader'", 
+            new ConsoleCommand("enable",
+                "e",
+                "Enable the specific package GUID without checking for updates, if it is installed and disabled. eg. 'enable sinai-dev.Outward-SideLoader'",
                 Cmd_Enable),
 
-            new ConsoleCommand("disable", 
+            new ConsoleCommand("disable",
                 "d",
                 "Disable the specific package GUID, if it is installed and enabled. eg. 'disable sinai-dev.Outward-SideLoader'",
                 Cmd_Disable),
 
-            new ConsoleCommand("disableall", 
-                "da", 
-                "Disable all enabled mods.", 
+            new ConsoleCommand("disableall",
+                "da",
+                "Disable all installed packages.",
                 Cmd_DisableAll),
+
+            new ConsoleCommand("uninstall", 
+                "u", 
+                "Uninstall (delete) the specified package GUID, eg. 'uninstall sinai-dev.Outward-SideLoader'", 
+                Cmd_Uninstall),
+
+            new ConsoleCommand("uninstallall", 
+                "", 
+                "Uninstall (delete) ALL packages", 
+                Cmd_UninstallAll),
         };
 
         internal static void ListCommands()
@@ -249,7 +251,14 @@ namespace Mefino.Loader.CLI
 
         private static void Cmd_DisableAll(string[] obj)
         {
-            throw new NotImplementedException();
+            if (!MefinoPackageManager.s_installedManifests.Any())
+                return;
+
+            for (int i = MefinoPackageManager.s_installedManifests.Count - 1; i >= 0; i--)
+            {
+                var pkg = MefinoPackageManager.s_installedManifests.ElementAt(i).Value;
+                MefinoPackageManager.TryDisablePackage(pkg.GUID);
+            }
         }
 
         // =========== ARGUMENT PARSER HELPER ============

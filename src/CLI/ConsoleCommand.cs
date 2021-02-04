@@ -18,18 +18,6 @@ namespace Mefino.Loader.CLI
             this.action = action;
         }
 
-        public override string ToString()
-        {
-            string ret = $"'{longName}' ";
-
-            if (!string.IsNullOrEmpty(this.shortName))
-                ret += $"('{shortName}') ";
-
-            ret += $": {description}";
-
-            return ret;
-        }
-
         public bool IsMatch(string command)
         {
             if (command.StartsWith("-"))
@@ -40,5 +28,17 @@ namespace Mefino.Loader.CLI
         }
 
         public void Invoke(string[] args) => action.Invoke(args);
+
+        public override string ToString()
+        {
+            string ret = $"'{longName}' ";
+
+            if (!string.IsNullOrEmpty(this.shortName))
+                ret += $"/ '{shortName}' ";
+
+            ret += $": {description}";
+
+            return ret;
+        }
     }
 }

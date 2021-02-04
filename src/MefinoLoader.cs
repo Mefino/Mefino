@@ -1,6 +1,9 @@
-﻿using Mefino.Loader.Manifests;
+﻿using Mefino.LightJson;
+using Mefino.Loader.Core;
+using Mefino.Loader.IO;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -12,120 +15,85 @@ namespace Mefino.Loader
     {
         public const string VERSION = "0.1.0.0";
 
-        // todo support this properly
-        public static string OutwardFolderPath => @"E:\Steam\steamapps\common\Outward";
+        public static string OUTWARD_FOLDER => m_outwardPath;
+        private static string m_outwardPath = "";
 
-        public static void Execute(params string[] args)
+        public static string OUTWARD_PLUGINS => OUTWARD_FOLDER + @"\BepInEx\plugins";
+
+        internal static string MEFINO_FOLDER_PATH => OUTWARD_FOLDER + @"\Mefino";
+        internal static string MEFINO_DISABLED_FOLDER => MEFINO_FOLDER_PATH + @"\Disabled";
+
+        internal static string MEFINO_CONFIG_PATH => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\mefino-config.json";
+
+        public static bool SetOutwardFolderPath(string path)
         {
-            Console.WriteLine("");
+            path = Path.GetFullPath(path);
 
-            if (args == null || args.Length < 1 || string.IsNullOrEmpty(args[0]))
+            if (!IsValidOutwardMonoPath(path))
             {
-                Console.WriteLine("Please enter a command:");
-                ListCommands();
-
-                Execute(Console.ReadLine().Split(' '));
-            }
-            else
-            {
-                if (s_commandDict.TryGetValue(args[0], out Action<string[]> action))
-                {
-                    string[] subArgs = null;
-                    if (args.Length > 1)
-                    {
-                        subArgs = new string[args.Length - 1];
-                        for (int i = 1; i < args.Length; i++)
-                            subArgs[i - 1] = args[i];
-                    }
-                    action.Invoke(subArgs);
-                }
-                else
-                    InvalidCommand(args[0]);
-            }
-        }
-
-        internal static readonly Dictionary<string, Action<string[]>> s_commandDict = new Dictionary<string, Action<string[]>>
-        {
-            { "-quit",           Cmd_Quit },
-            { "-bepinex",        Cmd_BepInEx },
-            { "-list",           Cmd_RefreshModList },
-            { "-install",        Cmd_Install },
-            { "-uninstall",      Cmd_Uninstall },
-            { "-uninstallall",   Cmd_UninstallAll }
-        };
-
-        internal static void ListCommands()
-        {
-            Console.WriteLine("");
-            Console.WriteLine(" -quit : Quit the application");
-            Console.WriteLine(" -bepinex : Check that BepInEx is installed and updated");
-            Console.WriteLine(" -list : Refresh mod lists (GitHub and installed mods)");
-            Console.WriteLine(" -install [author].[repo] : Install the mod from given author/repo, eg '-install sinai-dev.SideLoader'");
-            Console.WriteLine(" -uninstall [author].[repo] : Uninstall the mod from given author/repo, eg '-uninstall sinai-dev.SideLoader'");
-            Console.WriteLine(" -uninstallall : Uninstalls all mods (which are supported by a manifest)");
-            Console.WriteLine("");
-        }
-
-        internal static void InvalidCommand(string input)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Invalid command '" + input + "'");
-            Console.ForegroundColor = ConsoleColor.White;
-            Execute();
-        }
-
-        internal static void Cmd_Quit(params string[] args)
-        {
-            // do nothing and quit
-        }
-
-        internal static void Cmd_BepInEx(params string[] args)
-        {
-            Console.WriteLine("TODO");
-
-            // Return to arg input..
-            Execute();
-        }
-
-        internal static void Cmd_RefreshModList(params string[] args)
-        {
-            ManifestManager.RefreshModList();
-
-            // Return to arg input..
-            Execute();
-        }
-
-        internal static void Cmd_Install(params string[] args)
-        {
-            if (!ManifestManager.s_cachedWebManifests.Any())
-                ManifestManager.RefreshModList(true);
-
-            foreach (var guid in args)
-            {
-                if (ManifestManager.s_cachedWebManifests.TryGetValue(guid, out PackageManifest manifest))
-                    ManifestManager.TryInstallPackage(manifest);
-                else
-                    Console.WriteLine($"Could not find package by name '{guid}', maybe need to refresh the list?");
+                Console.WriteLine($"'{path}' is not a valid Outward Mono install path!");
+                return false;
             }
 
-            // Return to arg input..
-            Execute();
+            m_outwardPath = path;
+
+            CheckMefinoFolder();
+
+            SaveConfig();
+
+            return true;
         }
 
-        internal static void Cmd_Uninstall(params string[] args)
-        {
-            Console.WriteLine("TODO");
+        public static bool IsCurrentOutwardPathValid() => IsValidOutwardMonoPath(OUTWARD_FOLDER);
 
-            // Return to arg input..
-            Execute();
+        public static bool IsValidOutwardMonoPath(string path)
+        {
+            var suf = @"\Outward.exe";
+            if (path.EndsWith(suf))
+                path = path.Substring(0, path.Length - suf.Length);
+        
+            return !File.Exists(path + @"\GameAssembly.dll")
+                && File.Exists(path + @"\Outward_Data\Managed\Assembly-CSharp.dll")
+                && Directory.Exists(path + @"\MonoBleedingEdge");
         }
 
-        internal static void Cmd_UninstallAll(params string[] args)
+        internal static void CheckMefinoFolder()
         {
-            Console.WriteLine("TODO");
+            if (!IsCurrentOutwardPathValid())
+                return;
 
-            // Return to arg input..
-            Execute();
+            Directory.CreateDirectory(MEFINO_FOLDER_PATH);
+            Directory.CreateDirectory(MEFINO_DISABLED_FOLDER);
+        }
+
+        public static void LoadConfig()
+        {
+            if (!File.Exists(MEFINO_CONFIG_PATH))
+                return;
+
+            var jsonObject = LightJson.Serialization.JsonReader.ParseFile(MEFINO_CONFIG_PATH);
+
+            if (jsonObject == default)
+                return;
+
+            if (jsonObject[nameof(OUTWARD_FOLDER)].AsString is string path)
+            {
+                if (!SetOutwardFolderPath(path))
+                    Console.WriteLine("Saved Outward path '" + path + "' is invalid! Needs to be set again.");
+            }
+        }
+
+        public static void SaveConfig()
+        {
+            if (File.Exists(MEFINO_CONFIG_PATH))
+                File.Delete(MEFINO_CONFIG_PATH);
+
+            var jsonObject = new JsonObject
+            {
+                { nameof(OUTWARD_FOLDER), OUTWARD_FOLDER }
+            };
+
+            File.WriteAllText(MEFINO_CONFIG_PATH, jsonObject.ToString(true));
         }
     }
 }

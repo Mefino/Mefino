@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mefino.Loader.Manifests
+namespace Mefino.Loader.Core
 {
     public class PackageManifest
     {
@@ -15,6 +15,10 @@ namespace Mefino.Loader.Manifests
         /// Unique ID for this package, which is generated from: 'Author.PackageName'
         /// </summary>
         public string GUID => $"{Author}.{PackageName}";
+
+        public string InstallFolder => Author + "." + (string.IsNullOrEmpty(OverrideFolderName)
+                                                           ? PackageName
+                                                           : OverrideFolderName);
 
         /// <summary>Your GitHub username where the package repository is hosted.</summary>
         public string Author;

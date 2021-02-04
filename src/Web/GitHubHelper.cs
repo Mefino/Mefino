@@ -1,6 +1,6 @@
 ﻿using Mefino.LightJson;
 using Mefino.LightJson.Serialization;
-using Mefino.Loader.Manifests;
+using Mefino.Loader.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,6 @@ namespace Mefino.Loader.Web
 
         public static void TryFetchGithubPackages()
         {
-            WebClientManager.Reset();
-
             var githubQuery = FetchSearchResults();
 
             if (githubQuery == null)
@@ -47,6 +45,7 @@ namespace Mefino.Loader.Web
             string query;
             try
             {
+                WebClientManager.Reset();
                 query = WebClientManager.WebClient.DownloadString(QUERY_URL);
             }
             catch

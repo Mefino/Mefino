@@ -197,17 +197,19 @@ namespace Mefino.LightJson.Serialization
 				}
 				else
 				{
-					if (char.IsControl(c))
-					{
-						throw new JsonParseException(
-							ErrorType.InvalidOrUnexpectedCharacter,
-							this.scanner.Position
-						);
-					}
-					else
-					{
-						builder.Append(c);
-					}
+					builder.Append(c);
+					//if (char.IsControl(c) && c != '?')
+					//{
+					//	Console.WriteLine("UNEXPECTED CHAR: " + c);
+					//	throw new JsonParseException(
+					//		ErrorType.InvalidOrUnexpectedCharacter,
+					//		this.scanner.Position
+					//	);
+					//}
+					//else
+					//{
+					//	builder.Append(c);
+					//}
 				}
 			}
 

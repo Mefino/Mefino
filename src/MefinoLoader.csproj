@@ -7,7 +7,7 @@
     <ProjectGuid>{8E6DF09A-F1A6-409B-8C06-7388EBA12940}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Mefino.Loader</RootNamespace>
-    <AssemblyName>Mefino-Loader</AssemblyName>
+    <AssemblyName>MefinoLoader</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -55,11 +55,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\BepInExHandler.cs" />
+    <Compile Include="Core\CLI.cs" />
+    <Compile Include="Core\MefinoPackageManager.cs" />
     <Compile Include="IO\ZipHelper.cs" />
     <Compile Include="Web\GitHubHelper.cs" />
     <Compile Include="IO\TemporaryFile.cs" />
-    <Compile Include="Manifests\ManifestManager.cs" />
-    <Compile Include="Manifests\PackageManifest.cs" />
+    <Compile Include="Core\ManifestManager.cs" />
+    <Compile Include="Core\PackageManifest.cs" />
     <Compile Include="MefinoLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -3,8 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // Version information for the assembly
-[assembly: AssemblyVersion(Mefino.Loader.MefinoLoader.VERSION)]
-[assembly: AssemblyFileVersion(Mefino.Loader.MefinoLoader.VERSION)]
+[assembly: AssemblyVersion(Mefino.Mefino.VERSION)]
+[assembly: AssemblyFileVersion(Mefino.Mefino.VERSION)]
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information

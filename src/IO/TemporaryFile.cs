@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mefino.Loader.IO
+namespace Mefino.IO
 {
     class TemporaryFile
     {

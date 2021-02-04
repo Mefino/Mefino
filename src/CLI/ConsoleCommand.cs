@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mefino.Loader.CLI
+namespace Mefino.CLI
 {
     internal class ConsoleCommand
     {

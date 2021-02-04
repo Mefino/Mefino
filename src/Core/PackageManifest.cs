@@ -1,22 +1,22 @@
 ﻿using Mefino.LightJson;
 using Mefino.LightJson.Serialization;
-using Mefino.Loader.Web;
+using Mefino.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mefino.Loader.Core
+namespace Mefino.Core
 {
     public class PackageManifest
     {
         /// <summary>
         /// Unique ID for this package, which is generated from: 'Author.PackageName'
         /// </summary>
-        public string GUID => $"{Author}.{PackageName}";
+        public string GUID => $"{Author} {PackageName}";
 
-        public string InstallFolder => Author + "." + (string.IsNullOrEmpty(OverrideFolderName)
+        public string InstallFolder => Author + " " + (string.IsNullOrEmpty(OverrideFolderName)
                                                            ? PackageName
                                                            : OverrideFolderName);
 
@@ -37,6 +37,8 @@ namespace Mefino.Loader.Core
         public string Description;
         /// <summary>List of dependency GUIDs for this package</summary>
         public string[] Dependencies = new string[0];
+        /// <summary>True if this package should be installed by all players online, false if it doesn't matter.</summary>
+        public bool RequiresOnlineSync;
 
         public string m_manifestCachedTime;
 
@@ -72,20 +74,24 @@ namespace Mefino.Loader.Core
             }
             catch
             {
+                Console.WriteLine("Exception parsing utc time string " + utcTimeString);
                 // default to true if unable to parse the string to check against
                 return true;
             }
 
+            DateTime thisTime;
             try
             {
-                var thisTime = DateTime.Parse(this.m_manifestCachedTime);
-                return timeToCheck <= thisTime;
+                thisTime = DateTime.Parse(this.m_manifestCachedTime);
             }
             catch
             {
+                Console.WriteLine("Exception parsing manifest cache time: " + m_manifestCachedTime);
                 // default to false if unable to parse existing manifest time
                 return false;
             }
+
+            return timeToCheck <= thisTime;
         }
 
         public JsonObject ToJsonObject()
@@ -103,6 +109,7 @@ namespace Mefino.Loader.Core
                                                    .ToArray())
                 },
                 { nameof(OverrideFolderName), this.OverrideFolderName },
+                { nameof(RequiresOnlineSync), this.RequiresOnlineSync },
                 { nameof(m_manifestCachedTime), this.m_manifestCachedTime },
             };
         }
@@ -128,6 +135,9 @@ namespace Mefino.Loader.Core
 
                 if (json[nameof(OverrideFolderName)].AsString is string folder)
                     ret.OverrideFolderName = folder;
+
+                if (json[nameof(RequiresOnlineSync)].AsBoolean is bool requiresSync)
+                    ret.RequiresOnlineSync = requiresSync;
 
                 if (json[nameof(m_manifestCachedTime)].AsString is string cachetime)
                     ret.m_manifestCachedTime = cachetime;

@@ -1,12 +1,13 @@
-﻿using Mefino.Loader.IO;
+﻿using Mefino.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace Mefino.Loader.Core
+namespace Mefino.Core
 {
     public static class MefinoPackageManager
     {
@@ -20,7 +21,7 @@ namespace Mefino.Loader.Core
 
         internal static void RefreshInstalledMods()
         {
-            if (!MefinoLoader.IsCurrentOutwardPathValid())
+            if (!Mefino.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("Cannot retrieve installed mods as Outward folder path is not set!");
                 return;
@@ -28,7 +29,7 @@ namespace Mefino.Loader.Core
 
             s_installedManifests.Clear();
 
-            var pluginsPath = MefinoLoader.OUTWARD_PLUGINS;
+            var pluginsPath = Mefino.OUTWARD_PLUGINS;
             if (Directory.Exists(pluginsPath))
             {
                 foreach (var dir in Directory.GetDirectories(pluginsPath))
@@ -36,9 +37,9 @@ namespace Mefino.Loader.Core
             }
 
             s_disabledManifests.Clear();
-            if (Directory.Exists(MefinoLoader.MEFINO_DISABLED_FOLDER))
+            if (Directory.Exists(Mefino.MEFINO_DISABLED_FOLDER))
             {
-                foreach (var dir in Directory.GetDirectories(MefinoLoader.MEFINO_DISABLED_FOLDER))
+                foreach (var dir in Directory.GetDirectories(Mefino.MEFINO_DISABLED_FOLDER))
                     LoadLocalPackageManifest(dir, true);
             }
         }
@@ -102,7 +103,7 @@ namespace Mefino.Loader.Core
 
         public static void TryInstallPackage(string guid)
         {
-            if (!MefinoLoader.IsCurrentOutwardPathValid())
+            if (!Mefino.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("Outward folder is not set! Cannot install package.");
                 return;
@@ -134,11 +135,20 @@ namespace Mefino.Loader.Core
 
             try
             {
-                var dirPath = $@"{MefinoLoader.OUTWARD_PLUGINS}\{manifest.InstallFolder}";
+                var dirPath = $@"{Mefino.OUTWARD_PLUGINS}\{manifest.InstallFolder}";
+
+                var tempFile = TemporaryFile.CreateFile();
 
                 var zipUrl = $"{manifest.GithubURL}/releases/latest/download/{PKG_MEFINO_PACKAGE_NAME}";
 
-                if (ZipHelper.DownloadAndExtractZip(zipUrl, dirPath))
+                Web.WebClientManager.DownloadFileAsync(zipUrl, tempFile);
+
+                while (!Web.WebClientManager.WebClient.IsBusy)
+                    Thread.Sleep(20);
+                while (Web.WebClientManager.WebClient.IsBusy)
+                    Thread.Sleep(20);
+
+                if (ZipHelper.ExtractZip(tempFile, dirPath))
                 {
                     var manifestPath = $@"{dirPath}\manifest.json";
 
@@ -183,7 +193,7 @@ namespace Mefino.Loader.Core
 
                 var package = s_installedManifests[guid];
 
-                var dir = MefinoLoader.OUTWARD_PLUGINS + $@"\{package.InstallFolder}";
+                var dir = Mefino.OUTWARD_PLUGINS + $@"\{package.InstallFolder}";
 
                 if (TryDeleteDirectory(dir))
                     s_installedManifests.Remove(guid);
@@ -200,7 +210,7 @@ namespace Mefino.Loader.Core
 
                 var package = s_disabledManifests[guid];
 
-                var dir = MefinoLoader.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
+                var dir = Mefino.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
 
                 if (TryDeleteDirectory(dir))
                     s_disabledManifests.Remove(guid);
@@ -243,8 +253,8 @@ namespace Mefino.Loader.Core
 
             var package = s_disabledManifests[guid];
 
-            string toDir = MefinoLoader.OUTWARD_PLUGINS + $@"\{package.InstallFolder}";
-            string fromDir = MefinoLoader.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
+            string toDir = Mefino.OUTWARD_PLUGINS + $@"\{package.InstallFolder}";
+            string fromDir = Mefino.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
 
             if (TryMoveDirectory(guid, fromDir, toDir))
             {
@@ -270,8 +280,8 @@ namespace Mefino.Loader.Core
 
             var package = s_installedManifests[guid];
 
-            string toDir = MefinoLoader.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
-            string fromDir = MefinoLoader.OUTWARD_PLUGINS + $@"\{package.InstallFolder}";
+            string toDir = Mefino.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
+            string fromDir = Mefino.OUTWARD_PLUGINS + $@"\{package.InstallFolder}";
 
             if (TryMoveDirectory(guid, fromDir, toDir))
             {

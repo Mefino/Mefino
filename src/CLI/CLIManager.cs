@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using Mefino.Loader.Core;
-using Mefino.Loader.Web;
+using Mefino.Core;
+using Mefino.Web;
 
-namespace Mefino.Loader.CLI
+namespace Mefino.CLI
 {
     public static class CLIManager
     {
@@ -143,16 +143,14 @@ namespace Mefino.Loader.CLI
                 Console.WriteLine("Invalid outward path!");
             else
             {
-                if (MefinoLoader.SetOutwardFolderPath(args[0]))
-                    Console.WriteLine($"Set Outward folder to '{MefinoLoader.OUTWARD_FOLDER}'");
-                else
+                if (!Mefino.SetOutwardFolderPath(args[0]))
                     Console.WriteLine($"Invalid Outward path '{args[0]}'");
             }
         }
 
         internal static void Cmd_BepInEx(params string[] args)
         {
-            if (!MefinoLoader.IsCurrentOutwardPathValid())
+            if (!Mefino.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
@@ -163,7 +161,7 @@ namespace Mefino.Loader.CLI
 
         internal static void Cmd_RefreshModList(params string[] args)
         {
-            if (!MefinoLoader.IsCurrentOutwardPathValid())
+            if (!Mefino.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
@@ -176,7 +174,7 @@ namespace Mefino.Loader.CLI
 
         internal static void Cmd_Install(params string[] args)
         {
-            if (!MefinoLoader.IsCurrentOutwardPathValid())
+            if (!Mefino.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
@@ -193,7 +191,7 @@ namespace Mefino.Loader.CLI
 
         internal static void Cmd_Uninstall(params string[] args)
         {
-            if (!MefinoLoader.IsCurrentOutwardPathValid())
+            if (!Mefino.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
@@ -207,7 +205,7 @@ namespace Mefino.Loader.CLI
 
         internal static void Cmd_UninstallAll(params string[] args)
         {
-            if (!MefinoLoader.IsCurrentOutwardPathValid())
+            if (!Mefino.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
@@ -222,7 +220,7 @@ namespace Mefino.Loader.CLI
 
         internal static void Cmd_Enable(params string[] args)
         {
-            if (!MefinoLoader.IsCurrentOutwardPathValid())
+            if (!Mefino.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
@@ -236,7 +234,7 @@ namespace Mefino.Loader.CLI
 
         internal static void Cmd_Disable(params string[] args)
         {
-            if (!MefinoLoader.IsCurrentOutwardPathValid())
+            if (!Mefino.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 Execute();

@@ -1,30 +1,44 @@
 ﻿using Mefino.LightJson;
-using Mefino.Loader.Core;
-using Mefino.Loader.IO;
+using Mefino.Core;
+using Mefino.IO;
+using Mefino.Web;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
-namespace Mefino.Loader
+namespace Mefino
 {
-    public static class MefinoLoader
+    public static class Mefino
     {
         public const string VERSION = "0.1.0.0";
 
+        // Path to chosen or saved Outward folder.
         public static string OUTWARD_FOLDER => m_outwardPath;
         private static string m_outwardPath = "";
 
+        // Relative path to Outward\BepInEx\plugins
         public static string OUTWARD_PLUGINS => OUTWARD_FOLDER + @"\BepInEx\plugins";
 
+        // Relative path to Mefino's Outward folder
         internal static string MEFINO_FOLDER_PATH => OUTWARD_FOLDER + @"\Mefino";
         internal static string MEFINO_DISABLED_FOLDER => MEFINO_FOLDER_PATH + @"\Disabled";
 
+        // Mefino AppData config json path
         internal static string MEFINO_CONFIG_PATH 
             => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\mefino-config.json";
+
+        // Github URLs
+        internal const string MEFINO_RELEASE_API_QUERY = @"https://api.github.com/repos/Mefino/Mefino/releases/latest";
+        internal const string MEFINO_RELEASE_URL = @"https://github.com/Mefino/Mefino/releases/latest";
+
+        // ====== outward folder paths =======
 
         public static bool SetOutwardFolderPath(string path)
         {
@@ -38,9 +52,11 @@ namespace Mefino.Loader
 
             m_outwardPath = path;
 
-            CheckMefinoFolder();
+            CheckOutwardMefinoInstall();
 
-            SaveConfig();
+            SaveConfig(); 
+            
+            //Console.WriteLine($"Set Outward folder to '{OUTWARD_FOLDER}'");
 
             return true;
         }
@@ -58,30 +74,62 @@ namespace Mefino.Loader
                 && Directory.Exists(path + @"\MonoBleedingEdge");
         }
 
-        internal static void CheckMefinoFolder()
+        internal static void CheckOutwardMefinoInstall()
         {
             if (!IsCurrentOutwardPathValid())
                 return;
 
             Directory.CreateDirectory(MEFINO_FOLDER_PATH);
             Directory.CreateDirectory(MEFINO_DISABLED_FOLDER);
+
+            // todo install the mefino plugin(?)
         }
 
-        public static void LoadConfig()
+        // ========= self update ===========
+
+        internal static bool CheckSelfUpdate()
+        {
+            var fetchedVersion = GithubHelper.GetLatestReleaseVersion(MEFINO_RELEASE_API_QUERY);
+
+            if (fetchedVersion == null)
+                return false;
+
+            if (new Version(fetchedVersion) > new Version(VERSION))
+            {
+                var result = MessageBox.Show($"A new version of Mefino is available: {fetchedVersion}.\n\nDo you want to open the release page?", 
+                    "Update Available", 
+                    MessageBoxButtons.YesNo);
+
+                if (result == DialogResult.Yes)
+                {
+                    Process.Start(MEFINO_RELEASE_URL);
+                }
+            }
+
+            return false;
+        }
+
+        // ========== config ============
+
+        public static bool LoadConfig()
         {
             if (!File.Exists(MEFINO_CONFIG_PATH))
-                return;
+                return false;
 
             var jsonObject = LightJson.Serialization.JsonReader.ParseFile(MEFINO_CONFIG_PATH);
 
             if (jsonObject == default)
-                return;
+                return false;
 
             if (jsonObject[nameof(OUTWARD_FOLDER)].AsString is string path)
             {
                 if (!SetOutwardFolderPath(path))
                     Console.WriteLine("Saved Outward path '" + path + "' is invalid! Needs to be set again.");
+
+                return true;
             }
+
+            return false;
         }
 
         public static void SaveConfig()

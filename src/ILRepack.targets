@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="ILRepacker" AfterTargets="Build">
+
+    <ItemGroup>
+      <InputAssemblies Include="$(OutputPath)$(AssemblyName).exe" />
+      <InputAssemblies Include="$(OutputPath)MetroFramework.Design.dll" />
+      <InputAssemblies Include="$(OutputPath)MetroFramework.dll" />
+      <InputAssemblies Include="$(OutputPath)MetroFramework.Fonts.dll" />
+    </ItemGroup>
+
+    <ILRepack
+      Parallel="true"
+      Internalize="true"
+      DebugInfo="false"
+      LibraryPath="$(OutputPath)"
+      InputAssemblies="@(InputAssemblies)"      
+      TargetKind="Exe"
+      OutputFile="$(OutputPath)$(AssemblyName).exe"
+    />
+
+  </Target>
+</Project>

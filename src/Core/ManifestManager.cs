@@ -1,6 +1,6 @@
 ﻿using Mefino.LightJson;
-using Mefino.Loader.IO;
-using Mefino.Loader.Web;
+using Mefino.IO;
+using Mefino.Web;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,23 +8,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mefino.Loader.Core
+namespace Mefino.Core
 {
     public class ManifestManager
     {
         // Manifests from GitHub (cached on disk)
         internal static readonly Dictionary<string, PackageManifest> s_cachedWebManifests = new Dictionary<string, PackageManifest>();
 
-        internal static string MANIFEST_CACHE_FILENAME => MefinoLoader.MEFINO_FOLDER_PATH + @"\manifest-cache.json";
+        internal static string MANIFEST_CACHE_FILENAME => Mefino.MEFINO_FOLDER_PATH + @"\manifest-cache.json";
 
         internal static void RefreshManifestCache(bool onlyUseLocalCache = false)
         {
             // RefreshInstalledMods();
 
-            LoadManifestCache();
+            //LoadManifestCache();
 
             if (!onlyUseLocalCache)
-                GitHubHelper.TryFetchGithubPackages();
+                GithubHelper.TryFetchMefinoGithubPackages();
 
             SaveManifestCache();
         }
@@ -79,7 +79,7 @@ namespace Mefino.Loader.Core
                 { "manifests", array }
             };
 
-            Directory.CreateDirectory(MefinoLoader.MEFINO_FOLDER_PATH);
+            Directory.CreateDirectory(Mefino.MEFINO_FOLDER_PATH);
 
             if (File.Exists(MANIFEST_CACHE_FILENAME))
                 File.Delete(MANIFEST_CACHE_FILENAME);

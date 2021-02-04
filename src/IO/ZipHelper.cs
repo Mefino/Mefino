@@ -4,26 +4,19 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace Mefino.Loader.IO
+namespace Mefino.IO
 {
     public static class ZipHelper
     {
         // thanks to ML installer for this snippet
-        public static bool DownloadAndExtractZip(string zipURL, string dirpath)
+        public static bool ExtractZip(string zipFilePath, string dirpath)
         {
-            var tempFile = TemporaryFile.CreateFile();
-
             try
             {
-                var webClient = Web.WebClientManager.WebClient;
-                Web.WebClientManager.Reset();
-
-                webClient.DownloadFileAsync(new Uri(zipURL), tempFile);
-                while (webClient.IsBusy) { }
-
-                using (var stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read))
+                using (var stream = new FileStream(zipFilePath, FileMode.Open, FileAccess.Read))
                 {
                     if (stream == null || stream.Length == 0)
                         throw new IOException("The requested zip file was not found or was invalid!");
@@ -57,14 +50,14 @@ namespace Mefino.Loader.IO
                     }
                 }
 
-                TemporaryFile.CleanupFile(tempFile);
+                TemporaryFile.CleanupFile(zipFilePath);
 
                 return true;
             }
             catch (Exception ex)
             {
-                TemporaryFile.CleanupFile(tempFile);
-                Console.WriteLine("Exception getting zip from '" + zipURL + "'");
+                TemporaryFile.CleanupFile(zipFilePath);
+                Console.WriteLine("Exception getting zip at '" + zipFilePath + "'");
                 Console.WriteLine($"{ex.GetType()}: {ex.Message}");
 
                 return false;

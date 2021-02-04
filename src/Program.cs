@@ -1,12 +1,14 @@
-﻿using Mefino.Loader.Core;
-using Mefino.Loader.IO;
-using Mefino.Loader.Web;
+﻿using Mefino.Core;
+using Mefino.IO;
+using Mefino.Web;
 using System;
 using System.Net;
 using System.Windows.Forms;
-using Mefino.Loader.CLI;
+using Mefino.CLI;
+using System.Threading;
+using Mefino.GUI;
 
-namespace Mefino.Loader
+namespace Mefino
 {
     internal class Program
     {
@@ -17,23 +19,39 @@ namespace Mefino.Loader
         }
 
         internal static MefinoContext s_context = MefinoContext.CLI;
-
+        
+        [STAThread]
         static void Main(string[] args)
         {
+#if DEBUG
+#else
+            Mefino.CheckSelfUpdate();
+#endif
+
             try
             {
                 WebClientManager.Initialize();
 
-                MefinoLoader.LoadConfig();
+                Mefino.LoadConfig();
 
                 ManifestManager.LoadManifestCache();
                 MefinoPackageManager.RefreshInstalledMods();
 
                 if (args == null || args.Length < 1 || string.IsNullOrEmpty(args[0]))
                 {
-                    s_context = MefinoContext.GUI;
+#if DEBUG
+#else
                     CLIManager.HideConsole();
+#endif
+
+                    s_context = MefinoContext.GUI;
+
                     Application.Run(new GUI.Bootloader());
+
+                    if (Bootloader.s_bootloaderCloseResult == InstallState.Installed)
+                    {
+                        Application.Run(new GUI.Mefino());
+                    }
                 }
                 else
                 {

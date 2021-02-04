@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mefino.Loader.Core
+namespace Mefino.Loader.Web
 {
     public static class BepInExHandler
     {

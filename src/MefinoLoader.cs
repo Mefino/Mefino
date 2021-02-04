@@ -23,7 +23,8 @@ namespace Mefino.Loader
         internal static string MEFINO_FOLDER_PATH => OUTWARD_FOLDER + @"\Mefino";
         internal static string MEFINO_DISABLED_FOLDER => MEFINO_FOLDER_PATH + @"\Disabled";
 
-        internal static string MEFINO_CONFIG_PATH => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\mefino-config.json";
+        internal static string MEFINO_CONFIG_PATH 
+            => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\mefino-config.json";
 
         public static bool SetOutwardFolderPath(string path)
         {

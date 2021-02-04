@@ -3,6 +3,8 @@ using Mefino.Loader.IO;
 using Mefino.Loader.Web;
 using System;
 using System.Net;
+using System.Windows.Forms;
+using Mefino.Loader.CLI;
 
 namespace Mefino.Loader
 {
@@ -27,22 +29,17 @@ namespace Mefino.Loader
                 ManifestManager.LoadManifestCache();
                 MefinoPackageManager.RefreshInstalledMods();
 
-                Console.WriteLine("Mefino " + MefinoLoader.VERSION + " starting...");
-                Console.WriteLine("");
-
-                CLI.Execute(args);
-
-                //// TODO Enable this when GUI is actually developed
-                //if (args == null || args.Length < 1 || string.IsNullOrEmpty(args[0]))
-                //{
-                //    s_context = MefinoContext.GUI;
-                //    Application.Run(mainform);
-                //}
-                //else
-                //{
-                //    s_context = MefinoContext.CLI;
-                //    CLI.Execute(args);
-                //}
+                if (args == null || args.Length < 1 || string.IsNullOrEmpty(args[0]))
+                {
+                    s_context = MefinoContext.GUI;
+                    CLIManager.HideConsole();
+                    Application.Run(new GUI.Bootloader());
+                }
+                else
+                {
+                    s_context = MefinoContext.CLI;
+                    CLIManager.Execute(args);
+                }
 
             }
             catch (Exception ex)

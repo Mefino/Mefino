@@ -88,7 +88,7 @@ namespace Mefino.Loader.Core
                         s_disabledManifests.Add(manifest.GUID, manifest);
                     }
 
-                    Console.WriteLine($"Found installed package: {manifest.GUID} (disabled: {isInDisabledFolder})");
+                    //Console.WriteLine($"Found installed package: {manifest.GUID} (disabled: {isInDisabledFolder})");
                 }
                 catch (Exception ex)
                 {

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using Mefino.Loader.Core;
+using Mefino.Loader.Web;
 
-namespace Mefino.Loader.Core
+namespace Mefino.Loader.CLI
 {
-    public static class CLI
+    public static class CLIManager
     {
         const int SW_HIDE = 0;
         const int SW_SHOW = 5;
@@ -34,60 +36,88 @@ namespace Mefino.Loader.Core
 
         public static void Execute(params string[] args)
         {
-            Console.WriteLine("");
+            var joined = string.Join("", args);
+            var parsed = CreateArgs(joined);
 
-            if (args == null || args.Length < 1 || string.IsNullOrEmpty(args[0]))
+            foreach (var entry in s_commands)
             {
-                Console.WriteLine("Please enter a command:");
-                
-                Execute(CreateArgs(Console.ReadLine()));
-            }
-            else
-            {
-                if (s_commandDict.TryGetValue(args[0], out Action<string[]> action))
+                if (entry.IsMatch(parsed[0]))
                 {
                     string[] subArgs = null;
-                    if (args.Length > 1)
+                    if (parsed.Length > 1)
                     {
-                        subArgs = new string[args.Length - 1];
-                        for (int i = 1; i < args.Length; i++)
-                            subArgs[i - 1] = args[i];
+                        subArgs = new string[parsed.Length - 1];
+                        for (int i = 1; i < parsed.Length; i++)
+                            subArgs[i - 1] = parsed[i];
                     }
-                    action.Invoke(subArgs);
+                    entry.Invoke(subArgs);
+                    return;
                 }
-                else
-                    InvalidCommand(args[0]);
             }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Invalid input! The following commands are available:");
+            Console.ForegroundColor = ConsoleColor.White;
+            ListCommands();
         }
 
-        internal static readonly Dictionary<string, Action<string[]>> s_commandDict = new Dictionary<string, Action<string[]>>
+        internal static readonly HashSet<ConsoleCommand> s_commands = new HashSet<ConsoleCommand>
         {
-            { "-help",          Cmd_Help },
-            { "-quit",          Cmd_Quit },
-            { "-bepinex",       Cmd_BepInEx },
-            { "-outward",       Cmd_SetOutwardPath },
-            { "-list",          Cmd_RefreshModList },
-            { "-install",       Cmd_Install },
-            { "-uninstall",     Cmd_Uninstall },
-            { "-uninstallall",  Cmd_UninstallAll },
-            { "-enable",        Cmd_Enable },
-            { "-disable",       Cmd_Disable },
+            new ConsoleCommand("help", 
+                "h", 
+                "List all supported commands", 
+                Cmd_Help),
+
+            new ConsoleCommand("bepinex", 
+                "bie", 
+                "Check that BepInEx is up to date, and update it if not.", 
+                Cmd_BepInEx),
+
+            new ConsoleCommand("outward", 
+                "otw", 
+                @"Set the saved Outward path to the specified string, eg. 'otw ""C:\Program Files (x86)\..\Outward""'", 
+                Cmd_SetOutwardPath),
+
+            new ConsoleCommand("refresh", 
+                "r", 
+                "Refresh installed mods and the manifests from GitHub", 
+                Cmd_RefreshModList),
+
+            new ConsoleCommand("install", 
+                "i", 
+                "Install the specific package GUID, eg. 'install sinai-dev.Outward-SideLoader'", 
+                Cmd_Install),
+
+            new ConsoleCommand("uninstall", 
+                "u", 
+                "Uninstall the specified package GUID, eg. 'uninstall sinai-dev.Outward-SideLoader'", 
+                Cmd_Uninstall),
+
+            new ConsoleCommand("uninstallall", 
+                "", 
+                "Uninstall all packages (not disabling, actually uninstalling).", 
+                Cmd_UninstallAll),
+
+            new ConsoleCommand("enable", 
+                "e", 
+                "Enable the specific package GUID, if it is installed and disabled. eg. 'enable sinai-dev.Outward-SideLoader'", 
+                Cmd_Enable),
+
+            new ConsoleCommand("disable", 
+                "d",
+                "Disable the specific package GUID, if it is installed and enabled. eg. 'disable sinai-dev.Outward-SideLoader'",
+                Cmd_Disable),
+
+            new ConsoleCommand("disableall", 
+                "da", 
+                "Disable all enabled mods.", 
+                Cmd_DisableAll),
         };
 
         internal static void ListCommands()
         {
-            Console.WriteLine("");
-            Console.WriteLine(" -help : List available commands");
-            Console.WriteLine(" -quit : Quit the application");
-            Console.WriteLine(" -outward [path] : Set your Outward installation path, eg. '-outward C:\\Program Files\\Outward'");
-            Console.WriteLine(" -bepinex : Check that BepInEx is installed and updated");
-            Console.WriteLine(" -list : Refresh mod lists (GitHub and installed mods)");
-            Console.WriteLine(" -install [author].[repo] : Install the mod from given author/repo, eg '-install sinai-dev.SideLoader', or enable if it is disabled.");
-            Console.WriteLine(" -uninstall [author].[repo] : Uninstall the mod from given author/repo, eg '-uninstall sinai-dev.SideLoader'");
-            Console.WriteLine(" -uninstallall : Uninstalls all mods (which are supported by a manifest)");
-            Console.WriteLine(" -enable [author].[repo] : Try to enable the specified package");
-            Console.WriteLine(" -disable [author].[repo] : Try to disable the specified package");
-            Console.WriteLine("");
+            foreach (var entry in s_commands)
+                Console.WriteLine($" - {entry}");
         }
 
         internal static void InvalidCommand(string input)
@@ -102,13 +132,8 @@ namespace Mefino.Loader.Core
         internal static void Cmd_Help(params string[] args)
         {
             ListCommands();
-            Execute();
         }
 
-        internal static void Cmd_Quit(params string[] args)
-        {
-            // do nothing and quit
-        }
 
         internal static void Cmd_SetOutwardPath(params string[] args)
         {
@@ -121,9 +146,6 @@ namespace Mefino.Loader.Core
                 else
                     Console.WriteLine($"Invalid Outward path '{args[0]}'");
             }
-
-            // Return to arg input..
-            Execute();
         }
 
         internal static void Cmd_BepInEx(params string[] args)
@@ -131,14 +153,10 @@ namespace Mefino.Loader.Core
             if (!MefinoLoader.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
-                Execute();
                 return;
             }
 
             BepInExHandler.CheckAndUpdateBepInEx();
-
-            // Return to arg input..
-            Execute();
         }
 
         internal static void Cmd_RefreshModList(params string[] args)
@@ -146,16 +164,12 @@ namespace Mefino.Loader.Core
             if (!MefinoLoader.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
-                Execute();
                 return;
             }
 
             MefinoPackageManager.RefreshInstalledMods();
 
             ManifestManager.RefreshManifestCache();
-
-            // Return to arg input..
-            Execute();
         }
 
         internal static void Cmd_Install(params string[] args)
@@ -163,7 +177,6 @@ namespace Mefino.Loader.Core
             if (!MefinoLoader.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
-                Execute();
                 return;
             }
 
@@ -174,9 +187,6 @@ namespace Mefino.Loader.Core
                 else
                     Console.WriteLine($"Could not find package by name '{guid}', maybe need to refresh the list?");
             }
-
-            // Return to arg input..
-            Execute();
         }
 
         internal static void Cmd_Uninstall(params string[] args)
@@ -184,7 +194,6 @@ namespace Mefino.Loader.Core
             if (!MefinoLoader.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
-                Execute();
                 return;
             }
 
@@ -192,9 +201,6 @@ namespace Mefino.Loader.Core
             {
                 MefinoPackageManager.TryDeleteDirectory(guid);
             }
-
-            // Return to arg input..
-            Execute();
         }
 
         internal static void Cmd_UninstallAll(params string[] args)
@@ -202,19 +208,14 @@ namespace Mefino.Loader.Core
             if (!MefinoLoader.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
-                Execute();
                 return;
             }
 
             for (int i = MefinoPackageManager.s_installedManifests.Count - 1; i >= 0; i--)
             {
                 var pkg = MefinoPackageManager.s_installedManifests.ElementAt(i).Value;
-
                 MefinoPackageManager.TryRemovePackage(pkg.GUID);
             }
-
-            // Return to arg input..
-            Execute();
         }
 
         internal static void Cmd_Enable(params string[] args)
@@ -222,7 +223,6 @@ namespace Mefino.Loader.Core
             if (!MefinoLoader.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
-                Execute();
                 return;
             }
 
@@ -230,9 +230,6 @@ namespace Mefino.Loader.Core
             {
                 MefinoPackageManager.TryEnablePackage(guid);
             }
-
-            // Return to arg input..
-            Execute();
         }
 
         internal static void Cmd_Disable(params string[] args)
@@ -248,9 +245,11 @@ namespace Mefino.Loader.Core
             {
                 MefinoPackageManager.TryDisablePackage(guid);
             }
+        }
 
-            // Return to arg input..
-            Execute();
+        private static void Cmd_DisableAll(string[] obj)
+        {
+            throw new NotImplementedException();
         }
 
         // =========== ARGUMENT PARSER HELPER ============

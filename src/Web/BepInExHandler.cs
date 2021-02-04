@@ -83,7 +83,7 @@ namespace Mefino.Loader.Web
             else
             {
                 Console.WriteLine("Unable to parse BepInEx release query from github json!");
-                return false;
+                return File.Exists(existingFilePath);
             }
         }
 

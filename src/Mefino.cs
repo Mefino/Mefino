@@ -13,12 +13,51 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Mefino.GUI;
+using Mefino.CLI;
 
 namespace Mefino
 {
-    public static class Mefino
+    public class Mefino
     {
         public const string VERSION = "0.2.0.0";
+
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main(params string[] args)
+        {
+            try
+            {
+                CoreInit();
+
+                if (args.Any())
+                {
+                    CLIHandler.Execute(args);
+                }
+                else
+                {
+#if RELEASE
+                    CLIHandler.HideConsole();
+#endif
+
+                    if (CheckUpdatedWanted())
+                        return;
+
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new GUI.MefinoGUI());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fatal unhandled exception in Mefino.exe:" +
+                    $"\n\n" +
+                    $"{ex}",
+                    "Error!",
+                    MessageBoxButtons.OK);
+            }
+        }
 
         internal static void CoreInit()
         {

@@ -16,7 +16,7 @@ namespace Mefino.GUI
     {
         public static MefinoGUI Instance;
 
-        public static MetroTabPage[] FeatureTabPages;
+        internal static MetroTabPage[] s_featureTabPages;
 
         public MefinoGUI()
         {
@@ -24,7 +24,9 @@ namespace Mefino.GUI
 
             InitializeComponent();
 
-            FeatureTabPages = new MetroTabPage[]
+            SetProgressBarActive(false);
+
+            s_featureTabPages = new MetroTabPage[]
             {
                 Instance._installedTabPage,
                 Instance._browseTabPage,
@@ -34,35 +36,68 @@ namespace Mefino.GUI
             this.Text = $"Mefino {Mefino.VERSION}";
             this._versionLabel.Text = $"v{Mefino.VERSION}";
 
-            bool bepinexUpdated = Web.BepInExHandler.IsBepInExUpdated();
-
-            // create setup page control
-            this._setupTabPage.Controls.Add(new SetupPage());
-
             // if setup is all good, init features, otherwise SetupPage must do it.
-            if (Folders.IsCurrentOutwardPathValid() && bepinexUpdated)
+            if (Folders.IsCurrentOutwardPathValid() && Web.BepInExHandler.IsBepInExUpdated())
             {
                 InitFeatures();
             }
             else
             {
-                foreach (var tab in FeatureTabPages)
+                foreach (var tab in s_featureTabPages)
                     Instance._tabView.DisableTab(tab);
             }
+
+            // create setup page control
+            this._setupTabPage.Controls.Add(new SetupPage());
         }
+
+        private static bool s_doneInitFeatures;
 
         public static void InitFeatures()
         {
-            foreach (var tab in FeatureTabPages)
+            foreach (var tab in s_featureTabPages)
                 Instance._tabView.EnableTab(tab);
 
-            Core.WebManifestManager.UpdateWebManifests();
+            if (s_doneInitFeatures)
+                return;
 
-            // todo add control modules for other pages once made
+            s_doneInitFeatures = true;
 
+            // add control modules for other pages
+            Instance._installedTabPage.Controls.Add(new ManagerPage());
+            Instance._browseTabPage.Controls.Add(new BrowsePage());
+            Instance._profileTabPage.Controls.Add(new ProfilePage());
 
             // go to first feature page
             Instance._tabView.SelectedIndex = 1;
+
+            // Refresh 
+            Application.DoEvents();
+
+            // refresh web manifests after the menu inits (just looks smoother in this order)
+            Core.WebManifestManager.UpdateWebManifests();
+        }
+
+        public static void SetProgressBarActive(bool active)
+        {
+            Instance._progressBar.Visible = active;
+            Instance._progressText.Visible = active;
+        }
+
+        public static void SetProgressPercent(int value)
+        {
+            if (Instance == null)
+                return;
+
+            Instance._progressBar.Value = value;
+        }
+
+        public static void SetProgressMessage(string message)
+        {
+            if (Instance == null)
+                return;
+
+            Instance._progressText.Text = message;
         }
     }
 }

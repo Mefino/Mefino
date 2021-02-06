@@ -17,8 +17,8 @@ namespace Mefino.Web
         public static int LastDownloadProgress => s_lastDownloadProgressPercent;
         private static int s_lastDownloadProgressPercent;
 
-        public static bool LastDownloadSuccess => s_lastDownloadSuccess;
-        private static bool s_lastDownloadSuccess;
+        //public static bool LastDownloadSuccess => s_lastDownloadSuccess;
+        //private static bool s_lastDownloadSuccess;
 
         public static bool IsBusy => s_webClient?.IsBusy ?? false;
 
@@ -27,19 +27,20 @@ namespace Mefino.Web
         internal static void Initialize()
         {
             s_webClient.DownloadProgressChanged += OnDownloadProgress;
-            s_webClient.DownloadFileCompleted += OnDownloadCompleted;
+            //s_webClient.DownloadFileCompleted += OnDownloadCompleted;
         }
 
         private static void OnDownloadProgress(object sender, DownloadProgressChangedEventArgs e)
         {
             s_lastDownloadProgressPercent = e.ProgressPercentage;
+            // Mefino.SendAsyncProgress(e.ProgressPercentage);
         }
 
-        private static void OnDownloadCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            s_lastDownloadProgressPercent = 100;
-            s_lastDownloadSuccess = !e.Cancelled && e.Error == null;
-        }
+        //private static void OnDownloadCompleted(object sender, AsyncCompletedEventArgs e)
+        //{
+        //    s_lastDownloadProgressPercent = 100;
+        //    s_lastDownloadSuccess = !e.Cancelled && e.Error == null;
+        //}
 
         private static void Reset()
         {
@@ -77,27 +78,13 @@ namespace Mefino.Web
             {
                 Reset();
 
-                s_webClient.DownloadFileAsync(new Uri(fileURL), tempFile);
+                new Thread(() => { s_webClient.DownloadFileAsync(new Uri(fileURL), tempFile); }).Start();
 
-                //new Thread(() =>
-                //{
-                //    try
-                //    {
-                //        s_webClient.DownloadFileAsync(new Uri(fileURL), tempFile);
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        Console.WriteLine("Exception downloading file from: " + fileURL);
-                //        Console.WriteLine(ex);
-                //    }
-
-                //}).Start();
-
-                //var startTime = DateTime.Now;
-                //while (!s_webClient.IsBusy && (DateTime.Now - startTime).Seconds < 5)
-                //    Thread.Sleep(25);
-                //if (!s_webClient.IsBusy)
-                //    Console.WriteLine("ERROR! Timeout trying to download from: " + fileURL);
+                var startTime = DateTime.Now;
+                while (!s_webClient.IsBusy && (DateTime.Now - startTime).Seconds < 5)
+                    Thread.Sleep(25);
+                if (!s_webClient.IsBusy)
+                    Console.WriteLine("ERROR! Timeout trying to download from: " + fileURL);
             }
             catch (Exception ex)
             {

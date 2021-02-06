@@ -38,6 +38,8 @@ namespace Mefino.GUI.Models
             this._bepStatusTitle = new MetroFramework.Controls.MetroLabel();
             this._bepStatus = new MetroFramework.Controls.MetroLabel();
             this._bepInstallButton = new MetroFramework.Controls.MetroButton();
+            this._bepPanel = new MetroFramework.Controls.MetroPanel();
+            this._bepPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // _otwPathTitle
@@ -61,6 +63,7 @@ namespace Mefino.GUI.Models
             this._otwPathSelectBtn.Text = "Select Outward.exe...";
             this._otwPathSelectBtn.Theme = MetroFramework.MetroThemeStyle.Dark;
             this._otwPathSelectBtn.UseSelectable = true;
+            this._otwPathSelectBtn.Click += new System.EventHandler(this._otwPathSelectBtn_Click);
             // 
             // _otwPathInputField
             // 
@@ -82,7 +85,7 @@ namespace Mefino.GUI.Models
             this._otwPathInputField.MaxLength = 32767;
             this._otwPathInputField.Name = "_otwPathInputField";
             this._otwPathInputField.PasswordChar = '\0';
-            this._otwPathInputField.PromptText = "...";
+            this._otwPathInputField.WaterMark = "...";
             this._otwPathInputField.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._otwPathInputField.SelectedText = "";
             this._otwPathInputField.SelectionLength = 0;
@@ -101,7 +104,7 @@ namespace Mefino.GUI.Models
             this._bepTitle.AutoSize = true;
             this._bepTitle.FontSize = MetroFramework.MetroLabelSize.Tall;
             this._bepTitle.FontWeight = MetroFramework.MetroLabelWeight.Bold;
-            this._bepTitle.Location = new System.Drawing.Point(19, 138);
+            this._bepTitle.Location = new System.Drawing.Point(3, 0);
             this._bepTitle.Name = "_bepTitle";
             this._bepTitle.Size = new System.Drawing.Size(199, 25);
             this._bepTitle.TabIndex = 3;
@@ -124,6 +127,7 @@ namespace Mefino.GUI.Models
             // 
             this._otwPathStatus.AutoSize = true;
             this._otwPathStatus.FontWeight = MetroFramework.MetroLabelWeight.Regular;
+            this._otwPathStatus.ForeColor = System.Drawing.Color.LightGreen;
             this._otwPathStatus.Location = new System.Drawing.Point(151, 91);
             this._otwPathStatus.Name = "_otwPathStatus";
             this._otwPathStatus.Size = new System.Drawing.Size(58, 19);
@@ -131,12 +135,13 @@ namespace Mefino.GUI.Models
             this._otwPathStatus.Text = "<todo>";
             this._otwPathStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this._otwPathStatus.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._otwPathStatus.UseCustomForeColor = true;
             // 
             // _bepStatusTitle
             // 
             this._bepStatusTitle.AutoSize = true;
             this._bepStatusTitle.FontWeight = MetroFramework.MetroLabelWeight.Regular;
-            this._bepStatusTitle.Location = new System.Drawing.Point(95, 175);
+            this._bepStatusTitle.Location = new System.Drawing.Point(79, 37);
             this._bepStatusTitle.Name = "_bepStatusTitle";
             this._bepStatusTitle.Size = new System.Drawing.Size(50, 19);
             this._bepStatusTitle.TabIndex = 6;
@@ -148,42 +153,63 @@ namespace Mefino.GUI.Models
             // 
             this._bepStatus.AutoSize = true;
             this._bepStatus.FontWeight = MetroFramework.MetroLabelWeight.Regular;
-            this._bepStatus.Location = new System.Drawing.Point(151, 175);
+            this._bepStatus.ForeColor = System.Drawing.SystemColors.Control;
+            this._bepStatus.Location = new System.Drawing.Point(135, 37);
             this._bepStatus.Name = "_bepStatus";
             this._bepStatus.Size = new System.Drawing.Size(58, 19);
             this._bepStatus.TabIndex = 7;
             this._bepStatus.Text = "<todo>";
             this._bepStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this._bepStatus.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._bepStatus.UseCustomForeColor = true;
             // 
             // _bepInstallButton
             // 
-            this._bepInstallButton.Location = new System.Drawing.Point(19, 211);
+            this._bepInstallButton.Location = new System.Drawing.Point(3, 73);
             this._bepInstallButton.Name = "_bepInstallButton";
             this._bepInstallButton.Size = new System.Drawing.Size(126, 30);
             this._bepInstallButton.TabIndex = 8;
             this._bepInstallButton.Text = "<todo>";
             this._bepInstallButton.Theme = MetroFramework.MetroThemeStyle.Dark;
             this._bepInstallButton.UseSelectable = true;
+            this._bepInstallButton.Click += new System.EventHandler(this._bepInstallButton_Click);
+            // 
+            // _bepPanel
+            // 
+            this._bepPanel.Controls.Add(this._bepStatus);
+            this._bepPanel.Controls.Add(this._bepInstallButton);
+            this._bepPanel.Controls.Add(this._bepTitle);
+            this._bepPanel.Controls.Add(this._bepStatusTitle);
+            this._bepPanel.HorizontalScrollbarBarColor = true;
+            this._bepPanel.HorizontalScrollbarHighlightOnWheel = false;
+            this._bepPanel.HorizontalScrollbarSize = 10;
+            this._bepPanel.Location = new System.Drawing.Point(19, 139);
+            this._bepPanel.Name = "_bepPanel";
+            this._bepPanel.Size = new System.Drawing.Size(475, 163);
+            this._bepPanel.Style = MetroFramework.MetroColorStyle.Orange;
+            this._bepPanel.TabIndex = 9;
+            this._bepPanel.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._bepPanel.VerticalScrollbarBarColor = true;
+            this._bepPanel.VerticalScrollbarHighlightOnWheel = false;
+            this._bepPanel.VerticalScrollbarSize = 10;
             // 
             // SetupPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this._bepInstallButton);
-            this.Controls.Add(this._bepStatus);
-            this.Controls.Add(this._bepStatusTitle);
             this.Controls.Add(this._otwPathStatus);
             this.Controls.Add(this._otwPathStatusTitle);
-            this.Controls.Add(this._bepTitle);
             this.Controls.Add(this._otwPathInputField);
             this.Controls.Add(this._otwPathSelectBtn);
             this.Controls.Add(this._otwPathTitle);
+            this.Controls.Add(this._bepPanel);
             this.Margin = new System.Windows.Forms.Padding(15);
             this.Name = "SetupPage";
             this.Padding = new System.Windows.Forms.Padding(15);
             this.Size = new System.Drawing.Size(512, 320);
             this.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._bepPanel.ResumeLayout(false);
+            this._bepPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -200,5 +226,6 @@ namespace Mefino.GUI.Models
         private MetroFramework.Controls.MetroLabel _bepStatusTitle;
         private MetroFramework.Controls.MetroLabel _bepStatus;
         private MetroFramework.Controls.MetroButton _bepInstallButton;
+        private MetroFramework.Controls.MetroPanel _bepPanel;
     }
 }

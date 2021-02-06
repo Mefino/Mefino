@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Mefino.GUI;
 
 namespace Mefino
 {
@@ -37,19 +38,11 @@ namespace Mefino
             LocalPackageManager.RefreshInstalledPackages();
         }
 
-        public static string AsyncProgressMessage { get; internal set; }
-
-        public static event Action<int> OnAsyncProgress;
-        public static event Action<bool> OnAsyncCompletion;
-
         internal static void SendAsyncProgress(int progress)
         {
-            OnAsyncProgress?.Invoke(progress);
-        }
-
-        internal static void SendAsyncCompletion(bool success)
-        {
-            OnAsyncCompletion?.Invoke(success);
+            MefinoGUI.SetProgressPercent(progress);
+            // let UI actually refresh for the progress.
+            Application.DoEvents();
         }
 
         // ========= self update ===========

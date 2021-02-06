@@ -1,4 +1,5 @@
-﻿using Mefino.IO;
+﻿using Mefino.GUI;
+using Mefino.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +18,6 @@ namespace Mefino.Core
 
         // Actual installed manifests, serialized from mod folders.
         internal static readonly Dictionary<string, PackageManifest> s_enabledPackages = new Dictionary<string, PackageManifest>();
-
         internal static readonly Dictionary<string, PackageManifest> s_disabledPackages = new Dictionary<string, PackageManifest>();
 
         public static PackageManifest TryGetInstalledPackage(string guid)
@@ -203,8 +203,12 @@ namespace Mefino.Core
 
             if (webManifest.Dependencies != null && webManifest.Dependencies.Length > 0)
             {
+                int i = 1;
+                int count = webManifest.Dependencies.Length;
                 foreach (var dependency in webManifest.Dependencies)
                 {
+                    MefinoGUI.SetProgressMessage($"Installing dependency {i} of {count}: {dependency}");
+
                     if (!TryInstallWebPackage(dependency))
                     {
                         //Console.WriteLine("Installing dependency '" + dependency + "' failed!");
@@ -214,6 +218,8 @@ namespace Mefino.Core
                         else
                             return false;
                     }
+
+                    i++;
                 }
             }
 
@@ -221,6 +227,8 @@ namespace Mefino.Core
             existing = TryGetInstalledPackage(guid);
             if (!webManifest.IsGreaterVersionThan(existing))
                 return true;
+
+            MefinoGUI.SetProgressMessage($"Installing package {webManifest.GUID}");
 
             return DownloadAndInstallPackage(webManifest);
         }
@@ -265,7 +273,7 @@ namespace Mefino.Core
             {
                 Console.WriteLine("Exception isntalling package '" + manifest.GUID + "'");
                 Console.WriteLine($"{ex.GetType()}: {ex.Message}");
-                Mefino.SendAsyncCompletion(false);
+                //Mefino.SendAsyncCompletion(false);
                 return false;
             }
         }

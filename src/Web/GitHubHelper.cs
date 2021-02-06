@@ -78,7 +78,7 @@ namespace Mefino.Web
                 }
             }
 
-            Console.WriteLine($"Found {WebManifestManager.s_cachedWebManifests.Count} Mefino packages!");
+            //Console.WriteLine($"Found {WebManifestManager.s_cachedWebManifests.Count} Mefino packages!");
         }
 
         public static JsonValue? QueryForMefinoPackages()

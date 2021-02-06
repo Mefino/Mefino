@@ -47,14 +47,15 @@ namespace Mefino.IO
                                 Directory.CreateDirectory(fullPath);
                             }
 
-                            Mefino.SendAsyncProgress(i / total_entry_count);
+                            int prog = (int)((decimal)i / total_entry_count);
+                            Mefino.SendAsyncProgress(prog);
                         }
                     }
                 }
 
                 TemporaryFile.CleanupFile(zipFilePath);
 
-                Mefino.SendAsyncCompletion(true);
+                //Mefino.SendAsyncCompletion(true);
 
                 return true;
             }
@@ -64,7 +65,7 @@ namespace Mefino.IO
                 Console.WriteLine("Exception getting zip at '" + zipFilePath + "'");
                 Console.WriteLine($"{ex.GetType()}: {ex.Message}");
 
-                Mefino.SendAsyncCompletion(false);
+                //Mefino.SendAsyncCompletion(false);
                 return false;
             }
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mefino.Core;
+using System;
 using System.IO;
 
 namespace Mefino
@@ -22,11 +23,15 @@ namespace Mefino
 
         // ====== outward folder paths =======
 
-        public static bool SetOutwardFolderPath(string path)
+        public static bool SetOutwardFolderPath(string path) => SetOutwardFolderPath(path, out _);
+
+        public static bool SetOutwardFolderPath(string path, out InstallState state)
         {
             path = Path.GetFullPath(path);
 
-            if (!IsValidOutwardMonoPath(path))
+            state = InstallState.NotInstalled;
+
+            if (!IsValidOutwardMonoPath(path, out state))
             {
                 Console.WriteLine($"'{path}' is not a valid Outward Mono install path!");
                 return false;
@@ -43,17 +48,37 @@ namespace Mefino
             return true;
         }
 
-        public static bool IsCurrentOutwardPathValid() => IsValidOutwardMonoPath(OUTWARD_FOLDER);
+        public static bool IsCurrentOutwardPathValid() 
+            => IsValidOutwardMonoPath(OUTWARD_FOLDER, out _);
 
-        public static bool IsValidOutwardMonoPath(string path)
+        public static bool IsCurrentOutwardPathValid(out InstallState state) 
+            => IsValidOutwardMonoPath(OUTWARD_FOLDER, out state);
+
+        public static bool IsValidOutwardMonoPath(string path) 
+            => IsValidOutwardMonoPath(path, out _);
+
+        public static bool IsValidOutwardMonoPath(string path, out InstallState state)
         {
             var suf = @"\Outward.exe";
             if (path.EndsWith(suf))
                 path = path.Substring(0, path.Length - suf.Length);
 
-            return !File.Exists(path + @"\GameAssembly.dll")
-                && File.Exists(path + @"\Outward_Data\Managed\Assembly-CSharp.dll")
-                && Directory.Exists(path + @"\MonoBleedingEdge");
+            if (File.Exists(Path.Combine(path, "GameAssembly.dll")))
+            {
+                // il2cpp install. using "Outdated" for this result.
+                state = InstallState.Outdated;
+                return false;
+            }
+
+            if (File.Exists(path + @"\Outward_Data\Managed\Assembly-CSharp.dll")
+                && Directory.Exists(path + @"\MonoBleedingEdge"))
+            {
+                state = InstallState.Installed;
+                return true;
+            }
+
+            state = InstallState.NotInstalled;
+            return false;
         }
 
         internal static void CheckOutwardMefinoInstall()

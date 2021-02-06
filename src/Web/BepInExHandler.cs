@@ -44,12 +44,19 @@ namespace Mefino.Web
                 return false;
             }
 
-            return File.Exists(BepInExFilePath);
+            return File.Exists(BepInExFilePath)
+                && File.Exists(Path.Combine(Folders.OUTWARD_FOLDER, "winhttp.dll"));
         }
 
         public static bool IsBepInExUpdated()
         {
-            s_latestBepInExVersion = GithubHelper.GetLatestReleaseVersion(BEPINEX_RELEASE_API_QUERY);
+            // Only query the version once per launch.
+            // This is to limit GitHub API queries, since we are limited to 60 per hour.
+            if (string.IsNullOrEmpty(s_latestBepInExVersion))
+            {
+                s_latestBepInExVersion = GithubHelper.GetLatestReleaseVersion(BEPINEX_RELEASE_API_QUERY);
+            }
+            
             if (string.IsNullOrEmpty(s_latestBepInExVersion))
             {
                 Console.WriteLine("BepInEx GitHub release query returned null! Are you offline?");
@@ -109,15 +116,16 @@ namespace Mefino.Web
 
                 var tempFile = TemporaryFile.CreateFile();
 
+                MefinoGUI.SetProgressMessage($"Downloading BepInEx {s_latestBepInExVersion}");
+
                 WebClientManager.DownloadFileAsync(releaseURL, tempFile);
 
                 while (WebClientManager.IsBusy)
                 {
                     Mefino.SendAsyncProgress(WebClientManager.LastDownloadProgress);
-                    Thread.Sleep(20);
                 }
 
-                Mefino.SendAsyncCompletion(true);
+                MefinoGUI.SetProgressMessage($"Extracting BepInEx {s_latestBepInExVersion}");
 
                 ZipHelper.ExtractZip(tempFile, Folders.OUTWARD_FOLDER);
 

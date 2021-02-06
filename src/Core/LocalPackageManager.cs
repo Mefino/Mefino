@@ -250,7 +250,7 @@ namespace Mefino.Core
                 while (Web.WebClientManager.IsBusy)
                 {
                     Thread.Sleep(20);
-                    Mefino.SendAsyncProgress(Web.WebClientManager.LastDownloadProgress);
+                    MefinoApp.SendAsyncProgress(Web.WebClientManager.LastDownloadProgress);
                 }
 
                 if (ZipHelper.ExtractZip(tempFile, dirPath))

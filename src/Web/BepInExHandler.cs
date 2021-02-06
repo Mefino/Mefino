@@ -122,7 +122,7 @@ namespace Mefino.Web
 
                 while (WebClientManager.IsBusy)
                 {
-                    Mefino.SendAsyncProgress(WebClientManager.LastDownloadProgress);
+                    MefinoApp.SendAsyncProgress(WebClientManager.LastDownloadProgress);
                 }
 
                 MefinoGUI.SetProgressMessage($"Extracting BepInEx {s_latestBepInExVersion}");

@@ -48,7 +48,7 @@ namespace Mefino.IO
                             }
 
                             int prog = (int)((decimal)i / total_entry_count);
-                            Mefino.SendAsyncProgress(prog);
+                            MefinoApp.SendAsyncProgress(prog);
                         }
                     }
                 }

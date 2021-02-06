@@ -33,8 +33,8 @@ namespace Mefino.GUI
                 Instance._profileTabPage
             };
 
-            this.Text = $"Mefino {Mefino.VERSION}";
-            this._versionLabel.Text = $"v{Mefino.VERSION}";
+            this.Text = $"Mefino {MefinoApp.VERSION}";
+            this._versionLabel.Text = $"v{MefinoApp.VERSION}";
 
             // if setup is all good, init features, otherwise SetupPage must do it.
             if (Folders.IsCurrentOutwardPathValid() && Web.BepInExHandler.IsBepInExUpdated())

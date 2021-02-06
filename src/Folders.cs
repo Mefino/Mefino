@@ -41,7 +41,7 @@ namespace Mefino
 
             CheckOutwardMefinoInstall();
 
-            Mefino.SaveConfig();
+            MefinoApp.SaveConfig();
 
             //Console.WriteLine($"Set Outward folder to '{OUTWARD_FOLDER}'");
 

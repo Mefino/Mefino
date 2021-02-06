@@ -37,7 +37,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-      <StartupObject>Mefino.Mefino</StartupObject>
+    <StartupObject>Mefino.MefinoApp</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>logo.ico</ApplicationIcon>
@@ -108,7 +108,7 @@
       <DependentUpon>BrowsePage.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Mefino.cs" />
+    <Compile Include="MefinoApp.cs" />
     <Compile Include="CLI\CLIHandler.cs" />
     <Compile Include="CLI\ConsoleCommand.cs" />
     <Compile Include="Core\InstallState.cs" />

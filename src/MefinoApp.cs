@@ -17,7 +17,7 @@ using Mefino.CLI;
 
 namespace Mefino
 {
-    public class Mefino
+    public class MefinoApp
     {
         public const string VERSION = "0.2.0.0";
 

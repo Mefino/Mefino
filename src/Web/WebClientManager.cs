@@ -12,22 +12,22 @@ namespace Mefino.Web
 {
     internal static class WebClientManager
     {
-        internal static WebClient WebClient => s_webClient;
         private static readonly WebClient s_webClient = new WebClient();
 
-        internal static int s_lastDownloadProgressPercent;
+        public static int LastDownloadProgress => s_lastDownloadProgressPercent;
+        private static int s_lastDownloadProgressPercent;
+
+        public static bool LastDownloadSuccess => s_lastDownloadSuccess;
+        private static bool s_lastDownloadSuccess;
+
+        public static bool IsBusy => s_webClient?.IsBusy ?? false;
+
+        // ======== Internal =========
 
         internal static void Initialize()
         {
             s_webClient.DownloadProgressChanged += OnDownloadProgress;
             s_webClient.DownloadFileCompleted += OnDownloadCompleted;
-
-            Reset();
-        }
-
-        private static void OnDownloadCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            s_lastDownloadProgressPercent = 100;
         }
 
         private static void OnDownloadProgress(object sender, DownloadProgressChangedEventArgs e)
@@ -35,12 +35,14 @@ namespace Mefino.Web
             s_lastDownloadProgressPercent = e.ProgressPercentage;
         }
 
-        internal static void Reset()
+        private static void OnDownloadCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            //s_webClient?.Dispose();
+            s_lastDownloadProgressPercent = 100;
+            s_lastDownloadSuccess = !e.Cancelled && e.Error == null;
+        }
 
-            //s_webClient = new WebClient();
-
+        private static void Reset()
+        {
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3
                 | SecurityProtocolType.Tls
@@ -51,16 +53,57 @@ namespace Mefino.Web
             s_webClient.Headers.Clear();
             s_webClient.Headers.Add("User-Agent", "request");
         }
+        
+        // ========= Public ==========
 
-        internal static void DownloadFileAsync(string fileURL, string tempFile)
+        public static string DownloadString(string url)
         {
-            Reset();
-
-            new Thread(() =>
+            try
             {
-                WebClient.DownloadFileAsync(new Uri(fileURL), tempFile);
+                Reset();
+                return s_webClient.DownloadString(url);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception downloading string from: " + url);
+                Console.WriteLine(ex);
+                return null;
+            }
+        }
 
-            }).Start();
+        public static void DownloadFileAsync(string fileURL, string tempFile)
+        {
+            try
+            {
+                Reset();
+
+                s_webClient.DownloadFileAsync(new Uri(fileURL), tempFile);
+
+                //new Thread(() =>
+                //{
+                //    try
+                //    {
+                //        s_webClient.DownloadFileAsync(new Uri(fileURL), tempFile);
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        Console.WriteLine("Exception downloading file from: " + fileURL);
+                //        Console.WriteLine(ex);
+                //    }
+
+                //}).Start();
+
+                //var startTime = DateTime.Now;
+                //while (!s_webClient.IsBusy && (DateTime.Now - startTime).Seconds < 5)
+                //    Thread.Sleep(25);
+                //if (!s_webClient.IsBusy)
+                //    Console.WriteLine("ERROR! Timeout trying to download from: " + fileURL);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception downloading file from: " + fileURL);
+                Console.WriteLine(ex);
+            }
         }
     }
 }

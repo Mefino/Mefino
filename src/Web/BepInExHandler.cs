@@ -22,35 +22,39 @@ namespace Mefino.Web
         internal static string s_latestBepInExVersion;
         internal static InstallState s_lastInstallStateResult;
 
+        public static string BepInExFilePath => Path.Combine(Folders.OUTWARD_FOLDER, "BepInEx", "core", "BepInEx.dll");
+
         internal const string BEPINEX_RELEASE_API_QUERY = @"https://api.github.com/repos/BepInEx/BepInEx/releases/latest";
 
-        public static void CheckAndUpdateBepInEx()
+        public static void UpdateBepInExIfNeeded()
         {
             if (!IsBepInExUpdated())
             {
                 if (!string.IsNullOrEmpty(s_latestBepInExVersion))
-                    InstallLatestBepInEx();
+                    UpdateBepInEx();
             }
         }
 
-        internal static bool IsBepInExUpdated()
+        public static bool IsBepInExInstalled()
         {
-            if (!Mefino.IsCurrentOutwardPathValid())
+            if (!Folders.IsCurrentOutwardPathValid())
             {
-                Console.WriteLine("Current Outward install path not set or invalid!");
+                //Console.WriteLine("Current Outward install path not set or invalid!");
                 s_lastInstallStateResult = InstallState.NotInstalled;
                 return false;
             }
 
-            string existingFilePath = Path.Combine(Mefino.OUTWARD_FOLDER, "BepInEx", "core", "BepInEx.dll");
+            return File.Exists(BepInExFilePath);
+        }
 
-            var latestVersion = GithubHelper.GetLatestReleaseVersion(BEPINEX_RELEASE_API_QUERY);
-            if (string.IsNullOrEmpty(latestVersion))
+        public static bool IsBepInExUpdated()
+        {
+            s_latestBepInExVersion = GithubHelper.GetLatestReleaseVersion(BEPINEX_RELEASE_API_QUERY);
+            if (string.IsNullOrEmpty(s_latestBepInExVersion))
             {
-                s_latestBepInExVersion = null;
                 Console.WriteLine("BepInEx GitHub release query returned null! Are you offline?");
 
-                if (File.Exists(existingFilePath))
+                if (File.Exists(BepInExFilePath))
                 {
                     s_lastInstallStateResult = InstallState.Installed;
                     return true;
@@ -60,18 +64,16 @@ namespace Mefino.Web
                 return false;
             }
 
-            s_latestBepInExVersion = latestVersion;
-
-            if (!File.Exists(existingFilePath))
+            if (!File.Exists(BepInExFilePath))
             {
                 //Console.WriteLine("BepInEx not installed at '" + existingFilePath + "'");
                 s_lastInstallStateResult = InstallState.NotInstalled;
                 return false;
             }
 
-            string file_version = FileVersionInfo.GetVersionInfo(existingFilePath).FileVersion;
+            string file_version = FileVersionInfo.GetVersionInfo(BepInExFilePath).FileVersion;
 
-            if (new Version(file_version) >= new Version(latestVersion))
+            if (new Version(file_version) >= new Version(s_latestBepInExVersion))
             {
                 // Console.WriteLine($"BepInEx {latestVersion} is up to date!");
                 s_lastInstallStateResult = InstallState.Installed;
@@ -79,25 +81,27 @@ namespace Mefino.Web
             }
             else
             {
-                Console.WriteLine($"Your current BepInEx version {file_version} is older than latest version: {latestVersion}");
+                Console.WriteLine($"Your current BepInEx version {file_version} is older than latest version: {s_latestBepInExVersion}");
                 s_lastInstallStateResult = InstallState.Outdated;
                 return false;
             }
         }
 
-        public static void InstallLatestBepInEx()
+        public static void UpdateBepInEx()
         {
-            if (!Mefino.IsCurrentOutwardPathValid())
+            if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("Current Outward folder path not set or invalid! Cannot update BepInEx.");
                 return;
             }
 
-            if (string.IsNullOrEmpty(s_latestBepInExVersion))
-            {
-                Console.WriteLine("Latest BepInEx version not fetched! Cannot update!");
+            // If an update check hasn't been done this launch, do one now.
+            if (IsBepInExUpdated())
                 return;
-            }
+
+            // If the check we just did failed (no query result), we need to abort.
+            if (string.IsNullOrEmpty(s_latestBepInExVersion))
+                return;
 
             try
             {
@@ -107,21 +111,15 @@ namespace Mefino.Web
 
                 WebClientManager.DownloadFileAsync(releaseURL, tempFile);
 
-                while (!WebClientManager.WebClient.IsBusy)
+                while (WebClientManager.IsBusy)
                 {
-                    if (Bootloader.BepProgressBar != null)
-                        Bootloader.BepProgressBar.Value = WebClientManager.s_lastDownloadProgressPercent;
+                    Mefino.SendAsyncProgress(WebClientManager.LastDownloadProgress);
                     Thread.Sleep(20);
                 }
 
-                while (WebClientManager.WebClient.IsBusy)
-                {
-                    if (Bootloader.BepProgressBar != null)
-                        Bootloader.BepProgressBar.Value = WebClientManager.s_lastDownloadProgressPercent;
-                    Thread.Sleep(20);
-                }
+                Mefino.SendAsyncCompletion(true);
 
-                ZipHelper.ExtractZip(tempFile, Mefino.OUTWARD_FOLDER);
+                ZipHelper.ExtractZip(tempFile, Folders.OUTWARD_FOLDER);
 
                 Console.WriteLine("Updated BepInEx to version '" + s_latestBepInExVersion + "'");
             }

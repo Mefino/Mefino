@@ -17,77 +17,48 @@ namespace Mefino
 {
     public static class Mefino
     {
-        public const string VERSION = "0.1.0.0";
+        public const string VERSION = "0.2.0.0";
 
-        // Path to chosen or saved Outward folder.
-        public static string OUTWARD_FOLDER => m_outwardPath;
-        private static string m_outwardPath = "";
-
-        // Relative path to Outward\BepInEx\plugins
-        public static string OUTWARD_PLUGINS => OUTWARD_FOLDER + @"\BepInEx\plugins";
-
-        // Relative path to Mefino's Outward folder
-        internal static string MEFINO_FOLDER_PATH => OUTWARD_FOLDER + @"\Mefino";
-        internal static string MEFINO_DISABLED_FOLDER => MEFINO_FOLDER_PATH + @"\Disabled";
-
-        // Mefino AppData config json path
-        internal static string MEFINO_CONFIG_PATH 
-            => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\mefino-config.json";
-
-        // Github URLs
-        internal const string MEFINO_RELEASE_API_QUERY = @"https://api.github.com/repos/Mefino/Mefino/releases/latest";
-        internal const string MEFINO_RELEASE_URL = @"https://github.com/Mefino/Mefino/releases/latest";
-
-        // ====== outward folder paths =======
-
-        public static bool SetOutwardFolderPath(string path)
+        internal static void CoreInit()
         {
-            path = Path.GetFullPath(path);
+            LoadConfig();
 
-            if (!IsValidOutwardMonoPath(path))
-            {
-                Console.WriteLine($"'{path}' is not a valid Outward Mono install path!");
-                return false;
-            }
+            WebClientManager.Initialize();
 
-            m_outwardPath = path;
-
-            CheckOutwardMefinoInstall();
-
-            SaveConfig(); 
-            
-            //Console.WriteLine($"Set Outward folder to '{OUTWARD_FOLDER}'");
-
-            return true;
+            RefreshLocalManifests();
         }
 
-        public static bool IsCurrentOutwardPathValid() => IsValidOutwardMonoPath(OUTWARD_FOLDER);
-
-        public static bool IsValidOutwardMonoPath(string path)
+        public static void RefreshLocalManifests()
         {
-            var suf = @"\Outward.exe";
-            if (path.EndsWith(suf))
-                path = path.Substring(0, path.Length - suf.Length);
-        
-            return !File.Exists(path + @"\GameAssembly.dll")
-                && File.Exists(path + @"\Outward_Data\Managed\Assembly-CSharp.dll")
-                && Directory.Exists(path + @"\MonoBleedingEdge");
+            // load cached web manifests
+            WebManifestManager.LoadWebManifestCache();
+
+            // refresh installed packages
+            LocalPackageManager.RefreshInstalledPackages();
         }
 
-        internal static void CheckOutwardMefinoInstall()
+        public static string AsyncProgressMessage { get; internal set; }
+
+        public static event Action<int> OnAsyncProgress;
+        public static event Action<bool> OnAsyncCompletion;
+
+        internal static void SendAsyncProgress(int progress)
         {
-            if (!IsCurrentOutwardPathValid())
-                return;
+            OnAsyncProgress?.Invoke(progress);
+        }
 
-            Directory.CreateDirectory(MEFINO_FOLDER_PATH);
-            Directory.CreateDirectory(MEFINO_DISABLED_FOLDER);
-
-            // todo install the mefino plugin(?)
+        internal static void SendAsyncCompletion(bool success)
+        {
+            OnAsyncCompletion?.Invoke(success);
         }
 
         // ========= self update ===========
 
-        internal static bool CheckSelfUpdate()
+        // Github URLs
+        private const string MEFINO_RELEASE_API_QUERY = @"https://api.github.com/repos/Mefino/Mefino/releases/latest";
+        private const string MEFINO_RELEASE_URL = @"https://github.com/Mefino/Mefino/releases/latest";
+
+        internal static bool CheckUpdatedWanted()
         {
             var fetchedVersion = GithubHelper.GetLatestReleaseVersion(MEFINO_RELEASE_API_QUERY);
 
@@ -96,13 +67,15 @@ namespace Mefino
 
             if (new Version(fetchedVersion) > new Version(VERSION))
             {
-                var result = MessageBox.Show($"A new version of Mefino is available: {fetchedVersion}.\n\nDo you want to open the release page?", 
+                var result = MessageBox.Show(
+                    $"A new version of Mefino is available: {fetchedVersion}.\n\nDo you want to open the release page?", 
                     "Update Available", 
                     MessageBoxButtons.YesNo);
 
                 if (result == DialogResult.Yes)
                 {
                     Process.Start(MEFINO_RELEASE_URL);
+                    return true;
                 }
             }
 
@@ -113,17 +86,17 @@ namespace Mefino
 
         public static bool LoadConfig()
         {
-            if (!File.Exists(MEFINO_CONFIG_PATH))
+            if (!File.Exists(Folders.MEFINO_CONFIG_PATH))
                 return false;
 
-            var jsonObject = LightJson.Serialization.JsonReader.ParseFile(MEFINO_CONFIG_PATH);
+            var jsonObject = LightJson.Serialization.JsonReader.ParseFile(Folders.MEFINO_CONFIG_PATH);
 
             if (jsonObject == default)
                 return false;
 
-            if (jsonObject[nameof(OUTWARD_FOLDER)].AsString is string path)
+            if (jsonObject[nameof(Folders.OUTWARD_FOLDER)].AsString is string path)
             {
-                if (!SetOutwardFolderPath(path))
+                if (!Folders.SetOutwardFolderPath(path))
                     Console.WriteLine("Saved Outward path '" + path + "' is invalid! Needs to be set again.");
 
                 return true;
@@ -134,15 +107,15 @@ namespace Mefino
 
         public static void SaveConfig()
         {
-            if (File.Exists(MEFINO_CONFIG_PATH))
-                File.Delete(MEFINO_CONFIG_PATH);
+            if (File.Exists(Folders.MEFINO_CONFIG_PATH))
+                File.Delete(Folders.MEFINO_CONFIG_PATH);
 
             var jsonObject = new JsonObject
             {
-                { nameof(OUTWARD_FOLDER), OUTWARD_FOLDER }
+                { nameof(Folders.OUTWARD_FOLDER), Folders.OUTWARD_FOLDER }
             };
 
-            File.WriteAllText(MEFINO_CONFIG_PATH, jsonObject.ToString(true));
+            File.WriteAllText(Folders.MEFINO_CONFIG_PATH, jsonObject.ToString(true));
         }
     }
 }

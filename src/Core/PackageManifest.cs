@@ -44,6 +44,9 @@ namespace Mefino.Core
 
         public string GithubURL => $"https://github.com/{Author}/{PackageName}";
 
+        internal InstallState m_installState;
+        internal bool m_isDisabled;
+
         public bool IsGreaterVersionThan(PackageManifest other, bool greaterOrEqual = false)
         {
             Version otherVersion;
@@ -92,6 +95,47 @@ namespace Mefino.Core
             }
 
             return timeToCheck <= thisTime;
+        }
+
+        public bool IsDependantUpon(string otherGuid)
+        {
+            if (this.Dependencies == null || !this.Dependencies.Any())
+                return false;
+
+            return this.Dependencies.Contains(otherGuid);
+        }
+
+        public List<string> GetDependantEnabledPackagesOfThis()
+        {
+            var ret = new List<string>();
+
+            foreach (var package in LocalPackageManager.s_enabledPackages)
+            {
+                if (package.Value.IsDependantUpon(this.GUID))
+                    ret.Add(package.Key);
+            }
+
+            return ret;
+        }
+
+        public bool AreAllDependenciesEnabled(out List<string> missing)
+        {
+            missing = new List<string>();
+
+            if (this.Dependencies == null || !this.Dependencies.Any())
+                return true;
+
+            bool ret = true;
+            foreach (var dep in this.Dependencies)
+            {
+                if (!LocalPackageManager.s_enabledPackages.ContainsKey(dep))
+                {
+                    missing.Add(dep);
+                    ret = false;
+                }
+            }
+
+            return ret;
         }
 
         public JsonObject ToJsonObject()

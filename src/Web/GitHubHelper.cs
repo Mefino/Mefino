@@ -37,21 +37,10 @@ namespace Mefino.Web
 
         public static JsonValue? FetchJsonApiQuery(string apiQuery)
         {
-            string query;
-            try
-            {
-                WebClientManager.Reset();
-                query = WebClientManager.WebClient.DownloadString(apiQuery);
-            }
-            catch
-            {
-                return null;
-            }
+            string query = WebClientManager.DownloadString(apiQuery);
 
             if (!string.IsNullOrEmpty(query))
-            {
                 return JsonReader.Parse(query);
-            }
 
             return null;
         }
@@ -63,7 +52,7 @@ namespace Mefino.Web
 
         public static void TryFetchMefinoGithubPackages()
         {
-            var githubQuery = FetchSearchResults();
+            var githubQuery = QueryForMefinoPackages();
 
             if (githubQuery == null)
             {
@@ -71,39 +60,46 @@ namespace Mefino.Web
                 return;
             }
 
+            WebManifestManager.s_cachedWebManifests.Clear();
+
             var items = ((JsonValue)githubQuery).AsJsonObject["items"].AsJsonArray;
 
             foreach (var entry in items)
             {
-                var result = CheckQueryResult(entry);
+                var result = CheckAndAddQueryResult(entry);
 
-                if (result is PackageManifest webManifest)
-                    ManifestManager.s_cachedWebManifests.Add(webManifest.GUID, webManifest);
+                if (result == null)
+                    continue;
+
+                if (LocalPackageManager.TryGetInstalledPackage(result.GUID) is PackageManifest installed
+                        && result.IsGreaterVersionThan(installed))
+                {
+                    installed.m_installState = InstallState.Outdated;
+                }
             }
 
-            Console.WriteLine($"Found {ManifestManager.s_cachedWebManifests.Count} Mefino packages!");
+            Console.WriteLine($"Found {WebManifestManager.s_cachedWebManifests.Count} Mefino packages!");
         }
 
-        public static JsonValue? FetchSearchResults()
+        public static JsonValue? QueryForMefinoPackages()
         {
-            string query;
             try
             {
-                WebClientManager.Reset();
-                query = WebClientManager.WebClient.DownloadString(QUERY_URL);
+                string query = WebClientManager.DownloadString(QUERY_URL);
+
+                if (!string.IsNullOrEmpty(query))
+                    return JsonReader.Parse(query);
+
+                return null;
             }
             catch
             {
+                Console.WriteLine("Exception getting Mefino packages from github!");
                 return null;
             }
-
-            if (!string.IsNullOrEmpty(query))
-                return JsonReader.Parse(query);
-
-            return null;
         }
 
-        internal static PackageManifest CheckQueryResult(JsonValue queryResult)
+        internal static PackageManifest CheckAndAddQueryResult(JsonValue queryResult)
         {
             try
             {
@@ -117,16 +113,16 @@ namespace Mefino.Web
 
                 //Console.WriteLine("Checking github result '" + guid + "'");
 
-                if (ManifestManager.s_cachedWebManifests.ContainsKey(guid))
+                if (WebManifestManager.s_cachedWebManifests.ContainsKey(guid))
                 {
-                    var existing = ManifestManager.s_cachedWebManifests[guid];
+                    var existing = WebManifestManager.s_cachedWebManifests[guid];
 
                     if (!existing.IsManifestCachedSince(updatedAt))
-                        ManifestManager.s_cachedWebManifests.Remove(guid);
+                        WebManifestManager.s_cachedWebManifests.Remove(guid);
                     else
                     {
                         //Console.WriteLine("Existing cached manifest for '" + guid + "' is up to date.");
-                        return null;
+                        return existing;
                     }
                 }
 
@@ -136,7 +132,7 @@ namespace Mefino.Web
 
                 // Console.WriteLine("Checking url " + manifestPath);
 
-                var manifestString = WebClientManager.WebClient.DownloadString(manifestPath);
+                var manifestString = WebClientManager.DownloadString(manifestPath);
 
                 if (string.IsNullOrEmpty(manifestString))
                     return null;
@@ -152,6 +148,8 @@ namespace Mefino.Web
                 manifest.m_manifestCachedTime = updatedAt;
                 manifest.Author = author;
                 manifest.PackageName = repoName;
+
+                WebManifestManager.s_cachedWebManifests.Add(manifest.GUID, manifest);
 
                 return manifest;
             }

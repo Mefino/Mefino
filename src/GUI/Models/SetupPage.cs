@@ -8,15 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Mefino.GUI
+namespace Mefino.GUI.Models
 {
-    public partial class Mefino : MetroFramework.Forms.MetroForm
+    public partial class SetupPage : MetroFramework.Controls.MetroUserControl
     {
-        public Mefino()
+        public SetupPage()
         {
             InitializeComponent();
 
-            this._mainMefinoTitle.Text = $"Mefino {(global::Mefino.Mefino.VERSION)}";
+            // todo init page based on outward state and last bepinex result
         }
     }
 }

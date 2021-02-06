@@ -1,0 +1,204 @@
+﻿
+namespace Mefino.GUI.Models
+{
+    partial class SetupPage
+    {
+        /// <summary> 
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Component Designer generated code
+
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this._otwPathTitle = new MetroFramework.Controls.MetroLabel();
+            this._otwPathSelectBtn = new MetroFramework.Controls.MetroButton();
+            this._otwPathInputField = new MetroFramework.Controls.MetroTextBox();
+            this._bepTitle = new MetroFramework.Controls.MetroLabel();
+            this._otwPathStatusTitle = new MetroFramework.Controls.MetroLabel();
+            this._otwPathStatus = new MetroFramework.Controls.MetroLabel();
+            this._bepStatusTitle = new MetroFramework.Controls.MetroLabel();
+            this._bepStatus = new MetroFramework.Controls.MetroLabel();
+            this._bepInstallButton = new MetroFramework.Controls.MetroButton();
+            this.SuspendLayout();
+            // 
+            // _otwPathTitle
+            // 
+            this._otwPathTitle.AutoSize = true;
+            this._otwPathTitle.FontSize = MetroFramework.MetroLabelSize.Tall;
+            this._otwPathTitle.FontWeight = MetroFramework.MetroLabelWeight.Bold;
+            this._otwPathTitle.Location = new System.Drawing.Point(18, 15);
+            this._otwPathTitle.Name = "_otwPathTitle";
+            this._otwPathTitle.Size = new System.Drawing.Size(191, 25);
+            this._otwPathTitle.TabIndex = 0;
+            this._otwPathTitle.Text = "Outward install path:";
+            this._otwPathTitle.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // _otwPathSelectBtn
+            // 
+            this._otwPathSelectBtn.Location = new System.Drawing.Point(19, 44);
+            this._otwPathSelectBtn.Name = "_otwPathSelectBtn";
+            this._otwPathSelectBtn.Size = new System.Drawing.Size(126, 30);
+            this._otwPathSelectBtn.TabIndex = 1;
+            this._otwPathSelectBtn.Text = "Select Outward.exe...";
+            this._otwPathSelectBtn.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._otwPathSelectBtn.UseSelectable = true;
+            // 
+            // _otwPathInputField
+            // 
+            // 
+            // 
+            // 
+            this._otwPathInputField.CustomButton.Image = null;
+            this._otwPathInputField.CustomButton.Location = new System.Drawing.Point(315, 2);
+            this._otwPathInputField.CustomButton.Name = "";
+            this._otwPathInputField.CustomButton.Size = new System.Drawing.Size(25, 25);
+            this._otwPathInputField.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
+            this._otwPathInputField.CustomButton.TabIndex = 1;
+            this._otwPathInputField.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
+            this._otwPathInputField.CustomButton.UseSelectable = true;
+            this._otwPathInputField.CustomButton.Visible = false;
+            this._otwPathInputField.FontSize = MetroFramework.MetroTextBoxSize.Medium;
+            this._otwPathInputField.Lines = new string[0];
+            this._otwPathInputField.Location = new System.Drawing.Point(151, 44);
+            this._otwPathInputField.MaxLength = 32767;
+            this._otwPathInputField.Name = "_otwPathInputField";
+            this._otwPathInputField.PasswordChar = '\0';
+            this._otwPathInputField.PromptText = "...";
+            this._otwPathInputField.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this._otwPathInputField.SelectedText = "";
+            this._otwPathInputField.SelectionLength = 0;
+            this._otwPathInputField.SelectionStart = 0;
+            this._otwPathInputField.ShortcutsEnabled = true;
+            this._otwPathInputField.Size = new System.Drawing.Size(343, 30);
+            this._otwPathInputField.TabIndex = 2;
+            this._otwPathInputField.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._otwPathInputField.UseSelectable = true;
+            this._otwPathInputField.WaterMark = "...";
+            this._otwPathInputField.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
+            this._otwPathInputField.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            // 
+            // _bepTitle
+            // 
+            this._bepTitle.AutoSize = true;
+            this._bepTitle.FontSize = MetroFramework.MetroLabelSize.Tall;
+            this._bepTitle.FontWeight = MetroFramework.MetroLabelWeight.Bold;
+            this._bepTitle.Location = new System.Drawing.Point(19, 138);
+            this._bepTitle.Name = "_bepTitle";
+            this._bepTitle.Size = new System.Drawing.Size(199, 25);
+            this._bepTitle.TabIndex = 3;
+            this._bepTitle.Text = "BepInEx install status:";
+            this._bepTitle.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // _otwPathStatusTitle
+            // 
+            this._otwPathStatusTitle.AutoSize = true;
+            this._otwPathStatusTitle.FontWeight = MetroFramework.MetroLabelWeight.Regular;
+            this._otwPathStatusTitle.Location = new System.Drawing.Point(95, 91);
+            this._otwPathStatusTitle.Name = "_otwPathStatusTitle";
+            this._otwPathStatusTitle.Size = new System.Drawing.Size(50, 19);
+            this._otwPathStatusTitle.TabIndex = 4;
+            this._otwPathStatusTitle.Text = "Status:";
+            this._otwPathStatusTitle.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this._otwPathStatusTitle.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // _otwPathStatus
+            // 
+            this._otwPathStatus.AutoSize = true;
+            this._otwPathStatus.FontWeight = MetroFramework.MetroLabelWeight.Regular;
+            this._otwPathStatus.Location = new System.Drawing.Point(151, 91);
+            this._otwPathStatus.Name = "_otwPathStatus";
+            this._otwPathStatus.Size = new System.Drawing.Size(58, 19);
+            this._otwPathStatus.TabIndex = 5;
+            this._otwPathStatus.Text = "<todo>";
+            this._otwPathStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this._otwPathStatus.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // _bepStatusTitle
+            // 
+            this._bepStatusTitle.AutoSize = true;
+            this._bepStatusTitle.FontWeight = MetroFramework.MetroLabelWeight.Regular;
+            this._bepStatusTitle.Location = new System.Drawing.Point(95, 175);
+            this._bepStatusTitle.Name = "_bepStatusTitle";
+            this._bepStatusTitle.Size = new System.Drawing.Size(50, 19);
+            this._bepStatusTitle.TabIndex = 6;
+            this._bepStatusTitle.Text = "Status:";
+            this._bepStatusTitle.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this._bepStatusTitle.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // _bepStatus
+            // 
+            this._bepStatus.AutoSize = true;
+            this._bepStatus.FontWeight = MetroFramework.MetroLabelWeight.Regular;
+            this._bepStatus.Location = new System.Drawing.Point(151, 175);
+            this._bepStatus.Name = "_bepStatus";
+            this._bepStatus.Size = new System.Drawing.Size(58, 19);
+            this._bepStatus.TabIndex = 7;
+            this._bepStatus.Text = "<todo>";
+            this._bepStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this._bepStatus.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // _bepInstallButton
+            // 
+            this._bepInstallButton.Location = new System.Drawing.Point(19, 211);
+            this._bepInstallButton.Name = "_bepInstallButton";
+            this._bepInstallButton.Size = new System.Drawing.Size(126, 30);
+            this._bepInstallButton.TabIndex = 8;
+            this._bepInstallButton.Text = "<todo>";
+            this._bepInstallButton.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._bepInstallButton.UseSelectable = true;
+            // 
+            // SetupPage
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this._bepInstallButton);
+            this.Controls.Add(this._bepStatus);
+            this.Controls.Add(this._bepStatusTitle);
+            this.Controls.Add(this._otwPathStatus);
+            this.Controls.Add(this._otwPathStatusTitle);
+            this.Controls.Add(this._bepTitle);
+            this.Controls.Add(this._otwPathInputField);
+            this.Controls.Add(this._otwPathSelectBtn);
+            this.Controls.Add(this._otwPathTitle);
+            this.Margin = new System.Windows.Forms.Padding(15);
+            this.Name = "SetupPage";
+            this.Padding = new System.Windows.Forms.Padding(15);
+            this.Size = new System.Drawing.Size(512, 320);
+            this.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private MetroFramework.Controls.MetroLabel _otwPathTitle;
+        private MetroFramework.Controls.MetroButton _otwPathSelectBtn;
+        private MetroFramework.Controls.MetroTextBox _otwPathInputField;
+        private MetroFramework.Controls.MetroLabel _bepTitle;
+        private MetroFramework.Controls.MetroLabel _otwPathStatusTitle;
+        private MetroFramework.Controls.MetroLabel _otwPathStatus;
+        private MetroFramework.Controls.MetroLabel _bepStatusTitle;
+        private MetroFramework.Controls.MetroLabel _bepStatus;
+        private MetroFramework.Controls.MetroButton _bepInstallButton;
+    }
+}

@@ -2,19 +2,15 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-// Version information for the assembly
-[assembly: AssemblyVersion(Mefino.Mefino.VERSION)]
-[assembly: AssemblyFileVersion(Mefino.Mefino.VERSION)]
-
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Mefino-Loader")]
-[assembly: AssemblyDescription("Mod Manager for Outward")]
+[assembly: AssemblyTitle("Mefino")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Mefino")]
-[assembly: AssemblyProduct("Mefino-Loader")]
-[assembly: AssemblyCopyright("LGPL 3.0 License")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Mefino")]
+[assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -24,4 +20,17 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("8e6df09a-f1a6-409b-8c06-7388eba12940")]
+[assembly: Guid("42fa6537-1c93-48ef-88cb-0b6adf1220a2")]
+
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version
+//      Build Number
+//      Revision
+//
+// You can specify all the values or you can default the Build and Revision Numbers
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

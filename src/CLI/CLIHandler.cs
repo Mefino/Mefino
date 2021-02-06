@@ -9,7 +9,7 @@ using Mefino.Web;
 
 namespace Mefino.CLI
 {
-    public static class CLIManager
+    public static class CLIHandler
     {
         const int SW_HIDE = 0;
         const int SW_SHOW = 5;
@@ -65,29 +65,29 @@ namespace Mefino.CLI
 
         internal static readonly HashSet<ConsoleCommand> s_commands = new HashSet<ConsoleCommand>
         {
-            new ConsoleCommand("help", 
-                "h", 
-                "List all supported commands", 
+            new ConsoleCommand("help",
+                "h",
+                "List all supported commands",
                 Cmd_Help),
 
-            new ConsoleCommand("bepinex", 
-                "bie", 
-                "Check that BepInEx is up to date, and update it if not.", 
+            new ConsoleCommand("bepinex",
+                "bie",
+                "Check that BepInEx is up to date, and update it if not.",
                 Cmd_BepInEx),
 
-            new ConsoleCommand("outward", 
-                "otw", 
-                @"Set the saved Outward path to the specified string, eg. 'otw ""C:\Program Files (x86)\..\Outward""'", 
+            new ConsoleCommand("outward",
+                "otw",
+                @"Set the saved Outward path to the specified string, eg. 'otw ""C:\Program Files (x86)\..\Outward""'",
                 Cmd_SetOutwardPath),
 
-            new ConsoleCommand("refresh", 
-                "r", 
-                "Refresh installed mods and the manifests from GitHub", 
+            new ConsoleCommand("refresh",
+                "r",
+                "Refresh installed mods and the manifests from GitHub",
                 Cmd_RefreshModList),
 
-            new ConsoleCommand("install", 
-                "i", 
-                "Install and/or enable the specific package GUID, eg. 'install sinai-dev.Outward-SideLoader'", 
+            new ConsoleCommand("install",
+                "i",
+                "Install and/or enable the specific package GUID, eg. 'install sinai-dev.Outward-SideLoader'",
                 Cmd_Install),
 
             new ConsoleCommand("enable",
@@ -105,14 +105,14 @@ namespace Mefino.CLI
                 "Disable all installed packages.",
                 Cmd_DisableAll),
 
-            new ConsoleCommand("uninstall", 
-                "u", 
-                "Uninstall (delete) the specified package GUID, eg. 'uninstall sinai-dev.Outward-SideLoader'", 
+            new ConsoleCommand("uninstall",
+                "u",
+                "Uninstall (delete) the specified package GUID, eg. 'uninstall sinai-dev.Outward-SideLoader'",
                 Cmd_Uninstall),
 
-            new ConsoleCommand("uninstallall", 
-                "", 
-                "Uninstall (delete) ALL packages", 
+            new ConsoleCommand("uninstallall",
+                "",
+                "Uninstall (delete) ALL packages",
                 Cmd_UninstallAll),
         };
 
@@ -143,38 +143,38 @@ namespace Mefino.CLI
                 Console.WriteLine("Invalid outward path!");
             else
             {
-                if (!Mefino.SetOutwardFolderPath(args[0]))
+                if (!Folders.SetOutwardFolderPath(args[0]))
                     Console.WriteLine($"Invalid Outward path '{args[0]}'");
             }
         }
 
         internal static void Cmd_BepInEx(params string[] args)
         {
-            if (!Mefino.IsCurrentOutwardPathValid())
+            if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
             }
 
-            BepInExHandler.CheckAndUpdateBepInEx();
+            BepInExHandler.UpdateBepInExIfNeeded();
         }
 
         internal static void Cmd_RefreshModList(params string[] args)
         {
-            if (!Mefino.IsCurrentOutwardPathValid())
+            if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
             }
 
-            MefinoPackageManager.RefreshInstalledMods();
+            LocalPackageManager.RefreshInstalledPackages();
 
-            ManifestManager.RefreshManifestCache();
+            WebManifestManager.UpdateWebManifests();
         }
 
         internal static void Cmd_Install(params string[] args)
         {
-            if (!Mefino.IsCurrentOutwardPathValid())
+            if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
@@ -182,8 +182,8 @@ namespace Mefino.CLI
 
             foreach (var guid in args)
             {
-                if (ManifestManager.s_cachedWebManifests.ContainsKey(guid))
-                    MefinoPackageManager.TryInstallPackage(guid);
+                if (WebManifestManager.s_cachedWebManifests.ContainsKey(guid))
+                    LocalPackageManager.TryInstallWebPackage(guid);
                 else
                     Console.WriteLine($"Could not find package by name '{guid}', maybe need to refresh the list?");
             }
@@ -191,7 +191,7 @@ namespace Mefino.CLI
 
         internal static void Cmd_Uninstall(params string[] args)
         {
-            if (!Mefino.IsCurrentOutwardPathValid())
+            if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
@@ -199,28 +199,28 @@ namespace Mefino.CLI
 
             foreach (var guid in args)
             {
-                MefinoPackageManager.TryDeleteDirectory(guid);
+                LocalPackageManager.TryDeleteDirectory(guid);
             }
         }
 
         internal static void Cmd_UninstallAll(params string[] args)
         {
-            if (!Mefino.IsCurrentOutwardPathValid())
+            if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
             }
 
-            for (int i = MefinoPackageManager.s_installedManifests.Count - 1; i >= 0; i--)
+            for (int i = LocalPackageManager.s_enabledPackages.Count - 1; i >= 0; i--)
             {
-                var pkg = MefinoPackageManager.s_installedManifests.ElementAt(i).Value;
-                MefinoPackageManager.TryRemovePackage(pkg.GUID);
+                var pkg = LocalPackageManager.s_enabledPackages.ElementAt(i).Value;
+                LocalPackageManager.TryRemovePackage(pkg.GUID);
             }
         }
 
         internal static void Cmd_Enable(params string[] args)
         {
-            if (!Mefino.IsCurrentOutwardPathValid())
+            if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 return;
@@ -228,13 +228,13 @@ namespace Mefino.CLI
 
             foreach (var guid in args)
             {
-                MefinoPackageManager.TryEnablePackage(guid);
+                LocalPackageManager.TryEnablePackage(guid);
             }
         }
 
         internal static void Cmd_Disable(params string[] args)
         {
-            if (!Mefino.IsCurrentOutwardPathValid())
+            if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("You need to set the Outward path first!");
                 Execute();
@@ -243,96 +243,16 @@ namespace Mefino.CLI
 
             foreach (var guid in args)
             {
-                MefinoPackageManager.TryDisablePackage(guid);
+                LocalPackageManager.TryDisablePackage(guid);
             }
         }
 
         private static void Cmd_DisableAll(string[] obj)
         {
-            if (!MefinoPackageManager.s_installedManifests.Any())
+            if (!LocalPackageManager.s_enabledPackages.Any())
                 return;
 
-            for (int i = MefinoPackageManager.s_installedManifests.Count - 1; i >= 0; i--)
-            {
-                var pkg = MefinoPackageManager.s_installedManifests.ElementAt(i).Value;
-                MefinoPackageManager.TryDisablePackage(pkg.GUID);
-            }
-        }
-
-        // =========== ARGUMENT PARSER HELPER ============
-
-        /// <summary>
-        /// C-like argument parser
-        /// </summary>
-        /// <param name="commandLine">Command line string with arguments. Use Environment.CommandLine</param>
-        /// <returns>The args[] array (argv)</returns>
-        public static string[] CreateArgs(string commandLine)
-        {
-            StringBuilder argsBuilder = new StringBuilder(commandLine);
-            bool inQuote = false;
-
-            // Convert the spaces to a newline sign so we can split at newline later on
-            // Only convert spaces which are outside the boundries of quoted text
-            for (int i = 0; i < argsBuilder.Length; i++)
-            {
-                if (argsBuilder[i].Equals('"'))
-                {
-                    inQuote = !inQuote;
-                }
-
-                if (argsBuilder[i].Equals(' ') && !inQuote)
-                {
-                    argsBuilder[i] = '\n';
-                }
-            }
-
-            // Split to args array
-            string[] args = argsBuilder.ToString().Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-            // Clean the '"' signs from the args as needed.
-            for (int i = 0; i < args.Length; i++)
-            {
-                args[i] = ClearQuotes(args[i]);
-            }
-
-            return args;
-        }
-
-        /// <summary>
-        /// Cleans quotes from the arguments.<br/>
-        /// All signle quotes (") will be removed.<br/>
-        /// Every pair of quotes ("") will transform to a single quote.<br/>
-        /// </summary>
-        /// <param name="stringWithQuotes">A string with quotes.</param>
-        /// <returns>The same string if its without quotes, or a clean string if its with quotes.</returns>
-        private static string ClearQuotes(string stringWithQuotes)
-        {
-            int quoteIndex;
-            if ((quoteIndex = stringWithQuotes.IndexOf('"')) == -1)
-            {
-                // String is without quotes..
-                return stringWithQuotes;
-            }
-
-            // Linear sb scan is faster than string assignemnt if quote count is 2 or more (=always)
-            StringBuilder sb = new StringBuilder(stringWithQuotes);
-            for (int i = quoteIndex; i < sb.Length; i++)
-            {
-                if (sb[i].Equals('"'))
-                {
-                    // If we are not at the last index and the next one is '"', we need to jump one to preserve one
-                    if (i != sb.Length - 1 && sb[i + 1].Equals('"'))
-                    {
-                        i++;
-                    }
-
-                    // We remove and then set index one backwards.
-                    // This is because the remove itself is going to shift everything left by 1.
-                    sb.Remove(i--, 1);
-                }
-            }
-
-            return sb.ToString();
+            LocalPackageManager.TryDisableAllPackages();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Mefino.Core
         NONE,
         NotInstalled,
         Outdated,
+        MissingDependency,
         Installed
     }
 }

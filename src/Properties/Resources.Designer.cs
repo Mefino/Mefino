@@ -63,9 +63,9 @@ namespace Mefino.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap banner_350x128 {
+        internal static System.Drawing.Bitmap logo_128x128 {
             get {
-                object obj = ResourceManager.GetObject("banner_350x128", resourceCulture);
+                object obj = ResourceManager.GetObject("logo_128x128", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace Mefino.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap logo_128x128 {
+        internal static System.Drawing.Bitmap logo_64x64 {
             get {
-                object obj = ResourceManager.GetObject("logo_128x128", resourceCulture);
+                object obj = ResourceManager.GetObject("logo_64x64", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

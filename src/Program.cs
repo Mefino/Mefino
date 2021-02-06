@@ -1,76 +1,49 @@
-﻿using Mefino.Core;
-using Mefino.IO;
-using Mefino.Web;
+﻿using Mefino.CLI;
 using System;
-using System.Net;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Mefino.CLI;
-using System.Threading;
-using Mefino.GUI;
 
 namespace Mefino
 {
-    internal class Program
+    static class Program
     {
-        internal enum MefinoContext
-        {
-            CLI,
-            GUI
-        }
-
-        internal static MefinoContext s_context = MefinoContext.CLI;
-        
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
         [STAThread]
-        static void Main(string[] args)
+        static void Main(params string[] args)
         {
-#if DEBUG
-#else
-            Mefino.CheckSelfUpdate();
-#endif
-
             try
             {
-                WebClientManager.Initialize();
+                Mefino.CoreInit();
 
-                Mefino.LoadConfig();
-
-                ManifestManager.LoadManifestCache();
-                MefinoPackageManager.RefreshInstalledMods();
-
-                if (args == null || args.Length < 1 || string.IsNullOrEmpty(args[0]))
+                if (args.Any())
                 {
-#if DEBUG
-#else
-                    CLIManager.HideConsole();
-#endif
-
-                    s_context = MefinoContext.GUI;
-
-                    Application.Run(new GUI.Bootloader());
-
-                    if (Bootloader.s_bootloaderCloseResult == InstallState.Installed)
-                    {
-                        Application.Run(new GUI.Mefino());
-                    }
+                    CLIHandler.Execute(args);
                 }
                 else
                 {
-                    s_context = MefinoContext.CLI;
-                    CLIManager.Execute(args);
-                }
+#if RELEASE
+                    CLIHandler.HideConsole();
+#endif
 
+                    if (Mefino.CheckUpdatedWanted())
+                        return;
+
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new GUI.MefinoGUI());
+                }
             }
             catch (Exception ex)
             {
-                TemporaryFile.CleanupAllFiles();
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Fatal unhandled exception in Mefino!");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine(ex);
-                Console.WriteLine("");
-                Console.WriteLine("Press any button to exit.");
-                Console.ReadLine();
+                MessageBox.Show($"Fatal unhandled exception in Mefino.exe:" +
+                    $"\n\n" +
+                    $"{ex}",
+                    "Error!",
+                    MessageBoxButtons.OK);
             }
         }
     }

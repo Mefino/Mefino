@@ -32,12 +32,16 @@ namespace Mefino.Core
 
         // ===== installed package management =====
 
-        internal static void RefreshInstalledPackages()
+        /// <summary>
+        /// Updates packages, and check that all enabled packages are OK.
+        /// </summary>
+        /// <returns>true if all enabled packages are up to date and have dependencies enabled, otherwise false.</returns>
+        public static bool RefreshInstalledPackages()
         {
             if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("Cannot retrieve installed mods as Outward folder path is not set!");
-                return;
+                return false;
             }
 
             // load enabled plugins
@@ -57,20 +61,34 @@ namespace Mefino.Core
                     LoadLocalPackageManifest(dir, true);
             }
 
-            // update dependency statuses now that all packages loaded
+            // update statuses now that all packages loaded
+            bool enabledPacksAreOk = true;
             foreach (var package in s_enabledPackages.Values)
             {
-                if (package.Dependencies == null || !package.Dependencies.Any())
-                    continue;
-
-                foreach (var dep in package.Dependencies)
+                if (WebManifestManager.s_cachedWebManifests.ContainsKey(package.GUID))
                 {
-                    if (s_disabledPackages.ContainsKey(dep))
-                        package.m_installState = InstallState.MissingDependency;
-                    else if (!s_enabledPackages.ContainsKey(dep))
-                        package.m_installState = InstallState.MissingDependency;
+                    var web = WebManifestManager.s_cachedWebManifests[package.GUID];
+                    if (web.IsGreaterVersionThan(package))
+                    {
+                        enabledPacksAreOk = false;
+                        package.m_installState = InstallState.Outdated;
+                    }
+                }
+
+                if (package.dependencies != null && !package.dependencies.Any())
+                {
+                    foreach (var dep in package.dependencies)
+                    {
+                        if (!s_enabledPackages.ContainsKey(dep))
+                        {
+                            package.m_installState = InstallState.MissingDependency;
+                            enabledPacksAreOk = false;
+                        }
+                    }
                 }
             }
+
+            return enabledPacksAreOk;
         }
 
         private static void LoadLocalPackageManifest(string dir, bool disabled)
@@ -111,7 +129,7 @@ namespace Mefino.Core
                 {
                     if (s_enabledPackages.ContainsKey(manifest.GUID))
                     {
-                        Console.WriteLine("Duplicate package found in both installed and Disabled folders! Removing disabled: " + manifest.GUID);
+                        Console.WriteLine("Duplicate package found in both installed and disabled folders! Removing disabled: " + manifest.GUID);
                         TryRemovePackage(manifest);
                         return;
                     }
@@ -177,11 +195,11 @@ namespace Mefino.Core
 
             WebManifestManager.s_cachedWebManifests.TryGetValue(guid, out PackageManifest webManifest);
 
-            if (webManifest == null || string.IsNullOrEmpty(webManifest.GUID?.Trim()))
+            if (webManifest == null)
             {
-                if (s_disabledPackages.ContainsKey(guid))
+                if (!string.IsNullOrEmpty(guid) && TryGetInstalledPackage(guid) != null)
                 {
-                    Console.WriteLine("Could not find online package by GUID '" + guid + ", but a disabled package exists with that GUID, enabling.");
+                    Console.WriteLine("Could not find online package by GUID '" + guid + ", but an installed package exists with that GUID, enabling.");
                     TryEnablePackage(guid);
                     return true;
                 }
@@ -201,11 +219,11 @@ namespace Mefino.Core
                 return true;
             }
 
-            if (webManifest.Dependencies != null && webManifest.Dependencies.Length > 0)
+            if (webManifest.dependencies != null && webManifest.dependencies.Length > 0)
             {
                 int i = 1;
-                int count = webManifest.Dependencies.Length;
-                foreach (var dependency in webManifest.Dependencies)
+                int count = webManifest.dependencies.Length;
+                foreach (var dependency in webManifest.dependencies)
                 {
                     MefinoGUI.SetProgressMessage($"Installing dependency {i} of {count}: {dependency}");
 
@@ -235,7 +253,7 @@ namespace Mefino.Core
 
         internal static bool DownloadAndInstallPackage(PackageManifest manifest)
         {
-            Console.WriteLine($"Installing {manifest.GUID} version {manifest.Version}");
+            Console.WriteLine($"Installing {manifest.GUID} version {manifest.version}");
 
             try
             {
@@ -262,7 +280,7 @@ namespace Mefino.Core
 
                     File.WriteAllText(manifestPath, manifest.ToJsonObject().ToString(true));
 
-                    Console.WriteLine($"Installed package: {manifest.GUID} {manifest.Version}");
+                    Console.WriteLine($"Installed package: {manifest.GUID} {manifest.version}");
 
                     return true;
                 }
@@ -280,16 +298,17 @@ namespace Mefino.Core
 
         // ======== Uninstall / Deletion ========
 
-        public static void TryRemovePackage(string guid)
+        public static bool TryRemovePackage(string guid)
         {
             var package = TryGetInstalledPackage(guid);
             if (package != null)
-                TryRemovePackage(package);
+                return TryRemovePackage(package);
             else
-                Console.WriteLine("Package '" + guid + "' does not seem to be installed.");
+                //Console.WriteLine("Package '" + guid + "' does not seem to be installed.");
+                return false;
         }
 
-        internal static void TryRemovePackage(PackageManifest package)
+        internal static bool TryRemovePackage(PackageManifest package)
         {
             string dir;
             Dictionary<string, PackageManifest> dict;
@@ -308,10 +327,13 @@ namespace Mefino.Core
             if (CheckDependencyBeforeRemoval(package, false))
             {
                 if (TryDeleteDirectory(dir))
+                {
                     dict.Remove(package.GUID);
-                else
-                    Console.WriteLine("Unable to remove package '" + package.GUID + "' at path '" + dir + "'!");
+                    return true;
+                }
             }
+
+            return false;
         }
 
         internal static bool TryDeleteDirectory(string dir)
@@ -332,18 +354,18 @@ namespace Mefino.Core
 
         // ======== Enable/Disable ========
 
-        public static void TryEnablePackage(string guid)
+        public static bool TryEnablePackage(string guid)
         {
             if (s_enabledPackages.ContainsKey(guid))
             {
-                Console.WriteLine("Package '" + guid + "' is already enabled!");
-                return;
+                //Console.WriteLine("Package '" + guid + "' is already enabled!");
+                return true;
             }
 
             if (!s_disabledPackages.ContainsKey(guid))
             {
-                Console.WriteLine("Cannot enable package '" + guid + "' as it is not disabled!");
-                return;
+                //Console.WriteLine("Cannot enable package '" + guid + "' as it is not disabled!");
+                return false;
             }
 
             var package = s_disabledPackages[guid];
@@ -353,33 +375,40 @@ namespace Mefino.Core
 
             if (TryMoveDirectory(guid, fromDir, toDir))
             {
-                Console.WriteLine("Enabled package: " + guid);
+                //Console.WriteLine("Enabled package: " + guid);
                 s_disabledPackages.Remove(guid);
                 s_enabledPackages.Add(guid, package);
+                package.m_isDisabled = false;
+
+                return true;
             }
+
+            return false;
         }
 
-        public static void TryDisableAllPackages()
+        public static bool TryDisableAllPackages()
         {
-            for (int i = s_enabledPackages.Count; i >= 0; i--)
+            bool ret = true;
+            for (int i = s_enabledPackages.Count - 1; i >= 0; i--)
             {
                 var pkg = s_enabledPackages.ElementAt(i);
-                TryDisablePackage(pkg.Key, true);
+                ret &= TryDisablePackage(pkg.Key, true);
             }
+            return ret;
         }
 
-        public static void TryDisablePackage(string guid, bool skipDependencyWarning = false)
+        public static bool TryDisablePackage(string guid, bool skipDependencyWarning = false)
         {
             if (s_disabledPackages.ContainsKey(guid))
             {
-                Console.WriteLine("Package '" + guid + "' is already disabled!");
-                return;
+                //Console.WriteLine("Package '" + guid + "' is already disabled!");
+                return true;
             }
 
             if (!s_enabledPackages.ContainsKey(guid))
             {
-                Console.WriteLine("Cannot disable package '" + guid + "' as it is not installed!");
-                return;
+                //Console.WriteLine("Cannot disable package '" + guid + "' as it is not installed!");
+                return true;
             }
 
             var package = s_enabledPackages[guid];
@@ -387,7 +416,7 @@ namespace Mefino.Core
             if (!skipDependencyWarning)
             {
                 if (!CheckDependencyBeforeRemoval(package, true))
-                    return;
+                    return false;
             }
 
             string toDir = Folders.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
@@ -395,23 +424,28 @@ namespace Mefino.Core
 
             if (TryMoveDirectory(guid, fromDir, toDir))
             {
-                Console.WriteLine("Disable package: " + guid);
+                //Console.WriteLine("Disable package: " + guid);
                 s_enabledPackages.Remove(guid);
                 s_disabledPackages.Add(guid, package);
+                package.m_isDisabled = true;
+
+                return true;
             }
+
+            return false;
         }
 
         private static bool TryMoveDirectory(string guid, string fromDir, string toDir)
         {
             if (Directory.Exists(toDir))
             {
-                Console.WriteLine($"Trying to disable '{guid}' but a folder already exists at: {toDir}! Aborting!");
+                //Console.WriteLine($"Trying to disable '{guid}' but a folder already exists at: {toDir}! Aborting!");
                 return false;
             }
 
             if (!Directory.Exists(fromDir))
             {
-                Console.WriteLine($"Trying to disable '{guid}' but no folder exists at: {fromDir}! Aborting!");
+                //Console.WriteLine($"Trying to disable '{guid}' but no folder exists at: {fromDir}! Aborting!");
                 return false;
             }
 

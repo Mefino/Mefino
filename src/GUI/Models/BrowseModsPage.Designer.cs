@@ -1,7 +1,7 @@
 ﻿
 namespace Mefino.GUI.Models
 {
-    partial class ProfilePage
+    partial class BrowseModsPage
     {
         /// <summary> 
         /// Required designer variable.
@@ -35,20 +35,21 @@ namespace Mefino.GUI.Models
             // metroLabel1
             // 
             this.metroLabel1.AutoSize = true;
-            this.metroLabel1.Location = new System.Drawing.Point(78, 88);
+            this.metroLabel1.Location = new System.Drawing.Point(117, 104);
             this.metroLabel1.Name = "metroLabel1";
-            this.metroLabel1.Size = new System.Drawing.Size(230, 19);
-            this.metroLabel1.TabIndex = 2;
-            this.metroLabel1.Text = "This is where profiles will be managed";
+            this.metroLabel1.Size = new System.Drawing.Size(272, 19);
+            this.metroLabel1.TabIndex = 1;
+            this.metroLabel1.Text = "This is where you will browse online packages";
             this.metroLabel1.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
-            // ProfilePage
+            // BrowsePage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.metroLabel1);
-            this.Name = "ProfilePage";
-            this.Size = new System.Drawing.Size(777, 459);
+            this.Name = "BrowsePage";
+            this.Size = new System.Drawing.Size(786, 458);
+            this.Style = MetroFramework.MetroColorStyle.Orange;
             this.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -1,7 +1,7 @@
 ﻿
 namespace Mefino.GUI.Models
 {
-    partial class BrowsePage
+    partial class LauncherPage
     {
         /// <summary> 
         /// Required designer variable.
@@ -29,35 +29,37 @@ namespace Mefino.GUI.Models
         /// </summary>
         private void InitializeComponent()
         {
-            this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
+            this._launchOutwardButton = new MetroFramework.Controls.MetroButton();
             this.SuspendLayout();
             // 
-            // metroLabel1
+            // _launchOutwardButton
             // 
-            this.metroLabel1.AutoSize = true;
-            this.metroLabel1.Location = new System.Drawing.Point(117, 104);
-            this.metroLabel1.Name = "metroLabel1";
-            this.metroLabel1.Size = new System.Drawing.Size(272, 19);
-            this.metroLabel1.TabIndex = 1;
-            this.metroLabel1.Text = "This is where you will browse online packages";
-            this.metroLabel1.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._launchOutwardButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(186)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this._launchOutwardButton.FontSize = MetroFramework.MetroButtonSize.Medium;
+            this._launchOutwardButton.Location = new System.Drawing.Point(719, 16);
+            this._launchOutwardButton.Name = "_launchOutwardButton";
+            this._launchOutwardButton.Size = new System.Drawing.Size(186, 39);
+            this._launchOutwardButton.Style = MetroFramework.MetroColorStyle.Orange;
+            this._launchOutwardButton.TabIndex = 1;
+            this._launchOutwardButton.Text = "Launch Outward";
+            this._launchOutwardButton.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._launchOutwardButton.UseSelectable = true;
+            this._launchOutwardButton.Click += new System.EventHandler(this._launchOutwardButton_Click);
             // 
-            // BrowsePage
+            // LauncherPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.metroLabel1);
-            this.Name = "BrowsePage";
-            this.Size = new System.Drawing.Size(786, 458);
+            this.Controls.Add(this._launchOutwardButton);
+            this.Name = "LauncherPage";
+            this.Size = new System.Drawing.Size(925, 460);
             this.Style = MetroFramework.MetroColorStyle.Orange;
             this.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-
-        private MetroFramework.Controls.MetroLabel metroLabel1;
+        private MetroFramework.Controls.MetroButton _launchOutwardButton;
     }
 }

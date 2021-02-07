@@ -167,9 +167,9 @@ namespace Mefino.CLI
                 return;
             }
 
-            LocalPackageManager.RefreshInstalledPackages();
-
             WebManifestManager.UpdateWebManifests();
+
+            LocalPackageManager.RefreshInstalledPackages();
         }
 
         internal static void Cmd_Install(params string[] args)

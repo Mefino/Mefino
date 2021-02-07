@@ -39,6 +39,7 @@ namespace Mefino.GUI.Models
             this._bepStatus = new MetroFramework.Controls.MetroLabel();
             this._bepInstallButton = new MetroFramework.Controls.MetroButton();
             this._bepPanel = new MetroFramework.Controls.MetroPanel();
+            this._uninstallButton = new MetroFramework.Controls.MetroButton();
             this._bepPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -85,7 +86,7 @@ namespace Mefino.GUI.Models
             this._otwPathInputField.MaxLength = 32767;
             this._otwPathInputField.Name = "_otwPathInputField";
             this._otwPathInputField.PasswordChar = '\0';
-            this._otwPathInputField.WaterMark = "...";
+            this._otwPathInputField.PromptText = "...";
             this._otwPathInputField.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._otwPathInputField.SelectedText = "";
             this._otwPathInputField.SelectionLength = 0;
@@ -115,7 +116,7 @@ namespace Mefino.GUI.Models
             // 
             this._otwPathStatusTitle.AutoSize = true;
             this._otwPathStatusTitle.FontWeight = MetroFramework.MetroLabelWeight.Regular;
-            this._otwPathStatusTitle.Location = new System.Drawing.Point(95, 91);
+            this._otwPathStatusTitle.Location = new System.Drawing.Point(22, 91);
             this._otwPathStatusTitle.Name = "_otwPathStatusTitle";
             this._otwPathStatusTitle.Size = new System.Drawing.Size(50, 19);
             this._otwPathStatusTitle.TabIndex = 4;
@@ -128,7 +129,7 @@ namespace Mefino.GUI.Models
             this._otwPathStatus.AutoSize = true;
             this._otwPathStatus.FontWeight = MetroFramework.MetroLabelWeight.Regular;
             this._otwPathStatus.ForeColor = System.Drawing.Color.LightGreen;
-            this._otwPathStatus.Location = new System.Drawing.Point(151, 91);
+            this._otwPathStatus.Location = new System.Drawing.Point(78, 91);
             this._otwPathStatus.Name = "_otwPathStatus";
             this._otwPathStatus.Size = new System.Drawing.Size(58, 19);
             this._otwPathStatus.TabIndex = 5;
@@ -141,7 +142,7 @@ namespace Mefino.GUI.Models
             // 
             this._bepStatusTitle.AutoSize = true;
             this._bepStatusTitle.FontWeight = MetroFramework.MetroLabelWeight.Regular;
-            this._bepStatusTitle.Location = new System.Drawing.Point(79, 37);
+            this._bepStatusTitle.Location = new System.Drawing.Point(3, 37);
             this._bepStatusTitle.Name = "_bepStatusTitle";
             this._bepStatusTitle.Size = new System.Drawing.Size(50, 19);
             this._bepStatusTitle.TabIndex = 6;
@@ -154,7 +155,7 @@ namespace Mefino.GUI.Models
             this._bepStatus.AutoSize = true;
             this._bepStatus.FontWeight = MetroFramework.MetroLabelWeight.Regular;
             this._bepStatus.ForeColor = System.Drawing.SystemColors.Control;
-            this._bepStatus.Location = new System.Drawing.Point(135, 37);
+            this._bepStatus.Location = new System.Drawing.Point(59, 37);
             this._bepStatus.Name = "_bepStatus";
             this._bepStatus.Size = new System.Drawing.Size(58, 19);
             this._bepStatus.TabIndex = 7;
@@ -167,7 +168,7 @@ namespace Mefino.GUI.Models
             // 
             this._bepInstallButton.Location = new System.Drawing.Point(3, 73);
             this._bepInstallButton.Name = "_bepInstallButton";
-            this._bepInstallButton.Size = new System.Drawing.Size(126, 30);
+            this._bepInstallButton.Size = new System.Drawing.Size(190, 30);
             this._bepInstallButton.TabIndex = 8;
             this._bepInstallButton.Text = "<todo>";
             this._bepInstallButton.Theme = MetroFramework.MetroThemeStyle.Dark;
@@ -193,10 +194,24 @@ namespace Mefino.GUI.Models
             this._bepPanel.VerticalScrollbarHighlightOnWheel = false;
             this._bepPanel.VerticalScrollbarSize = 10;
             // 
+            // _uninstallButton
+            // 
+            this._uninstallButton.BackColor = System.Drawing.Color.DarkRed;
+            this._uninstallButton.Location = new System.Drawing.Point(22, 410);
+            this._uninstallButton.Name = "_uninstallButton";
+            this._uninstallButton.Size = new System.Drawing.Size(190, 30);
+            this._uninstallButton.TabIndex = 10;
+            this._uninstallButton.Text = "Remove Mefino";
+            this._uninstallButton.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._uninstallButton.UseCustomBackColor = true;
+            this._uninstallButton.UseSelectable = true;
+            this._uninstallButton.Click += new System.EventHandler(this._uninstallButton_Click);
+            // 
             // SetupPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this._uninstallButton);
             this.Controls.Add(this._otwPathStatus);
             this.Controls.Add(this._otwPathStatusTitle);
             this.Controls.Add(this._otwPathInputField);
@@ -206,7 +221,7 @@ namespace Mefino.GUI.Models
             this.Margin = new System.Windows.Forms.Padding(15);
             this.Name = "SetupPage";
             this.Padding = new System.Windows.Forms.Padding(15);
-            this.Size = new System.Drawing.Size(512, 320);
+            this.Size = new System.Drawing.Size(786, 458);
             this.Theme = MetroFramework.MetroThemeStyle.Dark;
             this._bepPanel.ResumeLayout(false);
             this._bepPanel.PerformLayout();
@@ -227,5 +242,6 @@ namespace Mefino.GUI.Models
         private MetroFramework.Controls.MetroLabel _bepStatus;
         private MetroFramework.Controls.MetroButton _bepInstallButton;
         private MetroFramework.Controls.MetroPanel _bepPanel;
+        private MetroFramework.Controls.MetroButton _uninstallButton;
     }
 }

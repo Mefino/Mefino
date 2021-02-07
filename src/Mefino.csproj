@@ -76,6 +76,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\AppDataManager.cs" />
+    <Compile Include="Core\Profiles\MefinoProfile.cs" />
+    <Compile Include="Core\Profiles\ProfileManager.cs" />
     <Compile Include="Folders.cs" />
     <Compile Include="GUI\MefinoGUI.cs">
       <SubType>Form</SubType>
@@ -83,29 +86,23 @@
     <Compile Include="GUI\MefinoGUI.Designer.cs">
       <DependentUpon>MefinoGUI.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Models\ProfilePage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="GUI\Models\ProfilePage.Designer.cs">
-      <DependentUpon>ProfilePage.cs</DependentUpon>
-    </Compile>
     <Compile Include="GUI\Models\SetupPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GUI\Models\SetupPage.Designer.cs">
       <DependentUpon>SetupPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Models\ManagerPage.cs">
+    <Compile Include="GUI\Models\LauncherPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Models\ManagerPage.Designer.cs">
-      <DependentUpon>ManagerPage.cs</DependentUpon>
+    <Compile Include="GUI\Models\LauncherPage.Designer.cs">
+      <DependentUpon>LauncherPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Models\BrowsePage.cs">
+    <Compile Include="GUI\Models\BrowseModsPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Models\BrowsePage.Designer.cs">
-      <DependentUpon>BrowsePage.cs</DependentUpon>
+    <Compile Include="GUI\Models\BrowseModsPage.Designer.cs">
+      <DependentUpon>BrowseModsPage.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MefinoApp.cs" />
@@ -136,17 +133,14 @@
     <EmbeddedResource Include="GUI\MefinoGUI.resx">
       <DependentUpon>MefinoGUI.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Models\ManagerPage.resx">
-      <DependentUpon>ManagerPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Models\ProfilePage.resx">
-      <DependentUpon>ProfilePage.cs</DependentUpon>
+    <EmbeddedResource Include="GUI\Models\LauncherPage.resx">
+      <DependentUpon>LauncherPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Models\SetupPage.resx">
       <DependentUpon>SetupPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Models\BrowsePage.resx">
-      <DependentUpon>BrowsePage.cs</DependentUpon>
+    <EmbeddedResource Include="GUI\Models\BrowseModsPage.resx">
+      <DependentUpon>BrowseModsPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

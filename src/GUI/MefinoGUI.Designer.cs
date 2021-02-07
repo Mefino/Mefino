@@ -34,16 +34,15 @@ namespace Mefino.GUI
             this._mainHeader = new System.Windows.Forms.Label();
             this._setupTabPage = new MetroFramework.Controls.MetroTabPage();
             this._tabView = new MetroFramework.Controls.MetroTabControl();
-            this._installedTabPage = new MetroFramework.Controls.MetroTabPage();
             this._browseTabPage = new MetroFramework.Controls.MetroTabPage();
-            this._profileTabPage = new MetroFramework.Controls.MetroTabPage();
+            this._manageTabPage = new MetroFramework.Controls.MetroTabPage();
             this._topTitlePanel = new MetroFramework.Controls.MetroPanel();
-            this._mainLogo = new System.Windows.Forms.PictureBox();
             this._versionLabel = new System.Windows.Forms.Label();
+            this._mainLogo = new System.Windows.Forms.PictureBox();
             this._btmProgressPanel = new MetroFramework.Controls.MetroPanel();
-            this._globalStyleManager = new MetroFramework.Components.MetroStyleManager(this.components);
-            this._progressBar = new MetroFramework.Controls.MetroProgressBar();
             this._progressText = new System.Windows.Forms.Label();
+            this._progressBar = new MetroFramework.Controls.MetroProgressBar();
+            this._globalStyleManager = new MetroFramework.Components.MetroStyleManager(this.components);
             this._tabView.SuspendLayout();
             this._topTitlePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._mainLogo)).BeginInit();
@@ -84,37 +83,21 @@ namespace Mefino.GUI
             // 
             this._tabView.Appearance = System.Windows.Forms.TabAppearance.FlatButtons;
             this._tabView.Controls.Add(this._setupTabPage);
-            this._tabView.Controls.Add(this._installedTabPage);
             this._tabView.Controls.Add(this._browseTabPage);
-            this._tabView.Controls.Add(this._profileTabPage);
+            this._tabView.Controls.Add(this._manageTabPage);
             this._tabView.Dock = System.Windows.Forms.DockStyle.Bottom;
             this._tabView.FontWeight = MetroFramework.MetroTabControlWeight.Bold;
             this._tabView.HotTrack = true;
             this._tabView.ItemSize = new System.Drawing.Size(200, 40);
             this._tabView.Location = new System.Drawing.Point(20, 106);
             this._tabView.Name = "_tabView";
-            this._tabView.SelectedIndex = 0;
+            this._tabView.SelectedIndex = 1;
             this._tabView.Size = new System.Drawing.Size(942, 521);
             this._tabView.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this._tabView.Style = MetroFramework.MetroColorStyle.Orange;
             this._tabView.TabIndex = 2;
             this._tabView.Theme = MetroFramework.MetroThemeStyle.Dark;
             this._tabView.UseSelectable = true;
-            // 
-            // _installedTabPage
-            // 
-            this._installedTabPage.HorizontalScrollbarBarColor = true;
-            this._installedTabPage.HorizontalScrollbarHighlightOnWheel = false;
-            this._installedTabPage.HorizontalScrollbarSize = 10;
-            this._installedTabPage.Location = new System.Drawing.Point(4, 44);
-            this._installedTabPage.Name = "_installedTabPage";
-            this._installedTabPage.Size = new System.Drawing.Size(934, 473);
-            this._installedTabPage.TabIndex = 1;
-            this._installedTabPage.Text = "Manage Packages";
-            this._installedTabPage.Theme = MetroFramework.MetroThemeStyle.Dark;
-            this._installedTabPage.VerticalScrollbarBarColor = true;
-            this._installedTabPage.VerticalScrollbarHighlightOnWheel = false;
-            this._installedTabPage.VerticalScrollbarSize = 10;
             // 
             // _browseTabPage
             // 
@@ -125,26 +108,26 @@ namespace Mefino.GUI
             this._browseTabPage.Name = "_browseTabPage";
             this._browseTabPage.Size = new System.Drawing.Size(934, 473);
             this._browseTabPage.TabIndex = 2;
-            this._browseTabPage.Text = "Browse Packages";
+            this._browseTabPage.Text = "Browse Mods";
             this._browseTabPage.Theme = MetroFramework.MetroThemeStyle.Dark;
             this._browseTabPage.VerticalScrollbarBarColor = true;
             this._browseTabPage.VerticalScrollbarHighlightOnWheel = false;
             this._browseTabPage.VerticalScrollbarSize = 10;
             // 
-            // _profileTabPage
+            // _manageTabPage
             // 
-            this._profileTabPage.HorizontalScrollbarBarColor = true;
-            this._profileTabPage.HorizontalScrollbarHighlightOnWheel = false;
-            this._profileTabPage.HorizontalScrollbarSize = 10;
-            this._profileTabPage.Location = new System.Drawing.Point(4, 44);
-            this._profileTabPage.Name = "_profileTabPage";
-            this._profileTabPage.Size = new System.Drawing.Size(934, 473);
-            this._profileTabPage.TabIndex = 3;
-            this._profileTabPage.Text = "Profiles";
-            this._profileTabPage.Theme = MetroFramework.MetroThemeStyle.Dark;
-            this._profileTabPage.VerticalScrollbarBarColor = true;
-            this._profileTabPage.VerticalScrollbarHighlightOnWheel = false;
-            this._profileTabPage.VerticalScrollbarSize = 10;
+            this._manageTabPage.HorizontalScrollbarBarColor = true;
+            this._manageTabPage.HorizontalScrollbarHighlightOnWheel = false;
+            this._manageTabPage.HorizontalScrollbarSize = 10;
+            this._manageTabPage.Location = new System.Drawing.Point(4, 44);
+            this._manageTabPage.Name = "_manageTabPage";
+            this._manageTabPage.Size = new System.Drawing.Size(934, 473);
+            this._manageTabPage.TabIndex = 1;
+            this._manageTabPage.Text = "Launch";
+            this._manageTabPage.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._manageTabPage.VerticalScrollbarBarColor = true;
+            this._manageTabPage.VerticalScrollbarHighlightOnWheel = false;
+            this._manageTabPage.VerticalScrollbarSize = 10;
             // 
             // _topTitlePanel
             // 
@@ -164,16 +147,6 @@ namespace Mefino.GUI
             this._topTitlePanel.VerticalScrollbarHighlightOnWheel = false;
             this._topTitlePanel.VerticalScrollbarSize = 10;
             // 
-            // _mainLogo
-            // 
-            this._mainLogo.Image = global::Mefino.Properties.Resources.logo_64x64;
-            this._mainLogo.Location = new System.Drawing.Point(0, 0);
-            this._mainLogo.Name = "_mainLogo";
-            this._mainLogo.Size = new System.Drawing.Size(64, 64);
-            this._mainLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this._mainLogo.TabIndex = 0;
-            this._mainLogo.TabStop = false;
-            // 
             // _versionLabel
             // 
             this._versionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -188,6 +161,16 @@ namespace Mefino.GUI
             this._versionLabel.TabIndex = 2;
             this._versionLabel.Text = "v0.2.0.0";
             this._versionLabel.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+            // 
+            // _mainLogo
+            // 
+            this._mainLogo.Image = global::Mefino.Properties.Resources.logo_64x64;
+            this._mainLogo.Location = new System.Drawing.Point(0, 0);
+            this._mainLogo.Name = "_mainLogo";
+            this._mainLogo.Size = new System.Drawing.Size(64, 64);
+            this._mainLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this._mainLogo.TabIndex = 0;
+            this._mainLogo.TabStop = false;
             // 
             // _btmProgressPanel
             // 
@@ -208,11 +191,18 @@ namespace Mefino.GUI
             this._btmProgressPanel.VerticalScrollbarHighlightOnWheel = false;
             this._btmProgressPanel.VerticalScrollbarSize = 10;
             // 
-            // _globalStyleManager
+            // _progressText
             // 
-            this._globalStyleManager.Owner = null;
-            this._globalStyleManager.Style = MetroFramework.MetroColorStyle.Orange;
-            this._globalStyleManager.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._progressText.AutoSize = true;
+            this._progressText.Font = new System.Drawing.Font("Ebrima", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._progressText.ForeColor = System.Drawing.SystemColors.AppWorkspace;
+            this._progressText.Location = new System.Drawing.Point(338, 3);
+            this._progressText.MinimumSize = new System.Drawing.Size(500, 30);
+            this._progressText.Name = "_progressText";
+            this._progressText.Size = new System.Drawing.Size(500, 30);
+            this._progressText.TabIndex = 4;
+            this._progressText.Text = "This is an example of some text";
+            this._progressText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _progressBar
             // 
@@ -227,18 +217,11 @@ namespace Mefino.GUI
             this._progressBar.UseCustomBackColor = true;
             this._progressBar.Value = 10;
             // 
-            // _progressText
+            // _globalStyleManager
             // 
-            this._progressText.AutoSize = true;
-            this._progressText.Font = new System.Drawing.Font("Ebrima", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._progressText.ForeColor = System.Drawing.SystemColors.AppWorkspace;
-            this._progressText.Location = new System.Drawing.Point(338, 3);
-            this._progressText.MinimumSize = new System.Drawing.Size(500, 30);
-            this._progressText.Name = "_progressText";
-            this._progressText.Size = new System.Drawing.Size(500, 30);
-            this._progressText.TabIndex = 4;
-            this._progressText.Text = "This is an example of some text";
-            this._progressText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this._globalStyleManager.Owner = null;
+            this._globalStyleManager.Style = MetroFramework.MetroColorStyle.Orange;
+            this._globalStyleManager.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // MefinoGUI
             // 
@@ -277,9 +260,8 @@ namespace Mefino.GUI
         private MetroFramework.Controls.MetroTabControl _tabView;
         private MetroFramework.Controls.MetroPanel _topTitlePanel;
         private MetroFramework.Controls.MetroTabPage _setupTabPage;
-        private MetroFramework.Controls.MetroTabPage _installedTabPage;
+        private MetroFramework.Controls.MetroTabPage _manageTabPage;
         private MetroFramework.Controls.MetroTabPage _browseTabPage;
-        private MetroFramework.Controls.MetroTabPage _profileTabPage;
         private System.Windows.Forms.Label _versionLabel;
         private MetroFramework.Controls.MetroPanel _btmProgressPanel;
         private MetroFramework.Components.MetroStyleManager _globalStyleManager;

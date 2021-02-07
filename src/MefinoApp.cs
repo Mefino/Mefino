@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Mefino.GUI;
 using Mefino.CLI;
+using Mefino.Core.Profiles;
 
 namespace Mefino
 {
@@ -61,17 +62,21 @@ namespace Mefino
 
         internal static void CoreInit()
         {
-            LoadConfig();
+            AppDataManager.LoadConfig();
 
             WebClientManager.Initialize();
 
-            RefreshLocalManifests();
+            RefreshAllPackages();
+
+            ProfileManager.LoadProfileOrSetDefault();
         }
 
-        public static void RefreshLocalManifests()
+        public static void RefreshAllPackages(bool refreshOnline = false)
         {
-            // load cached web manifests
-            WebManifestManager.LoadWebManifestCache();
+            if (refreshOnline)
+                WebManifestManager.UpdateWebManifests();
+            else
+                WebManifestManager.LoadWebManifestCache();
 
             // refresh installed packages
             LocalPackageManager.RefreshInstalledPackages();
@@ -114,40 +119,72 @@ namespace Mefino
             return false;
         }
 
-        // ========== config ============
+        // ========== complete uninstall ==========
 
-        public static bool LoadConfig()
+        public static DialogResult CompleteUninstall(bool warningMessage = true)
         {
-            if (!File.Exists(Folders.MEFINO_CONFIG_PATH))
-                return false;
-
-            var jsonObject = LightJson.Serialization.JsonReader.ParseFile(Folders.MEFINO_CONFIG_PATH);
-
-            if (jsonObject == default)
-                return false;
-
-            if (jsonObject[nameof(Folders.OUTWARD_FOLDER)].AsString is string path)
+            if (warningMessage)
             {
-                if (!Folders.SetOutwardFolderPath(path))
-                    Console.WriteLine("Saved Outward path '" + path + "' is invalid! Needs to be set again.");
+                var result = MessageBox.Show(
+                    $"Really uninstall everything?" +
+                    $"\n\nThis will delete BepInEx and all Mefino packages from the Outward folder." +
+                    $"\n\nThis will not delete your Mefino profiles.",
+                    $"Are you sure?",
+                    MessageBoxButtons.OKCancel);
 
-                return true;
+                if (result != DialogResult.OK)
+                    return result;
+            }
+
+            try
+            {
+                Directory.Delete(Folders.MEFINO_FOLDER_PATH, true);
+                Directory.Delete(Path.Combine(Folders.OUTWARD_FOLDER, "BepInEx"), true);
+                File.Delete(Path.Combine(Folders.OUTWARD_FOLDER, "winhttp.dll"));
+                File.Delete(Path.Combine(Folders.OUTWARD_FOLDER, "doorstop_config.ini"));
+                File.Delete(Path.Combine(Folders.OUTWARD_FOLDER, "changelog.txt"));
+
+                return DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed uninstalling Mefino!\n\n{ex}");
+                return DialogResult.Cancel;
+            }
+        }
+
+        // ========= launch ========
+
+        public static bool TryLaunchOutward()
+        {
+            if (!Folders.IsCurrentOutwardPathValid())
+                return false;
+
+            if (!LocalPackageManager.RefreshInstalledPackages())
+            {
+                var result = MessageBox.Show($"Some enabled packages are outdated or missing dependencies. Launch anyway?", $"Warning", MessageBoxButtons.OKCancel);
+
+                if (result == DialogResult.Cancel)
+                    return false;
+            }
+
+            try
+            {
+                if (Folders.OUTWARD_FOLDER.Contains(Path.Combine("Steam", "steamapps", "common", "Outward")))
+                {
+                    Process.Start($"steam://rungameid/794260");
+                }
+                else
+                {
+                    Process.Start(Path.Combine(Folders.OUTWARD_FOLDER, "Outward.exe"));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error launching Outward:\n\n{ex}", "Error!", MessageBoxButtons.OK);
             }
 
             return false;
-        }
-
-        public static void SaveConfig()
-        {
-            if (File.Exists(Folders.MEFINO_CONFIG_PATH))
-                File.Delete(Folders.MEFINO_CONFIG_PATH);
-
-            var jsonObject = new JsonObject
-            {
-                { nameof(Folders.OUTWARD_FOLDER), Folders.OUTWARD_FOLDER }
-            };
-
-            File.WriteAllText(Folders.MEFINO_CONFIG_PATH, jsonObject.ToString(true));
         }
     }
 }

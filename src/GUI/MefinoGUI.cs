@@ -28,35 +28,48 @@ namespace Mefino.GUI
 
             s_featureTabPages = new MetroTabPage[]
             {
-                Instance._installedTabPage,
+                Instance._manageTabPage,
                 Instance._browseTabPage,
-                Instance._profileTabPage
             };
 
             this.Text = $"Mefino {MefinoApp.VERSION}";
             this._versionLabel.Text = $"v{MefinoApp.VERSION}";
 
-            // if setup is all good, init features, otherwise SetupPage must do it.
-            if (Folders.IsCurrentOutwardPathValid() && Web.BepInExHandler.IsBepInExUpdated())
-            {
-                InitFeatures();
-            }
-            else
-            {
-                foreach (var tab in s_featureTabPages)
-                    Instance._tabView.DisableTab(tab);
-            }
+            var bepinex = Web.BepInExHandler.IsBepInExUpdated();
 
             // create setup page control
             this._setupTabPage.Controls.Add(new SetupPage());
+
+            // if setup is all good, init features, otherwise SetupPage must do it.
+            if (Folders.IsCurrentOutwardPathValid() && bepinex)
+                EnabledFeaturePages();
+            else
+                DisableFeaturePages();
+        }
+
+        public static void DisableFeaturePages()
+        {
+            if (Instance == null)
+                return;
+
+            foreach (var tab in s_featureTabPages)
+                Instance._tabView.DisableTab(tab); 
+            
+            Instance._tabView.SelectedIndex = 0;
         }
 
         private static bool s_doneInitFeatures;
 
-        public static void InitFeatures()
+        public static void EnabledFeaturePages()
         {
+            if (Instance == null)
+                return;
+
             foreach (var tab in s_featureTabPages)
                 Instance._tabView.EnableTab(tab);
+
+            // go to launch page by default
+            Instance._tabView.SelectedIndex = 2;
 
             if (s_doneInitFeatures)
                 return;
@@ -64,12 +77,8 @@ namespace Mefino.GUI
             s_doneInitFeatures = true;
 
             // add control modules for other pages
-            Instance._installedTabPage.Controls.Add(new ManagerPage());
-            Instance._browseTabPage.Controls.Add(new BrowsePage());
-            Instance._profileTabPage.Controls.Add(new ProfilePage());
-
-            // go to first feature page
-            Instance._tabView.SelectedIndex = 1;
+            Instance._manageTabPage.Controls.Add(new LauncherPage());
+            Instance._browseTabPage.Controls.Add(new BrowseModsPage());
 
             // Refresh 
             Application.DoEvents();

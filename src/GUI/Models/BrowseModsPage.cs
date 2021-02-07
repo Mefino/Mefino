@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace Mefino.GUI.Models
 {
-    public partial class ManagerPage : MetroFramework.Controls.MetroUserControl
+    public partial class BrowseModsPage : MetroFramework.Controls.MetroUserControl
     {
-        public ManagerPage()
+        public BrowseModsPage()
         {
             InitializeComponent();
         }

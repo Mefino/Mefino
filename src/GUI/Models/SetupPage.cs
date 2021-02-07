@@ -35,7 +35,7 @@ namespace Mefino.GUI.Models
         {
             switch (state)
             {
-                // this value is used to indicate its il2cpp in this context.
+                // 'Outdated' is used to indicate its il2cpp in this context.
                 case InstallState.Outdated:
                     this._otwPathStatus.Text = $"IL2CPP install detected!";
                     this._otwPathStatus.ForeColor = Color.IndianRed;
@@ -49,21 +49,28 @@ namespace Mefino.GUI.Models
                         Process.Start($"https://outward.gamepedia.com/Installing_Mods#Modding_Branch");
                     }
 
+                    this._uninstallButton.Visible = false;
+                    MefinoGUI.DisableFeaturePages();
                     break;
 
                 case InstallState.NotInstalled:
                     this._otwPathStatus.Text = $"Not found / invalid path";
                     this._otwPathStatus.ForeColor = Color.DarkKhaki;
+                    this._uninstallButton.Visible = false;
+                    MefinoGUI.DisableFeaturePages();
                     break;
 
                 case InstallState.Installed:
                     this._otwPathStatus.Text = $"Found Mono install";
                     this._otwPathStatus.ForeColor = Color.LightGreen;
 
+                    Application.DoEvents();
+
                     RefreshBepInExPanel();
 
                     break;
             }
+
         }
 
         internal void RefreshBepInExPanel()
@@ -71,6 +78,8 @@ namespace Mefino.GUI.Models
             if (!Folders.IsCurrentOutwardPathValid())
             {
                 this._bepPanel.Visible = false;
+                this._uninstallButton.Visible = false;
+                MefinoGUI.DisableFeaturePages();
                 return;
             }
 
@@ -78,28 +87,34 @@ namespace Mefino.GUI.Models
 
             if (Web.BepInExHandler.IsBepInExUpdated())
             {
-                this._bepStatus.Text = "Up to date";
+                this._bepStatus.Text = "Installed";
                 this._bepStatus.ForeColor = Color.LightGreen;
                 this._bepInstallButton.Visible = false;
 
-                MefinoGUI.InitFeatures();
+                MefinoGUI.EnabledFeaturePages();
+                Folders.CheckOutwardMefinoInstall();
+
+                this._uninstallButton.Visible = true;
             }
             else
             {
+                this._uninstallButton.Visible = false;
+                MefinoGUI.DisableFeaturePages();
+
                 switch (Web.BepInExHandler.s_lastInstallStateResult)
                 {
                     case InstallState.Outdated:
-                        this._bepStatus.Text = $"Outdated ({Web.BepInExHandler.s_latestBepInExVersion} available)";
+                        this._bepStatus.Text = $"Outdated";
                         this._bepStatus.ForeColor = Color.DarkKhaki;
                         this._bepInstallButton.Visible = true;
-                        this._bepInstallButton.Text = "Update";
+                        this._bepInstallButton.Text = $"Update to {Web.BepInExHandler.s_latestBepInExVersion}";
                         break;
 
                     case InstallState.NotInstalled:
                         this._bepStatus.Text = "Not installed";
                         this._bepStatus.ForeColor = Color.IndianRed;
                         this._bepInstallButton.Visible = true;
-                        this._bepInstallButton.Text = "Install";
+                        this._bepInstallButton.Text = $"Install BepInEx {Web.BepInExHandler.s_latestBepInExVersion}";
                         break;
                 }
             }
@@ -130,15 +145,34 @@ namespace Mefino.GUI.Models
         private void _bepInstallButton_Click(object sender, EventArgs e)
         {
             this._bepInstallButton.Enabled = false;
-
+            this._uninstallButton.Enabled = false;
             MefinoGUI.SetProgressBarActive(true);
 
             Web.BepInExHandler.UpdateBepInEx();
 
-            MefinoGUI.SetProgressBarActive(false);
-
+            // update GUI before moving on
             this._bepInstallButton.Enabled = true;
+            this._uninstallButton.Enabled = true;
+            MefinoGUI.SetProgressBarActive(false);
             RefreshBepInExPanel();
+            Application.DoEvents();
+
+            if (Web.BepInExHandler.s_lastInstallStateResult != InstallState.Installed)
+            {
+                MessageBox.Show($"Failed to update BepInEx! Make sure Outward isn't running and you're online.", "Warning", MessageBoxButtons.OK);
+            }
+
+        }
+
+        private void _uninstallButton_Click(object sender, EventArgs e)
+        {
+            var result = MefinoApp.CompleteUninstall();
+
+            if (result == DialogResult.Cancel)
+                return;
+
+            Folders.IsCurrentOutwardPathValid(out InstallState state);
+            SetOtwPathResult(state);
         }
     }
 }

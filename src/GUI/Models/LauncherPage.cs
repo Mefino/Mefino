@@ -10,11 +10,16 @@ using System.Windows.Forms;
 
 namespace Mefino.GUI.Models
 {
-    public partial class BrowsePage : MetroFramework.Controls.MetroUserControl
+    public partial class LauncherPage : MetroFramework.Controls.MetroUserControl
     {
-        public BrowsePage()
+        public LauncherPage()
         {
             InitializeComponent();
+        }
+
+        private void _launchOutwardButton_Click(object sender, EventArgs e)
+        {
+            MefinoApp.TryLaunchOutward();
         }
     }
 }

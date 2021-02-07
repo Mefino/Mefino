@@ -17,9 +17,8 @@ namespace Mefino
         internal static string MEFINO_FOLDER_PATH => OUTWARD_FOLDER + @"\Mefino";
         internal static string MEFINO_DISABLED_FOLDER => MEFINO_FOLDER_PATH + @"\Disabled";
 
-        // Mefino AppData config json path
-        internal static string MEFINO_CONFIG_PATH
-            => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\mefino-config.json";
+        internal static string MEFINO_APPDATA_FOLDER =>
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Mefino");
 
         // ====== outward folder paths =======
 
@@ -28,8 +27,6 @@ namespace Mefino
         public static bool SetOutwardFolderPath(string path, out InstallState state)
         {
             path = Path.GetFullPath(path);
-
-            state = InstallState.NotInstalled;
 
             if (!IsValidOutwardMonoPath(path, out state))
             {
@@ -41,7 +38,7 @@ namespace Mefino
 
             CheckOutwardMefinoInstall();
 
-            MefinoApp.SaveConfig();
+            AppDataManager.SaveConfig();
 
             //Console.WriteLine($"Set Outward folder to '{OUTWARD_FOLDER}'");
 

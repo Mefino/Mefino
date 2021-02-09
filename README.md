@@ -60,7 +60,7 @@ Mefino package GUIDs are always `githubUsername repositoryName`, for example `si
 * [optional] `author` and `name` are your GitHub username and Repository name, but they are not required for web releases. If you install a package locally (manually), you <b>do</b> need to set these.
 * `version` is the version of your latest release, eg `1.0.0.0`
 * `description` is a short description of your package, just one or two sentences.
-* `dependencies` is a list of other package GUIDs which your package depends on. The format is `authorName repositoryName`.
+* `dependencies` is a list of other package GUIDs which your package depends on.
 * `conflicts_with` is also a list of GUIDs, but these are packages which your mod conflicts with (meaning they CANNOT be active at the same time).
 * `require_sync` is whether your mod should be installed by all players online, it must be `true` or `false`. In the future this will be used for "automatic" online mod syncing.
 * [optional] `override_folder` is an optional special name you can use for the install directory, instead of your repository name. This does not affect your GUID.

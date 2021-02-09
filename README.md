@@ -2,7 +2,16 @@
 
 Mefino is a work-in-progress Mod Manager for Outward.
 
-## Temporary Guide
+Mefino is currently in Alpha testing phase.
+
+## How to use
+
+<b>Please remove (or make a backup of) all existing mods first before installing / testing Mefino.</b> This is not technically required, but the safety of your non-Mefino files is not guaranteed while using Mefino.
+
+1. Download Mefino.exe from the release page
+2. Run it :)
+
+## Temporary Release Guide
 
 1. Create a file called `manifest.json` using the example below.
 2. Put the contents of your release inside a zip file, not in any sub-folders. Your manifest does <b>not</b> need to be included in your actual release file.

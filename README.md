@@ -18,8 +18,7 @@ Mefino is currently in Alpha testing phase.
 2. Create a file called `manifest.json` in the root of the repository using the example below, and push it to GitHub.
 3. Put the contents of your release inside a zip file called `mefino-package.zip`. Your manifest does <b>not</b> need to be included in your actual release file. 
 4. Make a new release, and include your `mefino-package.zip` in the release.
-5. Put your `manifest.json` file in the root of your repository and push it.
-6. Make sure your repository has a `README.md` file, and anywhere in the README you must put the phrase `outward mefino mod` (case insensitive and special characters ignored). 
+5. Make sure your repository has a `README.md` file, and anywhere in the README you must put the phrase `outward mefino mod` (case insensitive and special characters ignored). 
 
 That's all there is to it, your package should now appear in the Mefino browser.
 

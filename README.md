@@ -45,25 +45,25 @@ For an example release, you can see [here](https://github.com/Mefino/Mefino.Plug
 }
 ```
 
-`author` and `name` [optional]
+`author` and `name` (string) [optional]
 * Your GitHub username and Repository name, they are <b>not required</b> to be set for web releases. If you install a local package manually you <b>do</b> need to set these for Mefino to work properly.
 
-`version`
+`version` (string)
 * The version of your latest release, eg `1.0.0.0`
 
-`description` 
+`description` (string)
 * A short description for your package, just one or two sentences.
 
-`dependencies`
+`dependencies` (list of strings)
 * A list of other package GUIDs which your package depends on.
 
-`conflicts_with` 
+`conflicts_with`  (list of strings)
 * A list of GUIDs, packages which your mod conflicts with (meaning they CANNOT be active at the same time).
 
-`require_sync`
+`require_sync` (boolean)
 * Whether your mod should be installed by all players online, it must be `true` or `false`. In the future this will be used for "automatic" online mod syncing.
 
-`override_folder` [optional]
+`override_folder` (string) [optional]
 * An optional special name you can use for the install directory instead of your `name`, ie. instead of installing to `plugins\{author} {name}\` it will install to `plugins\{author} {overide_folder}\`. This does not affect your GUID.
 
 ### Local installs

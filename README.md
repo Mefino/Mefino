@@ -58,7 +58,7 @@ For an example release, you can see [here](https://github.com/Mefino/Mefino.Plug
 * A list of other package GUIDs which your package depends on.
 
 `conflicts_with`  (list of strings)
-* A list of GUIDs, packages which your mod conflicts with (meaning they CANNOT be active at the same time).
+* A list of other package GUIDs which your mod conflicts with (meaning they CANNOT be active at the same time).
 
 `require_sync` (boolean)
 * Whether your mod should be installed by all players online, it must be `true` or `false`. In the future this will be used for "automatic" online mod syncing.

@@ -6,9 +6,9 @@ Mefino is currently in Alpha testing phase.
 
 ## How to use
 
-<b>Please remove (or make a backup of) all existing mods first before installing / testing Mefino.</b> This is not technically required, but the safety of your non-Mefino files is not guaranteed while using Mefino.
+<b>Please remove (or make a backup of) all existing mods before installing / testing Mefino.</b> This is not technically required, but the safety of your non-Mefino files is not guaranteed while using Mefino.
 
-1. Download Mefino.exe from the release page
+1. Download `Mefino.exe` from the release page
 2. Run it :)
 
 ## Temporary Release Guide

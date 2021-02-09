@@ -1,4 +1,4 @@
-﻿using Mefino.IO;
+﻿using Mefino.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Mefino.Web
+namespace Mefino.Core.Web
 {
     internal static class WebClientManager
     {

@@ -112,8 +112,8 @@
     <Compile Include="GUI\Models\BrowseModsPage.Designer.cs">
       <DependentUpon>BrowseModsPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="IO\IOHelper.cs" />
-    <Compile Include="IO\FolderWatcher.cs" />
+    <Compile Include="Core\IO\IOHelper.cs" />
+    <Compile Include="Core\IO\FolderWatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MefinoApp.cs" />
     <Compile Include="CLI\CLIHandler.cs" />
@@ -122,11 +122,11 @@
     <Compile Include="Core\LocalPackageManager.cs" />
     <Compile Include="Core\PackageManifest.cs" />
     <Compile Include="Core\WebManifestManager.cs" />
-    <Compile Include="IO\TemporaryFile.cs" />
-    <Compile Include="IO\ZipHelper.cs" />
-    <Compile Include="Web\BepInExHandler.cs" />
-    <Compile Include="Web\GithubHelper.cs" />
-    <Compile Include="Web\WebClientManager.cs" />
+    <Compile Include="Core\IO\TemporaryFile.cs" />
+    <Compile Include="Core\IO\ZipHelper.cs" />
+    <Compile Include="Core\Web\BepInExHandler.cs" />
+    <Compile Include="Core\Web\GithubHelper.cs" />
+    <Compile Include="Core\Web\WebClientManager.cs" />
     <Compile Include="LightJson\JsonArray.cs" />
     <Compile Include="LightJson\JsonObject.cs" />
     <Compile Include="LightJson\JsonValue.cs" />

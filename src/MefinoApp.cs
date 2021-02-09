@@ -1,6 +1,6 @@
 ﻿using Mefino.Core;
-using Mefino.IO;
-using Mefino.Web;
+using Mefino.Core.IO;
+using Mefino.Core.Web;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -87,7 +87,6 @@ namespace Mefino
         /// <summary>
         /// Refresh all packages, online and local. Optionally re-download new manifests as well, if <paramref name="refreshOnline"/> is <see langword="true"/>
         /// </summary>
-        /// <param name="refreshOnline"></param>
         public static void RefreshAllPackages(bool refreshOnline = false)
         {
             if (refreshOnline)
@@ -102,7 +101,6 @@ namespace Mefino
         /// <summary>
         /// Send generic Async progress percentage for MefinoGUI's progress bar.
         /// </summary>
-        /// <param name="progress"></param>
         internal static void SendAsyncProgress(int progress)
         {
             MefinoGUI.SetProgressPercent(progress);

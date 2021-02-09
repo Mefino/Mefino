@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mefino.IO
+namespace Mefino.Core.IO
 {
     public static class IOHelper
     {

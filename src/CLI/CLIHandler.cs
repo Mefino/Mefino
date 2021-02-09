@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Mefino.Core;
-using Mefino.Web;
-using Mefino.IO;
+using Mefino.Core.Web;
+using Mefino.Core.IO;
 
 namespace Mefino.CLI
 {

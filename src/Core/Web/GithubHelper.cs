@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mefino.Web
+namespace Mefino.Core.Web
 {
     /// <summary>
     /// Handles generic GitHub interaction, and Mefino's package search query.

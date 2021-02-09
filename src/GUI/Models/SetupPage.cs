@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Mefino.Core.Web;
 
 namespace Mefino.GUI.Models
 {
@@ -86,7 +87,7 @@ namespace Mefino.GUI.Models
 
             this._bepPanel.Visible = true;
 
-            if (Web.BepInExHandler.IsBepInExUpdated())
+            if (BepInExHandler.IsBepInExUpdated())
             {
                 this._bepStatus.Text = "Installed";
                 this._bepStatus.ForeColor = Color.LightGreen;
@@ -104,20 +105,20 @@ namespace Mefino.GUI.Models
                 this._uninstallButton.Visible = false;
                 MefinoGUI.DisableFeaturePages();
 
-                switch (Web.BepInExHandler.s_lastInstallStateResult)
+                switch (BepInExHandler.s_lastInstallStateResult)
                 {
                     case InstallState.Outdated:
                         this._bepStatus.Text = $"Outdated";
                         this._bepStatus.ForeColor = Color.DarkKhaki;
                         this._bepInstallButton.Visible = true;
-                        this._bepInstallButton.Text = $"Update to {Web.BepInExHandler.s_latestBepInExVersion}";
+                        this._bepInstallButton.Text = $"Update to {BepInExHandler.s_latestBepInExVersion}";
                         break;
 
                     case InstallState.NotInstalled:
                         this._bepStatus.Text = "Not installed";
                         this._bepStatus.ForeColor = Color.IndianRed;
                         this._bepInstallButton.Visible = true;
-                        this._bepInstallButton.Text = $"Install BepInEx {Web.BepInExHandler.s_latestBepInExVersion}";
+                        this._bepInstallButton.Text = $"Install BepInEx {BepInExHandler.s_latestBepInExVersion}";
                         break;
                 }
             }
@@ -153,7 +154,7 @@ namespace Mefino.GUI.Models
             this._uninstallButton.Enabled = false;
             MefinoGUI.SetProgressBarActive(true);
 
-            Web.BepInExHandler.UpdateBepInEx();
+            BepInExHandler.UpdateBepInEx();
 
             // update GUI before moving on
             this._bepInstallButton.Enabled = true;
@@ -164,7 +165,7 @@ namespace Mefino.GUI.Models
 
             Application.DoEvents();
 
-            if (Web.BepInExHandler.s_lastInstallStateResult != InstallState.Installed)
+            if (BepInExHandler.s_lastInstallStateResult != InstallState.Installed)
             {
                 MessageBox.Show($"Failed to update BepInEx! Make sure Outward isn't running and you're online.", "Warning", MessageBoxButtons.OK);
             }

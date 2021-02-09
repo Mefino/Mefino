@@ -2,14 +2,10 @@
 using Mefino.Core.Profiles;
 using Mefino.GUI.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Mefino.IO
+namespace Mefino.Core.IO
 {
     /// <summary>
     /// Handles the <see cref="FileSystemWatcher"/>s for Mefino, to automatically update our state on manual user changes.

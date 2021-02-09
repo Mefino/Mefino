@@ -1,19 +1,13 @@
-﻿using Mefino.LightJson;
-using Mefino.LightJson.Serialization;
-using Mefino.Core;
-using Mefino.GUI;
-using Mefino.IO;
-using Mefino.Web;
+﻿using Mefino.GUI;
+using Mefino.Core.IO;
+using Mefino.Core.Web;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Mefino.Web
+namespace Mefino.Core.Web
 {
     /// <summary>
     /// Handles interaction with BepInEx releases.

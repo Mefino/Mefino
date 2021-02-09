@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Mefino.IO
+namespace Mefino.Core.IO
 {
     // Thanks to MelonLoader for their implementation:
     // https://github.com/LavaGang/MelonLoader/blob/master/MelonLoader.Installer/Program.cs#L256

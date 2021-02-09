@@ -1,6 +1,6 @@
 ﻿using Mefino.LightJson;
-using Mefino.IO;
-using Mefino.Web;
+using Mefino.Core.IO;
+using Mefino.Core.Web;
 using System;
 using System.Collections.Generic;
 using System.IO;

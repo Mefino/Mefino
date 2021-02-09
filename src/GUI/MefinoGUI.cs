@@ -1,7 +1,7 @@
 ﻿using Mefino.Core;
 using Mefino.Core.Profiles;
 using Mefino.GUI.Models;
-using Mefino.IO;
+using Mefino.Core.IO;
 using MetroFramework.Controls;
 using System;
 using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace Mefino.GUI
             this.Text = $"Mefino {MefinoApp.VERSION}";
             this._versionLabel.Text = $"v{MefinoApp.VERSION}";
 
-            var bepinex = Web.BepInExHandler.IsBepInExUpdated();
+            var bepinex = Core.Web.BepInExHandler.IsBepInExUpdated();
 
             // create setup page control
             this._setupTabPage.Controls.Add(new SetupPage());

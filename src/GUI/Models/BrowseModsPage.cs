@@ -28,9 +28,6 @@ namespace Mefino.GUI.Models
 
             _packageList.CellClick += _packageList_CellClick;
 
-            //// needed?
-            //Application.DoEvents();
-
             LocalPackageManager.OnPackageInstalled += RefreshRow;
             LocalPackageManager.OnPackageUninstalled += RefreshRow;
 
@@ -42,7 +39,7 @@ namespace Mefino.GUI.Models
 
         private void _updateButton_Click(object sender, EventArgs e)
         {
-            WebManifestManager.UpdateWebManifests();
+            MefinoApp.RefreshAllPackages(true);
 
             RefreshPackageList();
         }

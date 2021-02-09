@@ -6,7 +6,8 @@ Mefino is currently in Alpha testing phase.
 
 ## How to use
 
-<b>Please remove (or make a backup of) all existing mods before installing / testing Mefino.</b> This is not technically required, but the safety of your non-Mefino files is not guaranteed while using Mefino.
+* Outward must be closed for you to disable/enable any mod. Currently Mefino does not check if Outward is running so you'll probably just get an error for now. Next release will address it more gracefully.
+* <b>Please remove (or make a backup of) all existing mods before installing / testing Mefino.</b> This is not technically required, but the safety of your non-Mefino files is not guaranteed while using Mefino.
 
 1. Download `Mefino.exe` from the release page
 2. Run it :)

@@ -17,6 +17,9 @@ namespace Mefino.Core
 
         internal static string MANIFEST_CACHE_FILEPATH => Folders.MEFINO_APPDATA_FOLDER + @"\manifest-cache.json";
 
+        /// <summary>
+        /// Check GitHub for new web manifests and reload/save the cache.
+        /// </summary>
         public static void UpdateWebManifests()
         {
             LoadWebManifestCache();
@@ -30,7 +33,10 @@ namespace Mefino.Core
 
         internal const string GITHUB_PACKAGE_QUERY_URL = @"https://api.github.com/search/repositories?q=""outward mefino mod""%20in:readme&sort=stars&order=desc";
 
-        public static void TryFetchMefinoGithubPackages()
+        /// <summary>
+        /// Actually fetch and process web packages. 
+        /// </summary>
+        private static void TryFetchMefinoGithubPackages()
         {
             var githubQuery = GithubHelper.QueryForMefinoPackages();
 
@@ -40,26 +46,30 @@ namespace Mefino.Core
                 return;
             }
 
-            WebManifestManager.s_cachedWebManifests.Clear();
+            s_cachedWebManifests.Clear();
 
             var items = ((JsonValue)githubQuery).AsJsonObject["items"].AsJsonArray;
 
             foreach (var entry in items)
             {
-                CheckAndAddQueryResult(entry);
+                var result = CheckAndAddQueryResult(entry);
 
-                //if (result == null)
-                //    continue;
+                if (result == null)
+                    continue;
 
-                //if (LocalPackageManager.TryGetInstalledPackage(result.GUID) is PackageManifest installed
-                //        && result.IsGreaterVersionThan(installed))
-                //{
-                //    installed.m_installState = InstallState.Outdated;
-                //}
+                if (LocalPackageManager.TryGetInstalledPackage(result.GUID) is PackageManifest installed
+                        && result.IsGreaterVersionThan(installed))
+                {
+                    installed.m_installState = InstallState.Outdated;
+                }
             }
 
             //Console.WriteLine($"Found {WebManifestManager.s_cachedWebManifests.Count} Mefino packages!");
         }
+
+        /// <summary>
+        /// Process a web result.
+        /// </summary>
         internal static PackageManifest CheckAndAddQueryResult(JsonValue queryResult)
         {
             try
@@ -74,12 +84,12 @@ namespace Mefino.Core
 
                 //Console.WriteLine("Checking github result '" + guid + "'");
 
-                if (WebManifestManager.s_cachedWebManifests.ContainsKey(guid))
+                if (s_cachedWebManifests.ContainsKey(guid))
                 {
-                    var existing = WebManifestManager.s_cachedWebManifests[guid];
+                    var existing = s_cachedWebManifests[guid];
 
                     if (!existing.IsManifestCachedSince(updatedAt))
-                        WebManifestManager.s_cachedWebManifests.Remove(guid);
+                        s_cachedWebManifests.Remove(guid);
                     else
                     {
                         //Console.WriteLine("Existing cached manifest for '" + guid + "' is up to date.");
@@ -110,7 +120,7 @@ namespace Mefino.Core
                 manifest.author = author;
                 manifest.name = repoName;
 
-                WebManifestManager.s_cachedWebManifests.Add(manifest.GUID, manifest);
+                s_cachedWebManifests.Add(manifest.GUID, manifest);
 
                 return manifest;
             }
@@ -123,8 +133,9 @@ namespace Mefino.Core
             }
         }
 
-
-        // ======== loading/saving ========
+        /// <summary>
+        /// Load the cached web manifests from disk.
+        /// </summary>
         internal static void LoadWebManifestCache()
         {
             s_cachedWebManifests.Clear();
@@ -164,6 +175,9 @@ namespace Mefino.Core
             }
         }
 
+        /// <summary>
+        /// Save the cached web manifests to disk.
+        /// </summary>
         internal static void SaveWebManifestCache()
         {
             var array = new JsonArray();
@@ -176,7 +190,7 @@ namespace Mefino.Core
                 { "manifests", array }
             };
 
-            Directory.CreateDirectory(Folders.MEFINO_FOLDER_PATH);
+            IOHelper.CreateDirectory(Folders.MEFINO_OTWFOLDER_PATH);
 
             if (File.Exists(MANIFEST_CACHE_FILEPATH))
                 File.Delete(MANIFEST_CACHE_FILEPATH);

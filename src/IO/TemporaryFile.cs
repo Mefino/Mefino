@@ -7,7 +7,13 @@ using System.Threading.Tasks;
 
 namespace Mefino.IO
 {
-    class TemporaryFile
+    // Thanks to MelonLoader for their implementation (slightly reworked):
+    // https://github.com/LavaGang/MelonLoader/blob/master/MelonLoader.Installer/TempFileCache.cs
+
+    /// <summary>
+    /// Helper class for working with temporary files.
+    /// </summary>
+    public class TemporaryFile
     {
         private static readonly HashSet<string> s_tempFiles = new HashSet<string>();
 

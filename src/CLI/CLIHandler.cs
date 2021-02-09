@@ -6,50 +6,24 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Mefino.Core;
 using Mefino.Web;
+using Mefino.IO;
 
 namespace Mefino.CLI
 {
     public static class CLIHandler
     {
-        const int SW_HIDE = 0;
-        const int SW_SHOW = 5;
-
-        public static void ShowConsole()
-        {
-            var handle = GetConsoleWindow();
-            ShowWindow(handle, SW_SHOW);
-        }
-
-        public static void HideConsole()
-        {
-            var handle = GetConsoleWindow();
-            ShowWindow(handle, SW_HIDE);
-        }
-
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GetConsoleWindow();
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        // ========================================================= //
-
+        /// <summary>
+        /// Execute a string array as command line arguments. The first command is the command name/keyword, followed by any sub-arguments for that command.
+        /// </summary>
         public static void Execute(params string[] args)
         {
-            //var joined = string.Join(" ", args);
-            //var parsed = CreateArgs(joined);
-
             foreach (var entry in s_commands)
             {
                 if (entry.IsMatch(args[0]))
                 {
-                    string[] subArgs = null;
+                    string[] subArgs = new string[0];
                     if (args.Length > 1)
-                    {
-                        subArgs = new string[args.Length - 1];
-                        for (int i = 1; i < args.Length; i++)
-                            subArgs[i - 1] = args[i];
-                    }
+                        subArgs = args.ToList().GetRange(1, args.Length - 1).ToArray();
 
                     entry.Invoke(subArgs);
 
@@ -105,10 +79,10 @@ namespace Mefino.CLI
                 "Disable all installed packages.",
                 Cmd_DisableAll),
 
-            new ConsoleCommand("uninstall",
-                "u",
-                "Uninstall (delete) the specified package GUID, eg. 'uninstall sinai-dev.Outward-SideLoader'",
-                Cmd_Uninstall),
+            //new ConsoleCommand("uninstall",
+            //    "u",
+            //    "Uninstall (delete) the specified package GUID, eg. 'uninstall sinai-dev.Outward-SideLoader'",
+            //    Cmd_Uninstall),
 
             new ConsoleCommand("uninstallall",
                 "",
@@ -145,6 +119,8 @@ namespace Mefino.CLI
             {
                 if (!Folders.SetOutwardFolderPath(args[0]))
                     Console.WriteLine($"Invalid Outward path '{args[0]}'");
+                else
+                    AppDataManager.SaveConfig();
             }
         }
 
@@ -189,20 +165,6 @@ namespace Mefino.CLI
             }
         }
 
-        internal static void Cmd_Uninstall(params string[] args)
-        {
-            if (!Folders.IsCurrentOutwardPathValid())
-            {
-                Console.WriteLine("You need to set the Outward path first!");
-                return;
-            }
-
-            foreach (var guid in args)
-            {
-                LocalPackageManager.TryDeleteDirectory(guid);
-            }
-        }
-
         internal static void Cmd_UninstallAll(params string[] args)
         {
             if (!Folders.IsCurrentOutwardPathValid())
@@ -214,7 +176,7 @@ namespace Mefino.CLI
             for (int i = LocalPackageManager.s_enabledPackages.Count - 1; i >= 0; i--)
             {
                 var pkg = LocalPackageManager.s_enabledPackages.ElementAt(i).Value;
-                LocalPackageManager.TryRemovePackage(pkg.GUID);
+                LocalPackageManager.TryUninstallPackage(pkg.GUID);
             }
         }
 
@@ -252,7 +214,40 @@ namespace Mefino.CLI
             if (!LocalPackageManager.s_enabledPackages.Any())
                 return;
 
-            LocalPackageManager.TryDisableAllPackages();
+            LocalPackageManager.DisableAllPackages();
         }
+
+
+        // ============== Show/Hiding console (extern) ============= //
+
+        // the nCommandShow values used to Show/Hide a console window.
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+
+        /// <summary>
+        /// Show the console for the application
+        /// </summary>
+        public static void ShowConsole()
+        {
+            var handle = GetConsoleWindow();
+            ShowWindow(handle, SW_SHOW);
+        }
+
+        /// <summary>
+        /// Hide the console for the application
+        /// </summary>
+        public static void HideConsole()
+        {
+            var handle = GetConsoleWindow();
+            ShowWindow(handle, SW_HIDE);
+        }
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        // ========================================================= //
     }
 }

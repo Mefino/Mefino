@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace Mefino.Core
 {
+    /// <summary>
+    /// Used to track the status of a Mefino package.
+    /// </summary>
     public enum InstallState
     {
-        NONE,
         NotInstalled,
         Outdated,
         MissingDependency,
+        HasConflict,
         Installed
     }
 }

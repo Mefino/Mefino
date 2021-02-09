@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 
 namespace Mefino.Web
 {
+    /// <summary>
+    /// Handles interaction with BepInEx releases.
+    /// </summary>
     public static class BepInExHandler
     {
         public static string InstalledBepInExVersion;
@@ -26,15 +29,9 @@ namespace Mefino.Web
 
         internal const string BEPINEX_RELEASE_API_QUERY = @"https://api.github.com/repos/BepInEx/BepInEx/releases/latest";
 
-        public static void UpdateBepInExIfNeeded()
-        {
-            if (!IsBepInExUpdated())
-            {
-                if (!string.IsNullOrEmpty(s_latestBepInExVersion))
-                    UpdateBepInEx();
-            }
-        }
-
+        /// <summary>
+        /// Is BepInEx installed at all?
+        /// </summary>
         public static bool IsBepInExInstalled()
         {
             if (!Folders.IsCurrentOutwardPathValid())
@@ -48,6 +45,21 @@ namespace Mefino.Web
                 && File.Exists(Path.Combine(Folders.OUTWARD_FOLDER, "winhttp.dll"));
         }
 
+        /// <summary>
+        /// Check if BepInEx is oudated, if so update it.
+        /// </summary>
+        public static void UpdateBepInExIfNeeded()
+        {
+            if (!IsBepInExUpdated())
+            {
+                if (!string.IsNullOrEmpty(s_latestBepInExVersion))
+                    UpdateBepInEx();
+            }
+        }
+
+        /// <summary>
+        /// Is BepInEx up to date?
+        /// </summary>
         public static bool IsBepInExUpdated()
         {
             // Only query the version once per launch.
@@ -94,6 +106,9 @@ namespace Mefino.Web
             }
         }
 
+        /// <summary>
+        /// Attempt to update BepInEx to the latest version.
+        /// </summary>
         public static void UpdateBepInEx()
         {
             if (!Folders.IsCurrentOutwardPathValid())
@@ -136,8 +151,6 @@ namespace Mefino.Web
                 Console.WriteLine("Exception downloading and installing BepInEx!");
                 Console.WriteLine(ex);
             }
-
-            //ExtractZip(dirpath, tempfilepath);
         }
     }
 }

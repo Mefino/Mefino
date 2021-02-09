@@ -193,29 +193,26 @@ namespace Mefino.GUI
             // 
             // _progressText
             // 
-            this._progressText.AutoSize = true;
             this._progressText.Font = new System.Drawing.Font("Ebrima", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._progressText.ForeColor = System.Drawing.SystemColors.AppWorkspace;
-            this._progressText.Location = new System.Drawing.Point(338, 3);
-            this._progressText.MinimumSize = new System.Drawing.Size(500, 30);
+            this._progressText.Location = new System.Drawing.Point(475, 3);
+            this._progressText.MinimumSize = new System.Drawing.Size(200, 30);
             this._progressText.Name = "_progressText";
-            this._progressText.Size = new System.Drawing.Size(500, 30);
+            this._progressText.Size = new System.Drawing.Size(467, 30);
             this._progressText.TabIndex = 4;
             this._progressText.Text = "This is an example of some text";
             this._progressText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _progressBar
             // 
-            this._progressBar.Dock = System.Windows.Forms.DockStyle.Left;
             this._progressBar.HideProgressText = false;
-            this._progressBar.Location = new System.Drawing.Point(0, 0);
+            this._progressBar.Location = new System.Drawing.Point(4, 6);
             this._progressBar.Name = "_progressBar";
-            this._progressBar.Size = new System.Drawing.Size(332, 38);
+            this._progressBar.Size = new System.Drawing.Size(465, 27);
             this._progressBar.Style = MetroFramework.MetroColorStyle.Orange;
             this._progressBar.TabIndex = 3;
             this._progressBar.Theme = MetroFramework.MetroThemeStyle.Dark;
             this._progressBar.UseCustomBackColor = true;
-            this._progressBar.Value = 10;
             // 
             // _globalStyleManager
             // 
@@ -247,7 +244,6 @@ namespace Mefino.GUI
             this._topTitlePanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._mainLogo)).EndInit();
             this._btmProgressPanel.ResumeLayout(false);
-            this._btmProgressPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._globalStyleManager)).EndInit();
             this.ResumeLayout(false);
 

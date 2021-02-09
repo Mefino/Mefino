@@ -17,31 +17,24 @@ namespace Mefino.Web
         public static int LastDownloadProgress => s_lastDownloadProgressPercent;
         private static int s_lastDownloadProgressPercent;
 
-        //public static bool LastDownloadSuccess => s_lastDownloadSuccess;
-        //private static bool s_lastDownloadSuccess;
-
         public static bool IsBusy => s_webClient?.IsBusy ?? false;
 
-        // ======== Internal =========
-
+        /// <summary>
+        /// Setup the WebClientManager's callbacks.
+        /// </summary>
         internal static void Initialize()
         {
             s_webClient.DownloadProgressChanged += OnDownloadProgress;
-            //s_webClient.DownloadFileCompleted += OnDownloadCompleted;
         }
 
         private static void OnDownloadProgress(object sender, DownloadProgressChangedEventArgs e)
         {
             s_lastDownloadProgressPercent = e.ProgressPercentage;
-            // Mefino.SendAsyncProgress(e.ProgressPercentage);
         }
 
-        //private static void OnDownloadCompleted(object sender, AsyncCompletedEventArgs e)
-        //{
-        //    s_lastDownloadProgressPercent = 100;
-        //    s_lastDownloadSuccess = !e.Cancelled && e.Error == null;
-        //}
-
+        /// <summary>
+        /// Reset the WebClient, ensuring protocols and headers are set properly.
+        /// </summary>
         private static void Reset()
         {
             ServicePointManager.Expect100Continue = true;
@@ -55,8 +48,9 @@ namespace Mefino.Web
             s_webClient.Headers.Add("User-Agent", "request");
         }
         
-        // ========= Public ==========
-
+        /// <summary>
+        /// Download from the given URL as a string.
+        /// </summary>
         public static string DownloadString(string url)
         {
             try
@@ -72,6 +66,9 @@ namespace Mefino.Web
             }
         }
 
+        /// <summary>
+        /// Download from the given URL to the provided file path, which should probably be a temporary file.
+        /// </summary>
         public static void DownloadFileAsync(string fileURL, string tempFile)
         {
             try

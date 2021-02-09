@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Mefino.Core.Profiles
 {
@@ -28,26 +29,60 @@ namespace Mefino.Core.Profiles
             if (this.packages == null || this.packages.Count == 0)
             {
                 if (LocalPackageManager.s_enabledPackages.Any())
-                    LocalPackageManager.TryDisableAllPackages();
+                    LocalPackageManager.DisableAllPackages();
                 return;
+            }
+
+            // Try enable all packages (does nothing if already OK)
+            // its possible our 'packages' list will change during this process, so copy it now.
+            //var copy = packages.ToList();
+            List<string> missing = new List<string>();
+            for (int i = 0; i < packages.Count; i++)
+            {
+                var pkg = packages[i];
+                if (LocalPackageManager.TryGetInstalledPackage(pkg) == null)
+                {
+                    missing.Add(pkg);
+                }
+                else
+                {
+                    if (!LocalPackageManager.TryEnablePackage(pkg))
+                    {
+                        LocalPackageManager.TryDisablePackage(pkg, true);
+                        packages.Remove(pkg);
+                    }
+                }
+            }
+
+            if (missing.Any())
+            {
+                string miss = "";
+                foreach (var entry in missing)
+                    miss += $"\n{entry}";
+
+                var msgResult = MessageBox.Show($"The following packages in your profile are missing and need to be re-installed:" +
+                    $"\n{miss}" +
+                    $"\n\n" +
+                    $"Do you want to re-install them?",
+                    "Missing packages!",
+                    MessageBoxButtons.YesNo);
+                if (msgResult == DialogResult.Yes)
+                {
+                    foreach (var entry in missing)
+                        LocalPackageManager.TryInstallWebPackage(entry);
+                }
             }
 
             // Disable currently enabled packages which are not in this profile
             if (LocalPackageManager.s_enabledPackages.Any())
             {
-                foreach (var pkg in LocalPackageManager.s_enabledPackages.Where(it => !packages.Contains(it.Key)))
+                for (int i = LocalPackageManager.s_enabledPackages.Count - 1; i >= 0; i--)
                 {
-                    LocalPackageManager.TryDisablePackage(pkg.Key, true);
+                    var pkg = LocalPackageManager.s_enabledPackages.ElementAt(i);
+
+                    if (!packages.Any(it => it == pkg.Key))
+                        LocalPackageManager.TryDisablePackage(pkg.Key, true);
                 }
-            }
-
-            // Enable remaining packages in this profile which aren't enabled
-            foreach (var pkg in this.packages)
-            {
-                if (LocalPackageManager.s_enabledPackages.ContainsKey(pkg))
-                    continue;
-
-                LocalPackageManager.TryEnablePackage(pkg);
             }
         }
 

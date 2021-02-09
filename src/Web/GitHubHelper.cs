@@ -9,10 +9,15 @@ using System.Threading.Tasks;
 
 namespace Mefino.Web
 {
+    /// <summary>
+    /// Handles generic GitHub interaction, and Mefino's package search query.
+    /// </summary>
     public static class GithubHelper
     {
-        // ======= API Query ======== //
-
+        /// <summary>
+        /// Fetch a Json API query from the given URL.
+        /// </summary>
+        /// <returns>A JsonValue of the query result if successful, otherwise null.</returns>
         public static JsonValue? FetchJsonApiQuery(string apiQuery)
         {
             string query = WebClientManager.DownloadString(apiQuery);
@@ -23,6 +28,9 @@ namespace Mefino.Web
             return null;
         }
 
+        /// <summary>
+        /// Get the latest release version. The <paramref name="githubQueryUrl"/> should be: <c>https://api.github.com/repos/{AUTHOR}/{REPOSITORY}/releases/latest</c>
+        /// </summary>
         public static string GetLatestReleaseVersion(string githubQueryUrl)
         {
             var queryResult = FetchJsonApiQuery(githubQueryUrl);
@@ -45,7 +53,9 @@ namespace Mefino.Web
             return version;
         }
 
-        // used by WebManifestManager
+        /// <summary>
+        /// Search GitHub for Mefino packages. Returns the search result as a JsonValue.
+        /// </summary>
         public static JsonValue? QueryForMefinoPackages()
         {
             try

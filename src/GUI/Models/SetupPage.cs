@@ -1,4 +1,5 @@
 ﻿using Mefino.Core;
+using Mefino.Core.Profiles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -91,6 +92,8 @@ namespace Mefino.GUI.Models
                 this._bepStatus.ForeColor = Color.LightGreen;
                 this._bepInstallButton.Visible = false;
 
+                LocalPackageManager.RefreshInstalledPackages();
+
                 MefinoGUI.EnabledFeaturePages();
                 Folders.CheckOutwardMefinoInstall();
 
@@ -137,6 +140,8 @@ namespace Mefino.GUI.Models
                         Folders.SetOutwardFolderPath(filePath, out InstallState state);
 
                         SetOtwPathResult(state);
+
+                        AppDataManager.SaveConfig();
                     }
                 }
             }
@@ -154,25 +159,35 @@ namespace Mefino.GUI.Models
             this._bepInstallButton.Enabled = true;
             this._uninstallButton.Enabled = true;
             MefinoGUI.SetProgressBarActive(false);
+
             RefreshBepInExPanel();
+
             Application.DoEvents();
 
             if (Web.BepInExHandler.s_lastInstallStateResult != InstallState.Installed)
             {
                 MessageBox.Show($"Failed to update BepInEx! Make sure Outward isn't running and you're online.", "Warning", MessageBoxButtons.OK);
             }
-
+            else
+            {
+                ProfileManager.LoadProfiles(false);
+            }
         }
 
         private void _uninstallButton_Click(object sender, EventArgs e)
         {
-            var result = MefinoApp.CompleteUninstall();
+            ProfileManager.SavePrompt(false);
+
+            var result = OutwardHelper.UninstallFromOutward();
 
             if (result == DialogResult.Cancel)
                 return;
 
             Folders.IsCurrentOutwardPathValid(out InstallState state);
             SetOtwPathResult(state);
+
+            LocalPackageManager.RefreshInstalledPackages();
+            LauncherPage.Instance.RebuildPackageList();
         }
     }
 }

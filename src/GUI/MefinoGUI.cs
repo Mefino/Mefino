@@ -1,4 +1,7 @@
-﻿using Mefino.GUI.Models;
+﻿using Mefino.Core;
+using Mefino.Core.Profiles;
+using Mefino.GUI.Models;
+using Mefino.IO;
 using MetroFramework.Controls;
 using System;
 using System.Collections.Generic;
@@ -16,20 +19,29 @@ namespace Mefino.GUI
     {
         public static MefinoGUI Instance;
 
+        internal static readonly List<Control> SensitiveControls = new List<Control>();
+
         internal static MetroTabPage[] s_featureTabPages;
 
         public MefinoGUI()
         {
             Instance = this;
 
+            this.FormClosed += MefinoGUI_FormClosed;
+
             InitializeComponent();
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
 
             SetProgressBarActive(false);
 
             s_featureTabPages = new MetroTabPage[]
             {
-                Instance._manageTabPage,
                 Instance._browseTabPage,
+                Instance._manageTabPage,
             };
 
             this.Text = $"Mefino {MefinoApp.VERSION}";
@@ -42,9 +54,73 @@ namespace Mefino.GUI
 
             // if setup is all good, init features, otherwise SetupPage must do it.
             if (Folders.IsCurrentOutwardPathValid() && bepinex)
+            {
                 EnabledFeaturePages();
+            }
             else
+            {
                 DisableFeaturePages();
+                Instance._tabView.SelectedIndex = 0;
+            }
+        }
+
+        private void MefinoGUI_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            TemporaryFile.CleanupAllFiles();
+
+            AppDataManager.SaveConfig();
+            ProfileManager.SavePrompt();
+        }
+
+        private static bool[] s_lastEnabledSensitiveStates;
+
+        public static void DisableSensitiveControls()
+        {
+            try
+            {
+                for (int i = 0; i < Instance._tabView.TabPages.Count; i++)
+                {
+                    if (i == Instance._tabView.SelectedIndex)
+                        continue;
+
+                    var page = (MetroTabPage)Instance._tabView.TabPages[i];
+                    Instance.Invoke(new MethodInvoker(() => { Instance._tabView.DisableTab(page); }));
+                }
+
+                s_lastEnabledSensitiveStates = new bool[SensitiveControls.Count];
+                for (int i = 0; i < SensitiveControls.Count; i++)
+                {
+                    s_lastEnabledSensitiveStates[i] = SensitiveControls[i].Enabled;
+                    SensitiveControls[i].Invoke(new MethodInvoker(() => { SensitiveControls[i].Enabled = false; }));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("exception on DisableSensitiveControls: " + ex);
+            }
+        }
+
+        public static void ReEnableSensitiveControls()
+        {
+            try
+            {
+                int origSelected = Instance._tabView.SelectedIndex;
+                for (int i = 0; i < Instance._tabView.TabPages.Count; i++)
+                {
+                    var page = (MetroTabPage)Instance._tabView.TabPages[i];
+                    Instance.Invoke(new MethodInvoker(() => { Instance._tabView.EnableTab(page); }));
+                }
+                Instance.Invoke(new MethodInvoker(() => { Instance._tabView.SelectedIndex = origSelected; }));
+
+                for (int i = 0; i < SensitiveControls.Count; i++)
+                {
+                    SensitiveControls[i].Invoke(new MethodInvoker(() => { SensitiveControls[i].Enabled = s_lastEnabledSensitiveStates[i]; }));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("exception on ReEnableSensitiveControls: " + ex);
+            }
         }
 
         public static void DisableFeaturePages()
@@ -68,23 +144,21 @@ namespace Mefino.GUI
             foreach (var tab in s_featureTabPages)
                 Instance._tabView.EnableTab(tab);
 
-            // go to launch page by default
             Instance._tabView.SelectedIndex = 2;
 
-            if (s_doneInitFeatures)
-                return;
+            if (ProfileManager.ActiveProfile == null)
+                ProfileManager.LoadProfileOrSetDefault();
 
-            s_doneInitFeatures = true;
+            if (!s_doneInitFeatures)
+            {
+                s_doneInitFeatures = true;
 
-            // add control modules for other pages
-            Instance._manageTabPage.Controls.Add(new LauncherPage());
-            Instance._browseTabPage.Controls.Add(new BrowseModsPage());
+                // add control modules for other pages
+                Instance._browseTabPage.Controls.Add(new BrowseModsPage());
+                Instance._manageTabPage.Controls.Add(new LauncherPage());
+            }
 
-            // Refresh 
             Application.DoEvents();
-
-            // refresh web manifests after the menu inits (just looks smoother in this order)
-            Core.WebManifestManager.UpdateWebManifests();
         }
 
         public static void SetProgressBarActive(bool active)

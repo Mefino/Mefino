@@ -1,8 +1,14 @@
 # Mefino [![Mefino](https://raw.githubusercontent.com/Mefino/Mefino/main/img/logo_32x32.png)]()
 
-Mefino is a work-in-progress Mod Manager for Outward.
+<p align="center">
+  Mefino is a work-in-progress Mod Manager for Outward.
 
-Mefino is currently in Alpha testing phase.
+  <a href="https://discord.gg/zKyfGmy7TR">
+    <img src="https://img.shields.io/badge/Discord-chat-blue?style=social&logo=discord" />
+  </a>
+  
+</p>
+
 
 ## How to use
 
@@ -33,6 +39,11 @@ For an example release, you can see [here](https://github.com/Mefino/Mefino.Plug
 	"name": "",
 	"version": "",
 	"description": "",
+	"tags": [
+		"Mechanics",
+		"UI",
+		"Skills"
+	],
 	"dependencies": [
 		"someAuthor someRepository",
 		"someAuthor someRepository"
@@ -45,7 +56,7 @@ For an example release, you can see [here](https://github.com/Mefino/Mefino.Plug
 }
 ```
 
-`author` and `name` (string) [optional]
+`author` and `name` (string) <b>[optional]</b>
 * Your GitHub username and Repository name, they are <b>not required</b> to be set for web releases. If you install a local package manually you <b>do</b> need to set these for Mefino to work properly.
 
 `version` (string)
@@ -53,6 +64,11 @@ For an example release, you can see [here](https://github.com/Mefino/Mefino.Plug
 
 `description` (string)
 * A short description for your package, just one or two sentences.
+
+`tags` (list of strings) <b>[optional]</b>
+* A list of tags for your package, used for filtering on the "Browse Mods" tab of Mefino.
+* You can <b>only</b> use these accepted tags (case insensitive): `Balancing`, `Characters`, `Items`, `Mechanics`, `Quests`, `Skills`, `Skill Trees`, `Utility`, `UI`
+* You can suggest another tag in the Discord if you want.
 
 `dependencies` (list of strings)
 * A list of other package GUIDs which your package depends on.
@@ -63,7 +79,7 @@ For an example release, you can see [here](https://github.com/Mefino/Mefino.Plug
 `require_sync` (boolean)
 * Whether your mod should be installed by all players online, it must be `true` or `false`. In the future this will be used for "automatic" online mod syncing.
 
-`override_folder` (string) [optional]
+`override_folder` (string) <b>[optional]</b>
 * An optional special name you can use for the install directory instead of your `name`, ie. instead of installing to `plugins\{author} {name}\` it will install to `plugins\{author} {overide_folder}\`. This does not affect your GUID.
 
 ### Local installs

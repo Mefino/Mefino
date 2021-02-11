@@ -80,12 +80,13 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 #### Optional
 
 `author` and `repository` (string)
-* Your GitHub Username and the Repository name where this package is hosted. They are <b>not required</b> to be set for web releases, but if you install a local package manually you <b>do</b> need to set the `author` for Mefino to work properly.
+* Your GitHub Username and the Repository name where this package is hosted. They are <b>not required</b> to be set for web releases, but if you install a local package manually you <b>do</b> need to set `author` for Mefino to work properly.
 
 `tags` (list of strings)
 * A list of tags for your package, used for filtering on the "Browse Mods" tab of Mefino.
-* You can <b>only</b> use these accepted tags (case insensitive): `Balancing`, `Characters`, `Items`, `Mechanics`, `Quests`, `Skills`, `Skill Trees`, `Utility`, `UI`
+* You can <b>only</b> use these accepted tags (case insensitive): `Balancing`, `Characters`, `Classes`, `Items`, `Library`, `Mechanics`, `Quests`, `Skills`, `Utility`, `UI`
 * You can suggest another tag in the Discord if you want.
+* The `Library` tag will mean your package is hidden unless the user enables "Show Libraries".
 
 `dependencies` (list of strings)
 * A list of other package GUIDs which your package depends on.

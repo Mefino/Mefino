@@ -43,6 +43,7 @@ namespace Mefino.GUI
             this._progressText = new System.Windows.Forms.Label();
             this._progressBar = new MetroFramework.Controls.MetroProgressBar();
             this._globalStyleManager = new MetroFramework.Components.MetroStyleManager(this.components);
+            this._loadingSplash = new Mefino.GUI.Models.LoadingPage();
             this._tabView.SuspendLayout();
             this._topTitlePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._mainLogo)).BeginInit();
@@ -220,12 +221,22 @@ namespace Mefino.GUI
             this._globalStyleManager.Style = MetroFramework.MetroColorStyle.Orange;
             this._globalStyleManager.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
+            // _loadingSplash
+            // 
+            this._loadingSplash.Location = new System.Drawing.Point(25, 152);
+            this._loadingSplash.Name = "_loadingSplash";
+            this._loadingSplash.Size = new System.Drawing.Size(942, 470);
+            this._loadingSplash.TabIndex = 5;
+            this._loadingSplash.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._loadingSplash.UseSelectable = true;
+            // 
             // MefinoGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BorderStyle = MetroFramework.Forms.MetroFormBorderStyle.FixedSingle;
             this.ClientSize = new System.Drawing.Size(982, 685);
+            this.Controls.Add(this._loadingSplash);
             this.Controls.Add(this._topTitlePanel);
             this.Controls.Add(this._tabView);
             this.Controls.Add(this._btmProgressPanel);
@@ -263,5 +274,6 @@ namespace Mefino.GUI
         private MetroFramework.Components.MetroStyleManager _globalStyleManager;
         private MetroFramework.Controls.MetroProgressBar _progressBar;
         private System.Windows.Forms.Label _progressText;
+        private Models.LoadingPage _loadingSplash;
     }
 }

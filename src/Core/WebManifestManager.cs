@@ -80,6 +80,10 @@ namespace Mefino.Core
                 var author = queryResult["owner"].AsJsonObject["login"].AsString;
                 var repoName = queryResult["name"].AsString;
 
+                // Mefino itself might be a result, ignore it.
+                if (author == "Mefino" && repoName == "Mefino")
+                    return null;
+
                 var guid = $"{author} {repoName}";
 
                 //Console.WriteLine("Checking github result '" + guid + "'");

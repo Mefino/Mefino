@@ -29,16 +29,16 @@ namespace Mefino.GUI.Models
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BrowseModsPage));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             this._packageList = new System.Windows.Forms.DataGridView();
             this._listColName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._listColVersion = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -59,6 +59,7 @@ namespace Mefino.GUI.Models
             this._infoBoxTitle = new MetroFramework.Controls.MetroLabel();
             this._infoBoxVersionAuthor = new MetroFramework.Controls.MetroLabel();
             this._packagesTitle = new MetroFramework.Controls.MetroLabel();
+            this._tagDropDown = new MetroFramework.Controls.MetroComboBox();
             ((System.ComponentModel.ISupportInitialize)(this._packageList)).BeginInit();
             this._packageInfoBox.SuspendLayout();
             this._infoBoxTabs.SuspendLayout();
@@ -76,14 +77,14 @@ namespace Mefino.GUI.Models
             this._packageList.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             this._packageList.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this._packageList.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Ebrima", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle10.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._packageList.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Ebrima", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._packageList.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this._packageList.ColumnHeadersHeight = 25;
             this._packageList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this._packageList.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -91,27 +92,27 @@ namespace Mefino.GUI.Models
             this._listColVersion,
             this._listColAuthor,
             this._listColStatus});
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Ebrima", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._packageList.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Ebrima", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._packageList.DefaultCellStyle = dataGridViewCellStyle2;
             this._packageList.EnableHeadersVisualStyles = false;
             this._packageList.GridColor = System.Drawing.Color.Black;
             this._packageList.Location = new System.Drawing.Point(16, 56);
             this._packageList.Name = "_packageList";
-            this._packageList.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
+            this._packageList.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._packageList.RowHeadersVisible = false;
             this._packageList.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle13.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            dataGridViewCellStyle13.Font = new System.Drawing.Font("Ebrima", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle13.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.Black;
-            this._packageList.RowsDefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Ebrima", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
+            this._packageList.RowsDefaultCellStyle = dataGridViewCellStyle4;
             this._packageList.RowTemplate.DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
             this._packageList.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("Ebrima", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._packageList.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.Color.White;
@@ -128,7 +129,6 @@ namespace Mefino.GUI.Models
             this._listColName.Name = "_listColName";
             this._listColName.ReadOnly = true;
             this._listColName.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this._listColName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this._listColName.Width = 180;
             // 
             // _listColVersion
@@ -137,7 +137,6 @@ namespace Mefino.GUI.Models
             this._listColVersion.Name = "_listColVersion";
             this._listColVersion.ReadOnly = true;
             this._listColVersion.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this._listColVersion.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this._listColVersion.Width = 80;
             // 
             // _listColAuthor
@@ -146,7 +145,6 @@ namespace Mefino.GUI.Models
             this._listColAuthor.Name = "_listColAuthor";
             this._listColAuthor.ReadOnly = true;
             this._listColAuthor.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this._listColAuthor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this._listColAuthor.Width = 149;
             // 
             // _listColStatus
@@ -155,7 +153,6 @@ namespace Mefino.GUI.Models
             this._listColStatus.Name = "_listColStatus";
             this._listColStatus.ReadOnly = true;
             this._listColStatus.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this._listColStatus.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this._listColStatus.Width = 127;
             // 
             // _updateButton
@@ -163,13 +160,13 @@ namespace Mefino.GUI.Models
             this._updateButton.ForeColor = System.Drawing.Color.LightGreen;
             this._updateButton.Location = new System.Drawing.Point(417, 18);
             this._updateButton.Name = "_updateButton";
-            this._updateButton.Size = new System.Drawing.Size(139, 32);
+            this._updateButton.Size = new System.Drawing.Size(139, 29);
             this._updateButton.TabIndex = 14;
             this._updateButton.Text = "Refresh";
             this._updateButton.Theme = MetroFramework.MetroThemeStyle.Dark;
             this._updateButton.UseCustomForeColor = true;
             this._updateButton.UseSelectable = true;
-            this._updateButton.Click += new System.EventHandler(this._updateButton_Click);
+            this._updateButton.Click += new System.EventHandler(this._refreshButton_Click);
             // 
             // _packageInfoBox
             // 
@@ -256,53 +253,53 @@ namespace Mefino.GUI.Models
             this._infoboxListView.AllowUserToDeleteRows = false;
             this._infoboxListView.AllowUserToResizeColumns = false;
             this._infoboxListView.AllowUserToResizeRows = false;
-            dataGridViewCellStyle14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(22)))), ((int)(((byte)(22)))));
-            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(22)))), ((int)(((byte)(22)))));
-            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.White;
-            this._infoboxListView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(22)))), ((int)(((byte)(22)))));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(22)))), ((int)(((byte)(22)))));
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.White;
+            this._infoboxListView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle5;
             this._infoboxListView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this._infoboxListView.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
             this._infoboxListView.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             this._infoboxListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this._infoboxListView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle15.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
-            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle15.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
-            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._infoboxListView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._infoboxListView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this._infoboxListView.ColumnHeadersHeight = 25;
             this._infoboxListView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this._infoboxListView.ColumnHeadersVisible = false;
             this._infoboxListView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn1,
             this.dataGridViewTextBoxColumn2});
-            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle16.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
-            dataGridViewCellStyle16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle16.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
-            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this._infoboxListView.DefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._infoboxListView.DefaultCellStyle = dataGridViewCellStyle7;
             this._infoboxListView.EnableHeadersVisualStyles = false;
             this._infoboxListView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this._infoboxListView.Location = new System.Drawing.Point(0, 13);
             this._infoboxListView.Name = "_infoboxListView";
             this._infoboxListView.ReadOnly = true;
-            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._infoboxListView.RowHeadersDefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._infoboxListView.RowHeadersDefaultCellStyle = dataGridViewCellStyle8;
             this._infoboxListView.RowHeadersVisible = false;
             this._infoboxListView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle18.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
-            dataGridViewCellStyle18.Font = new System.Drawing.Font("Ebrima", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle18.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
-            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.White;
-            this._infoboxListView.RowsDefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Ebrima", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.Color.White;
+            this._infoboxListView.RowsDefaultCellStyle = dataGridViewCellStyle9;
             this._infoboxListView.RowTemplate.DefaultCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopLeft;
             this._infoboxListView.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("Ebrima", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._infoboxListView.RowTemplate.DefaultCellStyle.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
@@ -344,11 +341,11 @@ namespace Mefino.GUI.Models
             this._infoBoxCloseButton.UseSelectable = true;
             this._infoBoxCloseButton.Click += new System.EventHandler(this._infoBoxCloseButton_Click);
             // 
-            // _infoBoxUninstallButton
+            // _infoBoxInstallButton
             // 
             this._infoBoxInstallButton.ForeColor = System.Drawing.Color.IndianRed;
             this._infoBoxInstallButton.Location = new System.Drawing.Point(13, 345);
-            this._infoBoxInstallButton.Name = "_infoBoxUninstallButton";
+            this._infoBoxInstallButton.Name = "_infoBoxInstallButton";
             this._infoBoxInstallButton.Size = new System.Drawing.Size(315, 29);
             this._infoBoxInstallButton.TabIndex = 7;
             this._infoBoxInstallButton.Text = "Uninstall";
@@ -400,10 +397,24 @@ namespace Mefino.GUI.Models
             this._packagesTitle.Text = "GitHub Packages:";
             this._packagesTitle.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
+            // _tagDropDown
+            // 
+            this._tagDropDown.FormattingEnabled = true;
+            this._tagDropDown.ItemHeight = 23;
+            this._tagDropDown.Location = new System.Drawing.Point(185, 18);
+            this._tagDropDown.Name = "_tagDropDown";
+            this._tagDropDown.Size = new System.Drawing.Size(226, 29);
+            this._tagDropDown.Style = MetroFramework.MetroColorStyle.Orange;
+            this._tagDropDown.TabIndex = 17;
+            this._tagDropDown.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._tagDropDown.UseSelectable = true;
+            this._tagDropDown.SelectedIndexChanged += new System.EventHandler(this._tagDropDown_SelectedIndexChanged);
+            // 
             // BrowseModsPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this._tagDropDown);
             this.Controls.Add(this._packagesTitle);
             this.Controls.Add(this._packageInfoBox);
             this.Controls.Add(this._updateButton);
@@ -426,10 +437,6 @@ namespace Mefino.GUI.Models
         #endregion
 
         private System.Windows.Forms.DataGridView _packageList;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _listColName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _listColVersion;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _listColAuthor;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _listColStatus;
         private MetroFramework.Controls.MetroButton _updateButton;
         private MetroFramework.Controls.MetroPanel _packageInfoBox;
         private MetroFramework.Controls.MetroTabControl _infoBoxTabs;
@@ -445,5 +452,10 @@ namespace Mefino.GUI.Models
         private MetroFramework.Controls.MetroLabel _infoBoxTitle;
         private MetroFramework.Controls.MetroLabel _infoBoxVersionAuthor;
         private MetroFramework.Controls.MetroLabel _packagesTitle;
+        private MetroFramework.Controls.MetroComboBox _tagDropDown;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _listColName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _listColVersion;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _listColAuthor;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _listColStatus;
     }
 }

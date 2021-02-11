@@ -32,11 +32,21 @@ namespace Mefino.GUI
             InitializeComponent();
         }
 
+        public static void SetLoadingSplashVisible(bool visible)
+        {
+            if (Instance == null)
+                return;
+
+            Instance.Invoke(new MethodInvoker(() => { Instance._loadingSplash.Visible = visible; }));
+            Application.DoEvents();
+        }
+
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
 
             SetProgressBarActive(false);
+            SetLoadingSplashVisible(false);
 
             s_featureTabPages = new MetroTabPage[]
             {
@@ -47,13 +57,13 @@ namespace Mefino.GUI
             this.Text = $"Mefino {MefinoApp.VERSION}";
             this._versionLabel.Text = $"v{MefinoApp.VERSION}";
 
-            var bepinex = Core.Web.BepInExHandler.IsBepInExUpdated();
+            bool bepUpdated = Core.Web.BepInExHandler.IsBepInExUpdated();
 
             // create setup page control
             this._setupTabPage.Controls.Add(new SetupPage());
 
             // if setup is all good, init features, otherwise SetupPage must do it.
-            if (Folders.IsCurrentOutwardPathValid() && bepinex)
+            if (Folders.IsCurrentOutwardPathValid() && bepUpdated)
             {
                 EnabledFeaturePages();
             }
@@ -141,6 +151,8 @@ namespace Mefino.GUI
             if (Instance == null)
                 return;
 
+            SetLoadingSplashVisible(true);
+
             foreach (var tab in s_featureTabPages)
                 Instance._tabView.EnableTab(tab);
 
@@ -159,6 +171,8 @@ namespace Mefino.GUI
             }
 
             Application.DoEvents();
+
+            SetLoadingSplashVisible(false);
         }
 
         public static void SetProgressBarActive(bool active)

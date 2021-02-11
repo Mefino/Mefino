@@ -220,34 +220,13 @@ namespace Mefino.CLI
 
         // ============== Show/Hiding console (extern) ============= //
 
-        // the nCommandShow values used to Show/Hide a console window.
-        const int SW_HIDE = 0;
-        const int SW_SHOW = 5;
-
-        /// <summary>
-        /// Show the console for the application
-        /// </summary>
         public static void ShowConsole()
         {
-            var handle = GetConsoleWindow();
-            ShowWindow(handle, SW_SHOW);
+            AllocConsole();
         }
 
-        /// <summary>
-        /// Hide the console for the application
-        /// </summary>
-        public static void HideConsole()
-        {
-            var handle = GetConsoleWindow();
-            ShowWindow(handle, SW_HIDE);
-        }
-
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GetConsoleWindow();
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        // ========================================================= //
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
     }
 }

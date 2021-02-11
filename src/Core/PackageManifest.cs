@@ -48,15 +48,11 @@ namespace Mefino.Core
         /// <summary>Version of the package, eg. 1.0.0.0</summary>
         public string version;
 
-        /// <summary>
-        /// [OPTIONAL] If set, this will be used instead of your <c>name</c> when installing your package.<br />
-        /// Meaning that instead of installing at <c>plugins\{author} {name}\</c>, it will be installed at <c>plugins\{author} {override_folder}\</c><br /><br />
-        /// This does not affect your <see cref="GUID"/>.
-        /// </summary>
-        public string override_folder;
-
         /// <summary>Short description of the package</summary>
         public string description;
+
+        /// <summary></summary>
+        public string[] tags = new string[0];
 
         /// <summary>List of dependency GUIDs for this package</summary>
         public string[] dependencies = new string[0];
@@ -66,6 +62,13 @@ namespace Mefino.Core
 
         /// <summary>True if this package should be installed by all players online, false if it doesn't matter.</summary>
         public bool require_sync;
+
+        /// <summary>
+        /// [OPTIONAL] If set, this will be used instead of your <c>name</c> when installing your package.<br />
+        /// Meaning that instead of installing at <c>plugins\{author} {name}\</c>, it will be installed at <c>plugins\{author} {override_folder}\</c><br /><br />
+        /// This does not affect your <see cref="GUID"/>.
+        /// </summary>
+        public string override_folder;
 
         /// <summary>
         /// [INTERNAL] The time the manifest was cached from the web, for web manifests.
@@ -162,6 +165,38 @@ namespace Mefino.Core
             }
 
             return timeToCheck <= thisTime;
+        }
+
+        /// <summary>
+        /// Try to enable this package, and optionally all dependencies too.
+        /// </summary>
+        public bool TryEnable(bool tryEnableDependencies = true)
+        {
+            return LocalPackageManager.TryEnablePackage(this.GUID, tryEnableDependencies);
+        }
+
+        /// <summary>
+        /// Try to disable this package.
+        /// </summary>
+        public bool TryDisable(bool skipWarnings = false)
+        {
+            return LocalPackageManager.TryDisablePackage(this.GUID, skipWarnings);
+        }
+
+        /// <summary>
+        /// Try to install this package and optionally enable it.
+        /// </summary>
+        public bool TryInstall(bool andEnable)
+        {
+            return LocalPackageManager.TryInstallWebPackage(this.GUID, andEnable);
+        }
+
+        /// <summary>
+        /// Try to uninstall this package.
+        /// </summary>
+        public bool TryUninstall()
+        {
+            return LocalPackageManager.TryUninstallPackage(this);
         }
 
         /// <summary>
@@ -359,19 +394,19 @@ namespace Mefino.Core
                 { nameof(m_manifestCachedTime), this.m_manifestCachedTime },
             };
 
-            if (this.dependencies != null)
-                ret.Add(nameof(dependencies), new JsonArray(this.dependencies.Select(it => new JsonValue(it))
-                                                                             .ToArray()));
-            else
-                ret.Add(nameof(dependencies), new JsonArray(new JsonValue[0]));
-
-            if (this.conflicts_with != null)
-                ret.Add(nameof(conflicts_with), new JsonArray(this.conflicts_with.Select(it => new JsonValue(it))
-                                                                                 .ToArray()));
-            else
-                ret.Add(nameof(conflicts_with), new JsonArray(new JsonValue[0]));
+            AddJsonStringArraySafe(ret, nameof(this.tags), this.tags);
+            AddJsonStringArraySafe(ret, nameof(this.dependencies), this.dependencies);
+            AddJsonStringArraySafe(ret, nameof(this.conflicts_with), this.conflicts_with);
 
             return ret;
+        }
+
+        private static void AddJsonStringArraySafe(JsonObject json, string name, string[] array)
+        {
+            if (array != null)
+                json.Add(name, new JsonArray(array.Select(it => new JsonValue(it)).ToArray()));
+            else
+                json.Add(name, new JsonArray(new JsonValue[0]));
         }
 
         /// <summary>
@@ -395,17 +430,20 @@ namespace Mefino.Core
                 if (json[nameof(description)].AsString is string desc)
                     ret.description = desc;
 
-                if (json[nameof(require_sync)].AsBoolean is bool requiresSync)
-                    ret.require_sync = requiresSync;
-
-                if (json[nameof(override_folder)].AsString is string folder)
-                    ret.override_folder = folder;
+                if (json[nameof(tags)].AsJsonArray is JsonArray tag)
+                    ret.tags = tag.Select(it => it.AsString)?.ToArray();
 
                 if (json[nameof(dependencies)].AsJsonArray is JsonArray deps)
                     ret.dependencies = deps.Select(it => it.AsString)?.ToArray();
 
                 if (json[nameof(conflicts_with)].AsJsonArray is JsonArray conflicts)
                     ret.conflicts_with = conflicts.Select(it => it.AsString)?.ToArray();
+
+                if (json[nameof(require_sync)].AsBoolean is bool requiresSync)
+                    ret.require_sync = requiresSync;
+
+                if (json[nameof(override_folder)].AsString is string folder)
+                    ret.override_folder = folder;
 
                 if (json[nameof(m_manifestCachedTime)].AsString is string cachetime)
                     ret.m_manifestCachedTime = cachetime;

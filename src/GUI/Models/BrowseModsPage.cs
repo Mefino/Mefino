@@ -16,6 +16,33 @@ namespace Mefino.GUI.Models
     {
         public static BrowseModsPage Instance;
 
+        private static readonly HashSet<string> s_acceptedTags = new HashSet<string>
+        {
+            "Balancing",
+            "Characters",
+            "Items",
+            "Mechanics",
+            "Quests",
+            "Skills",
+            "Skill Trees",
+            "Utility",
+            "UI",
+        };
+
+        public static bool IsTagAccepted(string tag)
+        {
+            foreach (var accepted in s_acceptedTags)
+            {
+                if (string.Equals(tag, accepted, StringComparison.InvariantCultureIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static string SelectedTag = "All";
+        private static readonly HashSet<string> s_implementedTags = new HashSet<string>();
+
         public BrowseModsPage()
         {
             Instance = this;
@@ -23,27 +50,28 @@ namespace Mefino.GUI.Models
 
             MefinoGUI.SensitiveControls.AddRange(new Control[] { this._infoBoxInstallButton, this._updateButton });
 
+            // init some states
             _packageInfoBox.Visible = false;
             _infoBoxTabs.SelectedIndex = 0;
 
+            // Register callbacks
             _packageList.CellClick += _packageList_CellClick;
 
             LocalPackageManager.OnPackageInstalled += RefreshRow;
             LocalPackageManager.OnPackageUninstalled += RefreshRow;
 
+            Console.WriteLine("updating bep packages...");
+
             // Force an update of web manifests on launch
             WebManifestManager.UpdateWebManifests();
 
-            RefreshPackageList();
-        }
+            Console.WriteLine("done");
 
-        private void _updateButton_Click(object sender, EventArgs e)
-        {
-            MefinoApp.RefreshAllPackages(true);
+            // Refresh tags after manifest update
+            RefreshTags();
 
             RefreshPackageList();
         }
-
         // ======= helpers ==========
 
         internal int TryGetIndexOfPackage(PackageManifest package)
@@ -85,7 +113,27 @@ namespace Mefino.GUI.Models
             return package;
         }
 
-        // ==========================
+        // ====== misc buttons ======
+
+        // Button to refresh the package list
+        private void _refreshButton_Click(object sender, EventArgs e)
+        {
+            MefinoApp.RefreshAllPackages(true);
+
+            RefreshPackageList();
+        }
+
+        // When user selects a tag from dropdown
+        private void _tagDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var idx = _tagDropDown.SelectedIndex;
+            SelectedTag = _tagDropDown.Items[idx].ToString();
+
+            RefreshPackageList();
+        }
+
+
+        // ============ Main package list ==========
 
         // ANY part of a row clicked
         private void _packageList_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -98,6 +146,38 @@ namespace Mefino.GUI.Models
             SetInfoboxPackage(package);
         }
 
+        public void RefreshTags()
+        {
+            s_implementedTags.Clear();
+
+            s_implementedTags.Add("All");
+
+            foreach (var package in WebManifestManager.s_cachedWebManifests.Values)
+            {
+                if (package.tags == null || !package.tags.Any())
+                    continue;
+
+                foreach (var tag in package.tags)
+                {
+                    if (string.IsNullOrEmpty(tag) || s_implementedTags.Contains(tag))
+                        continue;
+
+                    if (IsTagAccepted(tag))
+                        s_implementedTags.Add(tag);
+                }
+            }
+
+            _tagDropDown.Items.Clear();
+
+            foreach (var tag in s_implementedTags)
+                _tagDropDown.Items.Add(tag);
+
+            if (s_implementedTags.Contains(SelectedTag))
+                _tagDropDown.SelectedIndex = _tagDropDown.Items.IndexOf(SelectedTag);
+            else
+                _tagDropDown.SelectedIndex = 0;
+        }
+
         public void RefreshPackageList()
         {
             _packageList.Rows.Clear();
@@ -107,6 +187,15 @@ namespace Mefino.GUI.Models
 
             void AddPackageRow(PackageManifest package)
             {
+                if (SelectedTag != "All" && !string.IsNullOrEmpty(SelectedTag))
+                {
+                    if (package.tags == null
+                        || !package.tags.Contains(SelectedTag))
+                    {
+                        return;
+                    }
+                }
+
                 _packageList.Rows.Add(new string[]
                 {
                     package.name,
@@ -180,6 +269,8 @@ namespace Mefino.GUI.Models
             }
         }
 
+        // ============== Infobox ==============
+
         public void SetInfoboxPackage(PackageManifest package)
         {
             CurrentInspectedPackage = package;
@@ -204,7 +295,21 @@ namespace Mefino.GUI.Models
 
             _infoboxListView.Rows.Clear();
 
-            _infoboxListView.Rows.Add("Requires Sync:", package.require_sync.ToString());
+            _infoboxListView.Rows.Add("Requires Sync:", package.require_sync ? "Yes" : "No");
+
+            string tags = "";
+            if (package.tags != null)
+            {
+                foreach (var tag in package.tags)
+                {
+                    if (!IsTagAccepted(tag))
+                        continue;
+
+                    if (tags != "") tags += "\n";
+                    tags += tag;
+                }
+            }
+            _infoboxListView.Rows.Add("Tags", tags);
 
             string deps = "";
             if (package.dependencies != null)

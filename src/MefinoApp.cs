@@ -44,8 +44,9 @@ namespace Mefino
                 }
                 else // Otherwise launch the GUI.
                 {
-#if RELEASE
-                    CLIHandler.HideConsole();
+#if DEBUG
+                    // Show a console if DEBUG build.
+                    CLIHandler.ShowConsole();
 #endif
                     CurrentContext = MefinoContext.GUI;
                     CoreInit();

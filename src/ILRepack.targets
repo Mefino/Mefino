@@ -15,7 +15,7 @@
       DebugInfo="false"
       LibraryPath="$(OutputPath)"
       InputAssemblies="@(InputAssemblies)"      
-      TargetKind="Exe"
+      TargetKind="WinExe"
       OutputFile="$(OutputPath)$(AssemblyName).exe"
     />
 

@@ -81,12 +81,12 @@ For an example release, you can see [here](https://github.com/Mefino/Mefino.Plug
 * Whether your mod should be installed by all players online, it must be `true` or `false`. In the future this will be used for "automatic" online mod syncing.
 
 `override_folder` (string) <b>[optional]</b>
-* An optional special name you can use for the install directory instead of your `name`, ie. instead of installing to `plugins\{author} {name}\` it will install to `plugins\{author} {overide_folder}\`. This does not affect your GUID.
+* An optional special name you can use for the install directory instead of your `name`, ie. instead of installing to `plugins\{author} {name}\` it will install to `plugins\{author} {override_folder}\`. This does not affect your GUID.
 
 ### Local installs
 
 To install a package locally for testing:
-1. Create a folder in the `BepInEx\plugins\` folder which matches your install folder path (either `{author} {name}` or `{author} {overide_folder}`).
+1. Create a folder in the `BepInEx\plugins\` folder which matches your install folder path (either `{author} {name}` or `{author} {override_folder}`).
 2. Unzip your `mefino-package.zip` contents inside here
 3. Put your `manifest.json` inside the folder too, and make sure you set the `author` and `name` correctly.
 

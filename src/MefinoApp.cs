@@ -51,8 +51,6 @@ namespace Mefino
                     CurrentContext = MefinoContext.GUI;
                     CoreInit();
 
-                    FolderWatcher.Init();
-
                     if (SelfUpdater.CheckUpdatedWanted())
                         return;
 

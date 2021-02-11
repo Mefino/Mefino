@@ -119,7 +119,7 @@ namespace Mefino.Core.Profiles
         {
             LoadProfiles(overwriteWithManualChanges);
 
-            if (AllProfiles.ContainsKey(s_activeProfile))
+            if (!string.IsNullOrEmpty(s_activeProfile) && AllProfiles.ContainsKey(s_activeProfile))
             {
                 SetActiveProfile(s_activeProfile, true);
             }

@@ -45,9 +45,16 @@ namespace Mefino.GUI
             Application.DoEvents();
         }
 
+        private static bool s_doneInit;
+
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
+
+            if (s_doneInit)
+                return;
+
+            s_doneInit = true;
 
             SetProgressBarActive(false);
             SetLoadingSplashVisible(false);
@@ -154,6 +161,8 @@ namespace Mefino.GUI
         {
             if (Instance == null)
                 return;
+
+            FolderWatcher.Init();
 
             SetLoadingSplashVisible(true);
 

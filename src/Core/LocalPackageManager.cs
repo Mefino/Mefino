@@ -51,7 +51,7 @@ namespace Mefino.Core
         {
             if (!Folders.IsCurrentOutwardPathValid())
             {
-                Console.WriteLine("Cannot retrieve installed mods as Outward folder path is not set!");
+                //Console.WriteLine("Cannot retrieve installed mods as Outward folder path is not set!");
                 return false;
             }
 

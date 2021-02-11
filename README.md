@@ -80,7 +80,7 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 #### Optional
 
 `author` and `repository` (string)
-* Your GitHub Username and the Repository name where this package is hosted. They are <b>not required</b> to be set for web releases, but if you install a local package manually you <b>do</b> need to set these for Mefino to work properly.
+* Your GitHub Username and the Repository name where this package is hosted. They are <b>not required</b> to be set for web releases, but if you install a local package manually you <b>do</b> need to set the `author` for Mefino to work properly.
 
 `tags` (list of strings)
 * A list of tags for your package, used for filtering on the "Browse Mods" tab of Mefino.

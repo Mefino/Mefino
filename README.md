@@ -1,7 +1,9 @@
-# Mefino [![Mefino](https://raw.githubusercontent.com/Mefino/Mefino/main/img/logo_32x32.png)]()
+<p align="center">
+  <img align="center" src="https://raw.githubusercontent.com/Mefino/Mefino/main/img/banner_350x128.png">
+</p>
 
 <p align="center">
-  Mefino is a work-in-progress Mod Manager for Outward.
+  Mefino is a work-in-progress Mod Manager for Outward.<br><br>
 
   <a href="https://discord.gg/zKyfGmy7TR">
     <img src="https://img.shields.io/badge/Discord-chat-blue?style=social&logo=discord" />

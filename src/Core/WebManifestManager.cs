@@ -7,13 +7,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mefino.LightJson.Serialization;
 
 namespace Mefino.Core
 {
     public class WebManifestManager
     {
-        // Manifests from GitHub (cached on disk)
-        internal static readonly Dictionary<string, PackageManifest> s_cachedWebManifests = new Dictionary<string, PackageManifest>();
+        // Manifests from GitHub
+        internal static readonly Dictionary<string, PackageManifest> s_webManifests = new Dictionary<string, PackageManifest>();
+
+        internal static readonly Dictionary<string, DateTime> s_repoCacheTimes = new Dictionary<string, DateTime>();
 
         internal static string MANIFEST_CACHE_FILEPATH => Folders.MEFINO_APPDATA_FOLDER + @"\manifest-cache.json";
 
@@ -46,31 +49,20 @@ namespace Mefino.Core
                 return;
             }
 
-            s_cachedWebManifests.Clear();
-
             var items = ((JsonValue)githubQuery).AsJsonObject["items"].AsJsonArray;
 
-            foreach (var entry in items)
+            foreach (var result in items)
             {
-                var result = CheckAndAddQueryResult(entry);
-
-                if (result == null)
-                    continue;
-
-                if (LocalPackageManager.TryGetInstalledPackage(result.GUID) is PackageManifest installed
-                        && result.IsGreaterVersionThan(installed))
-                {
-                    installed.m_installState = InstallState.Outdated;
-                }
+                CheckRepoSearchResult(result);
             }
 
             //Console.WriteLine($"Found {WebManifestManager.s_cachedWebManifests.Count} Mefino packages!");
         }
 
         /// <summary>
-        /// Process a web result.
+        /// Process a github search result for <c>"outward mefino mod"</c>
         /// </summary>
-        internal static PackageManifest CheckAndAddQueryResult(JsonValue queryResult)
+        internal static void CheckRepoSearchResult(JsonValue queryResult)
         {
             try
             {
@@ -80,60 +72,113 @@ namespace Mefino.Core
                 var author = queryResult["owner"].AsJsonObject["login"].AsString;
                 var repoName = queryResult["name"].AsString;
 
+                //Console.WriteLine("checking repo " + author + " " + repoName);
+
                 // Mefino itself might be a result, ignore it.
                 if (author == "Mefino" && repoName == "Mefino")
-                    return null;
+                    return;
 
-                var guid = $"{author} {repoName}";
+                var repoGuid = $"{author} {repoName}";
+                var updated = DateTime.Parse(updatedAt);
 
-                //Console.WriteLine("Checking github result '" + guid + "'");
-
-                if (s_cachedWebManifests.ContainsKey(guid))
+                if (s_repoCacheTimes.ContainsKey(repoGuid))
                 {
-                    var existing = s_cachedWebManifests[guid];
-
-                    if (!existing.IsManifestCachedSince(updatedAt))
-                        s_cachedWebManifests.Remove(guid);
-                    else
+                    if (updated > s_repoCacheTimes[repoGuid])
                     {
-                        //Console.WriteLine("Existing cached manifest for '" + guid + "' is up to date.");
-                        return existing;
+                        s_repoCacheTimes[repoGuid] = updated;
+                        var query = s_webManifests.Values.Where(it => it.author == author && it.repository == repoName);
+                        if (query.Any())
+                        {
+                            foreach (var entry in query)
+                                s_webManifests.Remove(entry.GUID);
+                        }
                     }
+                    else
+                        return;
                 }
+                else
+                    s_repoCacheTimes.Add(repoGuid, updated);
 
                 var manifestPath = repoUrl.Replace("github.com", "raw.githubusercontent.com")
                                  + $"/{queryResult["default_branch"].AsString}"
-                                 + $"/manifest.json";
+                                 + $"/mefino-manifest.json";
 
                 // Console.WriteLine("Checking url " + manifestPath);
 
                 var manifestString = WebClientManager.DownloadString(manifestPath);
 
                 if (string.IsNullOrEmpty(manifestString))
-                    return null;
+                    return;
 
-                var manifest = PackageManifest.FromManifestJson(manifestString);
-
-                if (manifest == default)
-                {
-                    Console.WriteLine("Unable to parse query result at '" + manifestPath + "'");
-                    return default;
-                }
-
-                manifest.m_manifestCachedTime = updatedAt;
-                manifest.author = author;
-                manifest.name = repoName;
-
-                s_cachedWebManifests.Add(manifest.GUID, manifest);
-
-                return manifest;
+                ProcessManifestFile(manifestString, author, repoName);
             }
+            //catch (IOException) { } // 404
             catch (Exception ex)
             {
-                Console.WriteLine("Exception parsing manifest from query result!");
+                Console.WriteLine("Exception parsing manifest(s) from search query result!");
                 Console.WriteLine(ex);
+            }
+        }
 
-                return null;
+        /// <summary>
+        /// Process a `mefino-manifest.json` file, which may be a list of manifests or just one.
+        /// </summary>
+        internal static void ProcessManifestFile(string manifestString, string authorName, string repoName)
+        {
+            var json = JsonReader.Parse(manifestString);
+
+            if (json == default)
+                return;
+
+            try
+            {
+                var list = json["packages"].AsJsonArray;
+                if (list != null)
+                {
+                    foreach (var entry in list)
+                    {
+                        var manifest = PackageManifest.FromManifestJson(entry.ToString());
+                        if (manifest != null)
+                        {
+                            ProcessManifest(manifest, authorName, repoName);
+                        }
+                    }
+                }
+                else throw new Exception();
+            }
+            catch
+            {
+                var manifest = PackageManifest.FromManifestJson(manifestString);
+                if (manifest != null)
+                {
+                    ProcessManifest(manifest, authorName, repoName);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process an actual PackageManifest result, either from a list or just a standalone one.
+        /// </summary>
+        internal static void ProcessManifest(PackageManifest manifest, string author, string repoName)
+        {
+            if (manifest == null)
+                return;
+
+            manifest.author = author;
+            manifest.repository = repoName;
+
+            if (s_webManifests.ContainsKey(manifest.GUID))
+            {
+                Console.WriteLine("Duplicate web manifests found! Skipping this one: " + manifest.GUID);
+                return;
+            }
+
+            s_webManifests.Add(manifest.GUID, manifest);
+
+            if (LocalPackageManager.TryGetInstalledPackage(manifest.GUID) is PackageManifest installed
+                    && manifest.IsGreaterVersionThan(installed))
+            {
+                installed.m_installState = InstallState.Outdated;
             }
         }
 
@@ -142,16 +187,36 @@ namespace Mefino.Core
         /// </summary>
         internal static void LoadWebManifestCache()
         {
-            s_cachedWebManifests.Clear();
+            s_webManifests.Clear();
 
             if (!File.Exists(MANIFEST_CACHE_FILEPATH))
                 return;
 
             try
             {
-                var manifests = LightJson.Serialization.JsonReader.ParseFile(MANIFEST_CACHE_FILEPATH);
+                JsonValue manifests = JsonReader.ParseFile(MANIFEST_CACHE_FILEPATH);
 
                 var input = manifests.AsJsonObject;
+
+                var times = input["cachetimes"].AsJsonObject;
+
+                if (times != null)
+                {
+                    s_repoCacheTimes.Clear();
+
+                    foreach (var entry in times)
+                    {
+                        var time = entry.Value.AsDateTime;
+
+                        if (time == null)
+                            continue;
+
+                        if (s_repoCacheTimes.ContainsKey(entry.Key))
+                            continue;
+
+                        s_repoCacheTimes.Add(entry.Key, (DateTime)time);
+                    }
+                }
 
                 var items = input["manifests"].AsJsonArray;
 
@@ -162,14 +227,14 @@ namespace Mefino.Core
                     if (manifest == default)
                         continue;
 
-                    if (s_cachedWebManifests.ContainsKey(manifest.GUID))
+                    if (s_webManifests.ContainsKey(manifest.GUID))
                     {
                         Console.WriteLine("Duplicate manifest in web cache! Skipping: " + manifest.GUID);
                         continue;
                     }
 
                     manifest.m_installState = InstallState.NotInstalled;
-                    s_cachedWebManifests.Add(manifest.GUID, manifest);
+                    s_webManifests.Add(manifest.GUID, manifest);
                 }
             }
             catch (Exception ex)
@@ -184,14 +249,18 @@ namespace Mefino.Core
         /// </summary>
         internal static void SaveWebManifestCache()
         {
-            var array = new JsonArray();
+            var manifests = new JsonArray();
+            foreach (var entry in s_webManifests)
+                manifests.Add(entry.Value.ToJsonObject());
 
-            foreach (var entry in s_cachedWebManifests)
-                array.Add(entry.Value.ToJsonObject());
+            var cachetimes = new JsonObject();
+            foreach (var entry in s_repoCacheTimes)
+                cachetimes.Add(entry.Key, entry.Value);
 
             var output = new JsonObject
             {
-                { "manifests", array }
+                { "manifests", manifests },
+                { "cachetimes", cachetimes }
             };
 
             IOHelper.CreateDirectory(Folders.MEFINO_OTWFOLDER_PATH);

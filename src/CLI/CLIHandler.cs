@@ -158,7 +158,7 @@ namespace Mefino.CLI
 
             foreach (var guid in args)
             {
-                if (WebManifestManager.s_cachedWebManifests.ContainsKey(guid))
+                if (WebManifestManager.s_webManifests.ContainsKey(guid))
                     LocalPackageManager.TryInstallWebPackage(guid);
                 else
                     Console.WriteLine($"Could not find package by name '{guid}', maybe need to refresh the list?");
@@ -220,13 +220,21 @@ namespace Mefino.CLI
 
         // ============== Show/Hiding console (extern) ============= //
 
-        public static void ShowConsole()
-        {
-            AllocConsole();
-        }
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool AllocConsole();
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        const int SW_HIDE = 0;
+        //const int SW_SHOW = 5;
+
+        public static void HideConsole()
+        {
+            var handle = GetConsoleWindow();
+
+            // Hide
+            ShowWindow(handle, SW_HIDE);
+        }
     }
 }

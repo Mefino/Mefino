@@ -13,30 +13,38 @@
 
 ## How to use
 
-* Outward must be closed for you to disable/enable any mod. Currently Mefino does not check if Outward is running so you'll probably just get an error for now. Next release will address it more gracefully.
-* <b>Please remove (or make a backup of) all existing mods before installing / testing Mefino.</b> This is not technically required, but the safety of your non-Mefino files is not guaranteed while using Mefino.
+* NOTE: <b>For now, please remove (or make a backup of) all existing mods before installing / testing Mefino.</b> This is not technically required, but the safety of your non-Mefino files is not guaranteed while using Mefino in alpha phase.
 
 1. Download `Mefino.exe` from the release page
-2. Run it :)
+2. Run it :) 
+
+<i>For Windows users, if SmartScreen warns you able the file you can disable these warnings through Windows Security > App & Browser Control > Reputation-based protection > Off. The source code for the Mefino launcher is available in its entirety in the `src` folder should you want to rebuild it yourself.</i>
 
 ## Temporary Release Guide
 
-1. Create a new repository on GitHub for your package, the name of this repository will be the name for your release.
-2. Create a file called `manifest.json` in the root of the repository using the example below, and push it to GitHub.
-3. Put the contents of your release inside a zip file called `mefino-package.zip`. Your manifest does <b>not</b> need to be included in your actual release file. 
-4. Make a new release, and include your `mefino-package.zip` in the release.
+1. Create a new repository on GitHub for your package, or use an existing one if you have one for the mod already.
+2. Create a file called `mefino-manifest.json` in the root folder of the repository using the example below, and push it to GitHub.
+3. Put the contents of your release inside a zip file. <b>The name of the zip is important, it must match the `download_filename` of the package (or the `name` if you do not set a filename).</b>
+4. Make a new release in your repository, and include your zip file in the release.
 5. Create or edit the `README.md` file in your repository, and put the phrase `outward mefino mod` (case insensitive and special characters ignored) anywhere in the readme. See existing packages for possible examples, it doesn't really matter how you do it as long as your package now shows up in the Mefino browser.
 
 For an example release, you can see [here](https://github.com/Mefino/Mefino.Plugin) for now.
 
+### Package GUIDs
+
+Mefino uses GUIDs (global unique IDs) to identify packages. Half of the GUID is determined by your GitHub username (or `author` for manually-installed packages), and the other half is determined by the `name` for your package.
+
+The format of the GUID is `{author} {name}`. <i>Note the space between the author name and the repository name.</i> For example `sinai-dev SideLoader` or `Mefino Mefino.Plugin`. 
+
 ### Manifest
 
 * Please use a JSON validator such as [this](https://jsonlint.com/) to ensure your JSON is valid before a release or update. Be careful with the commas on your dependency and conflict lists.
-* The file must be called `manifest.json`
+* The file must be called `mefino-manifest.json`
 
 ```json
 {
 	"author": "",
+	"repository": "",
 	"name": "",
 	"version": "",
 	"description": "",
@@ -53,20 +61,28 @@ For an example release, you can see [here](https://github.com/Mefino/Mefino.Plug
 		"someGuy someMod"
 	],
 	"require_sync": false,
-	"override_folder": ""
+	"download_filename": ""
 }
 ```
 
-`author` and `name` (string) <b>[optional]</b>
-* Your GitHub username and Repository name, they are <b>not required</b> to be set for web releases. If you install a local package manually you <b>do</b> need to set these for Mefino to work properly.
+#### Required
+
+`name`
+* The name for your mod or library. This will affect the install folder of your package, and will be the display name in the Mefino launcher.
 
 `version` (string)
 * The version of your latest release, eg `1.0.0.0`
+* You must use Semantic versioning (`Major.Minor.Patch.Build`), though only `Major` is required.
 
 `description` (string)
 * A short description for your package, just one or two sentences.
 
-`tags` (list of strings) <b>[optional]</b>
+#### Optional
+
+`author` and `repository` (string)
+* Your GitHub Username and the Repository name where this package is hosted. They are <b>not required</b> to be set for web releases, but if you install a local package manually you <b>do</b> need to set these for Mefino to work properly.
+
+`tags` (list of strings)
 * A list of tags for your package, used for filtering on the "Browse Mods" tab of Mefino.
 * You can <b>only</b> use these accepted tags (case insensitive): `Balancing`, `Characters`, `Items`, `Mechanics`, `Quests`, `Skills`, `Skill Trees`, `Utility`, `UI`
 * You can suggest another tag in the Discord if you want.
@@ -80,17 +96,37 @@ For an example release, you can see [here](https://github.com/Mefino/Mefino.Plug
 `require_sync` (boolean)
 * Whether your mod should be installed by all players online, it must be `true` or `false`. In the future this will be used for "automatic" online mod syncing.
 
-`override_folder` (string) <b>[optional]</b>
-* An optional special name you can use for the install directory instead of your `name`, ie. instead of installing to `plugins\{author} {name}\` it will install to `plugins\{author} {override_folder}\`. This does not affect your GUID.
+`download_filename` (string)
+* You can use this to set an alternate filename for your package download, ie. Mefino will try to download `<download_filename>.zip`. You will need to upload a zip file with this name in your latest release for the repository. If you don't set this, Mefino will expect to find a `<name>.zip` file in your latest release instead. 
+
+### Multi-package Repositories
+
+You can host multiple packages in one repository by using a different type of manifest.
+
+You can do this by defining a `packages` list in your JSON instead, your `mefino-manifest.json` should look like this:
+
+Notes: 
+* `//`-Comments are not valid JSON.
+* You will need to set a unique `download_filename` for each package.
+
+```json
+{
+  "packages": [
+    {
+      "name": "MyPlugin1",
+      // ... etc, fill out manifest as normal here
+    },
+	{
+	  "name": "MyOtherPlugin",
+	  // etc...
+	} // remember to NOT put a comma after your last package.
+  ]
+}
+```
 
 ### Local installs
 
 To install a package locally for testing:
-1. Create a folder in the `BepInEx\plugins\` folder which matches your install folder path (either `{author} {name}` or `{author} {override_folder}`).
-2. Unzip your `mefino-package.zip` contents inside here
-3. Put your `manifest.json` inside the folder too, and make sure you set the `author` and `name` correctly.
-
-### Package GUIDs
-
-Mefino package GUIDs are always `githubUsername repositoryName`, for example `sinai-dev Outward-SideLoader` or `Mefino Mefino.Plugin`.
-* <i>Note the space between the author name and the repository name!</i>
+1. Create a folder in the `BepInEx\plugins\` folder which matches your GUID (`{author} {name}`).
+2. Put your mefino package contents inside here
+3. Put your `mefino-manifest.json` (must be a singular manifest, not a multi-package manifest) inside the folder too, and make sure you set the `author` and `name` correctly.

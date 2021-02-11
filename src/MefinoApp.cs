@@ -22,7 +22,7 @@ namespace Mefino
 
     public class MefinoApp
     {
-        public const string VERSION = "0.2.2.0";
+        public const string VERSION = "0.2.3.0";
 
         public static MefinoContext CurrentContext;
 
@@ -44,9 +44,9 @@ namespace Mefino
                 }
                 else // Otherwise launch the GUI.
                 {
-#if DEBUG
+#if RELEASE
                     // Show a console if DEBUG build.
-                    CLIHandler.ShowConsole();
+                    CLIHandler.HideConsole();
 #endif
                     CurrentContext = MefinoContext.GUI;
                     CoreInit();

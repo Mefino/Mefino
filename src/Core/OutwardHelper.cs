@@ -12,12 +12,24 @@ namespace Mefino.Core
 {
     public static class OutwardHelper
     {
+        public static bool IsOutwardRunning()
+        {
+            Process[] pname = Process.GetProcessesByName("Outward");
+            return pname.Any();
+        }
+
         /// <summary>
         /// Verify packages and try to launch Outward.
         /// </summary>
         /// <returns><see langword="true"/> if successful, otherwise <see langword="false"/></returns>
         public static bool TryLaunchOutward()
         {
+            if (IsOutwardRunning())
+            {
+                MessageBox.Show("Outward is already running!");
+                return false; 
+            }
+
             if (!Folders.IsCurrentOutwardPathValid())
                 return false;
 
@@ -93,6 +105,12 @@ namespace Mefino.Core
         /// <returns><see cref="DialogResult.OK"/> if successful, otherwise <see cref="DialogResult.Cancel"/>.</returns>
         public static DialogResult UninstallFromOutward(bool warningMessage = true)
         {
+            if (IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that!");
+                return DialogResult.Cancel;
+            }
+
             if (warningMessage)
             {
                 var result = MessageBox.Show(

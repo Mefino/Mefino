@@ -100,11 +100,22 @@ namespace Mefino.GUI.Models
             _profileDropdown.Items.Clear();
             _profileDropdown.Items.AddRange(ProfileManager.AllProfiles.Select(it => it.Key).ToArray());
             _profileDropdown.SelectedIndex = ProfileManager.AllProfiles.Keys.ToList().IndexOf(ProfileManager.ActiveProfile.name);
+            prevProfileIndex = _profileDropdown.SelectedIndex;
         }
+
+        private static int prevProfileIndex = -1;
 
         private void _profileDropdown_OnSelectionChanged(object sender, EventArgs e)
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                if (prevProfileIndex != -1)
+                    _profileDropdown.SelectedIndex = prevProfileIndex;
+                return;
+            }
+
             var value = _profileDropdown.SelectedIndex;
+            prevProfileIndex = value;
 
             if (value < 0 || value >= ProfileManager.AllProfiles.Count)
             {
@@ -124,6 +135,12 @@ namespace Mefino.GUI.Models
 
         private void _newProfileButton_Click(object sender, EventArgs e)
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that.");
+                return;
+            }
+
             using (var creation = new ProfileCreationForm())
             {
                 if (creation.ShowDialog(this) == DialogResult.OK)
@@ -137,8 +154,13 @@ namespace Mefino.GUI.Models
             }
         }
 
-        private void _loadProfileButton_Click(object sender, EventArgs e)
+        private void _reloadProfileButton_Click(object sender, EventArgs e)
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that.");
+                return;
+            }
             //if (ProfileManager.s_changesSinceLastSave)
             //{
             //    var result = MessageBox.Show("You have unsaved changes, really revert them and load the last save?", "Warning", MessageBoxButtons.OKCancel);
@@ -154,6 +176,12 @@ namespace Mefino.GUI.Models
 
         private void _deleteProfileButton_Click(object sender, EventArgs e)
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that.");
+                return;
+            }
+
             var profile = ProfileManager.s_activeProfile;
             if (string.IsNullOrEmpty(profile))
                 return;

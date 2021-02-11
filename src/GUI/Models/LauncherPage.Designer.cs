@@ -139,7 +139,7 @@ namespace Mefino.GUI.Models
             this._reloadProfileButton.Text = "Reload";
             this._reloadProfileButton.Theme = MetroFramework.MetroThemeStyle.Dark;
             this._reloadProfileButton.UseSelectable = true;
-            this._reloadProfileButton.Click += new System.EventHandler(this._loadProfileButton_Click);
+            this._reloadProfileButton.Click += new System.EventHandler(this._reloadProfileButton_Click);
             // 
             // _saveProfileButton
             // 

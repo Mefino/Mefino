@@ -13,8 +13,8 @@ namespace Mefino.Core
 {
     public static class LocalPackageManager
     {
-        internal const string PKG_MANIFEST_FILENAME = "manifest.json";
-        internal const string PKG_MEFINO_PACKAGE_NAME = "mefino-package.zip";
+        internal const string PKG_MANIFEST_FILENAME = "mefino-manifest.json";
+        //internal const string PKG_MEFINO_PACKAGE_NAME = "mefino-package.zip";
 
         // Actual installed manifests, serialized from mod folders.
         internal static readonly Dictionary<string, PackageManifest> s_enabledPackages = new Dictionary<string, PackageManifest>();
@@ -80,9 +80,9 @@ namespace Mefino.Core
             bool enabledPacksAreOk = true;
             foreach (var package in s_enabledPackages.Values)
             {
-                if (WebManifestManager.s_cachedWebManifests.ContainsKey(package.GUID))
+                if (WebManifestManager.s_webManifests.ContainsKey(package.GUID))
                 {
-                    var web = WebManifestManager.s_cachedWebManifests[package.GUID];
+                    var web = WebManifestManager.s_webManifests[package.GUID];
                     if (web.IsGreaterVersionThan(package))
                     {
                         package.m_installState = InstallState.Outdated;
@@ -185,6 +185,12 @@ namespace Mefino.Core
         /// <returns><see langword="true"/> if successful, otherwise <see langword="false"/></returns>
         public static bool TryEnablePackage(string guid, bool tryEnableDependencies = true)
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that.");
+                return false;
+            }
+
             var package = TryGetInstalledPackage(guid);
 
             if (package == null)
@@ -208,8 +214,8 @@ namespace Mefino.Core
                 return true;
             }
 
-            string toDir = Folders.OUTWARD_PLUGINS + $@"\{package.InstallFolder}";
-            string fromDir = Folders.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
+            string toDir = Folders.OUTWARD_PLUGINS + $@"\{package.GUID}";
+            string fromDir = Folders.MEFINO_DISABLED_FOLDER + $@"\{package.GUID}";
 
             if (IOHelper.TryMoveDirectory(fromDir, toDir))
             {
@@ -233,11 +239,17 @@ namespace Mefino.Core
         /// <returns><see langword="true"/> if successful, otherwise <see langword="false"/></returns>
         public static bool TryUpdatePackage(string guid)
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that.");
+                return false;
+            }
+
             var installed = TryGetInstalledPackage(guid);
             if (installed == null)
                 return false;
 
-            if (!WebManifestManager.s_cachedWebManifests.TryGetValue(guid, out PackageManifest webManifest))
+            if (!WebManifestManager.s_webManifests.TryGetValue(guid, out PackageManifest webManifest))
                 return false;
 
             if (installed.IsGreaterVersionThan(webManifest))
@@ -247,7 +259,7 @@ namespace Mefino.Core
                             ? Folders.MEFINO_DISABLED_FOLDER
                             : Folders.OUTWARD_PLUGINS;
 
-            dir = Path.Combine(dir, installed.InstallFolder);
+            dir = Path.Combine(dir, installed.GUID);
 
             if (!IOHelper.TryDeleteDirectory(dir))
                 return false;
@@ -268,13 +280,19 @@ namespace Mefino.Core
         /// <returns><see langword="true"/> if successful, otherwise <see langword="false"/></returns>
         public static bool TryInstallWebPackage(string guid, bool andEnable = true)
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that.");
+                return false;
+            }
+
             if (!Folders.IsCurrentOutwardPathValid())
             {
                 Console.WriteLine("Outward folder is not set! Cannot install package.");
                 return false;
             }
 
-            WebManifestManager.s_cachedWebManifests.TryGetValue(guid, out PackageManifest webManifest);
+            WebManifestManager.s_webManifests.TryGetValue(guid, out PackageManifest webManifest);
 
             if (webManifest == null)
             {
@@ -306,7 +324,7 @@ namespace Mefino.Core
                 int count = webManifest.dependencies.Length;
                 foreach (var dependency in webManifest.dependencies)
                 {
-                    MefinoGUI.SetProgressMessage($"Installing dependency {i} of {count}: {dependency}");
+                    MefinoGUI.SetProgressMessage($"Downloading dependency {i} of {count}: {dependency}");
 
                     if (!TryInstallWebPackage(dependency))
                     {
@@ -326,7 +344,7 @@ namespace Mefino.Core
             if (!webManifest.IsGreaterVersionThan(existing))
                 return true;
 
-            MefinoGUI.SetProgressMessage($"Installing package {webManifest.GUID}");
+            MefinoGUI.SetProgressMessage($"Downloading package '{webManifest.GUID}'");
 
             if (!DownloadAndInstallPackage(webManifest))
             {
@@ -357,14 +375,14 @@ namespace Mefino.Core
 
                 MefinoGUI.DisableSensitiveControls();
 
-                var dirPath = $@"{Folders.MEFINO_DISABLED_FOLDER}\{manifest.InstallFolder}";
+                var dirPath = $@"{Folders.MEFINO_DISABLED_FOLDER}\{manifest.GUID}";
 
                 if (Directory.Exists(dirPath))
                     Directory.Delete(dirPath, true);
 
                 var tempFile = TemporaryFile.CreateFile();
 
-                var zipUrl = $"{manifest.GithubURL}/releases/latest/download/{PKG_MEFINO_PACKAGE_NAME}";
+                var zipUrl = $"{manifest.GithubURL}/releases/latest/download/{manifest.DownloadFileName}";
 
                 Web.WebClientManager.DownloadFileAsync(zipUrl, tempFile);
 
@@ -374,11 +392,11 @@ namespace Mefino.Core
                     MefinoApp.SendAsyncProgress(Web.WebClientManager.LastDownloadProgress);
                 }
 
-                MefinoGUI.SetProgressMessage($"Installing {manifest.GUID} version {manifest.version}");
+                MefinoGUI.SetProgressMessage($"Installing '{manifest.GUID}' (version {manifest.version})");
 
                 if (ZipHelper.ExtractZip(tempFile, dirPath))
                 {
-                    var manifestPath = $@"{dirPath}\manifest.json";
+                    var manifestPath = $@"{dirPath}\mefino-manifest.json";
 
                     if (File.Exists(manifestPath))
                         File.Delete(manifestPath);
@@ -560,9 +578,18 @@ namespace Mefino.Core
         /// <returns><see langword="true"/> if successful, otherwise <see langword="false"/></returns>
         public static bool DisableAllPackages()
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that.");
+                return false;
+            }
+
             bool ret = true;
             for (int i = s_enabledPackages.Count - 1; i >= 0; i--)
             {
+                if (!s_enabledPackages.Any())
+                    break;
+
                 var pkg = s_enabledPackages.ElementAt(i);
                 ret &= TryDisablePackage(pkg.Key, true);
             }
@@ -576,6 +603,12 @@ namespace Mefino.Core
         /// <returns><see langword="true"/> if successful, otherwise <see langword="false"/></returns>
         public static bool TryDisablePackage(string guid, bool skipDependencyWarning = false)
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that.");
+                return false;
+            }
+
             var package = TryGetInstalledPackage(guid);
 
             if (package == null)
@@ -596,8 +629,8 @@ namespace Mefino.Core
             else
                 package.TryDisableAllDependencies();
 
-            string toDir = Folders.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
-            string fromDir = Folders.OUTWARD_PLUGINS + $@"\{package.InstallFolder}";
+            string toDir = Folders.MEFINO_DISABLED_FOLDER + $@"\{package.GUID}";
+            string fromDir = Folders.OUTWARD_PLUGINS + $@"\{package.GUID}";
 
             if (IOHelper.TryMoveDirectory(fromDir, toDir))
             {
@@ -635,17 +668,23 @@ namespace Mefino.Core
         /// <returns><see langword="true"/> if successful, otherwise <see langword="false"/></returns>
         internal static bool TryUninstallPackage(PackageManifest package)
         {
+            if (OutwardHelper.IsOutwardRunning())
+            {
+                MessageBox.Show("You need to close Outward to do that.");
+                return false;
+            }
+
             string dir;
             Dictionary<string, PackageManifest> dict;
 
             if (!package.IsDisabled)
             {
-                dir = Folders.OUTWARD_PLUGINS + $@"\{package.InstallFolder}";
+                dir = Folders.OUTWARD_PLUGINS + $@"\{package.GUID}";
                 dict = s_enabledPackages;
             }
             else
             {
-                dir = Folders.MEFINO_DISABLED_FOLDER + $@"\{package.InstallFolder}";
+                dir = Folders.MEFINO_DISABLED_FOLDER + $@"\{package.GUID}";
                 dict = s_disabledPackages;
             }
 

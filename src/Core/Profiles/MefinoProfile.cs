@@ -120,7 +120,7 @@ namespace Mefino.Core.Profiles
                 {
                     var guid = ret.packages[i];
 
-                    if (!WebManifestManager.s_cachedWebManifests.ContainsKey(guid)
+                    if (!WebManifestManager.s_webManifests.ContainsKey(guid)
                         && LocalPackageManager.TryGetInstalledPackage(guid) == null)
                     {
                         // GUID in package list does not exist, locally or online!

@@ -16,33 +16,6 @@ namespace Mefino.GUI.Models
     {
         public static BrowseModsPage Instance;
 
-        private static readonly HashSet<string> s_acceptedTags = new HashSet<string>
-        {
-            "Balancing",
-            "Characters",
-            "Items",
-            "Mechanics",
-            "Quests",
-            "Skills",
-            "Skill Trees",
-            "Utility",
-            "UI",
-        };
-
-        public static bool IsTagAccepted(string tag)
-        {
-            foreach (var accepted in s_acceptedTags)
-            {
-                if (string.Equals(tag, accepted, StringComparison.InvariantCultureIgnoreCase))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public static string SelectedTag = "All";
-        private static readonly HashSet<string> s_implementedTags = new HashSet<string>();
-
         public BrowseModsPage()
         {
             Instance = this;
@@ -60,18 +33,44 @@ namespace Mefino.GUI.Models
             LocalPackageManager.OnPackageInstalled += RefreshRow;
             LocalPackageManager.OnPackageUninstalled += RefreshRow;
 
-            Console.WriteLine("updating bep packages...");
-
             // Force an update of web manifests on launch
             WebManifestManager.UpdateWebManifests();
-
-            Console.WriteLine("done");
 
             // Refresh tags after manifest update
             RefreshTags();
 
             RefreshPackageList();
         }
+
+        private static readonly HashSet<string> s_acceptedTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Balancing",
+            "Characters",
+            "Classes",
+            "Items",
+            "Library",
+            "Mechanics",
+            "Quests",
+            "Skills",
+            "Utility",
+            "UI",
+        };
+
+        public static bool IsTagAccepted(string tag, bool showLibraries)
+        {
+            tag = tag.ToLower();
+
+            if (string.Equals(tag, "Library", StringComparison.OrdinalIgnoreCase) && !showLibraries)
+                return false;
+
+            return s_acceptedTags.Contains(tag);
+        }
+
+        public static string SelectedTag = "All";
+        private static readonly HashSet<string> s_implementedTags = new HashSet<string>();
+
+        public static bool ShowLibraries;
+
         // ======= helpers ==========
 
         internal int TryGetIndexOfPackage(PackageManifest package)
@@ -102,7 +101,7 @@ namespace Mefino.GUI.Models
             var row = _packageList.Rows[e.RowIndex];
 
             var guid = $"{row.Cells[2].Value} {row.Cells[0].Value}";
-            WebManifestManager.s_cachedWebManifests.TryGetValue(guid, out PackageManifest package);
+            WebManifestManager.s_webManifests.TryGetValue(guid, out PackageManifest package);
 
             if (package == null)
             {
@@ -111,6 +110,43 @@ namespace Mefino.GUI.Models
             }
 
             return package;
+        }
+
+        public void RefreshTags()
+        {
+            s_implementedTags.Clear();
+
+            s_implementedTags.Add("All");
+
+            foreach (var package in WebManifestManager.s_webManifests.Values)
+            {
+                if (package.tags == null || !package.tags.Any())
+                    continue;
+
+                foreach (var tag in package.tags)
+                {
+                    if (string.IsNullOrEmpty(tag) || s_implementedTags.Contains(tag))
+                        continue;
+
+                    if (IsTagAccepted(tag, ShowLibraries))
+                        s_implementedTags.Add(tag);
+                }
+            }
+
+            _tagDropDown.Items.Clear();
+
+            foreach (var tag in s_implementedTags)
+            {
+                if (!ShowLibraries && string.Equals(tag, "Library", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                _tagDropDown.Items.Add(tag);
+            }
+
+            if (s_implementedTags.Contains(SelectedTag))
+                _tagDropDown.SelectedIndex = _tagDropDown.Items.IndexOf(SelectedTag);
+            else
+                _tagDropDown.SelectedIndex = 0;
         }
 
         // ====== misc buttons ======
@@ -132,6 +168,17 @@ namespace Mefino.GUI.Models
             RefreshPackageList();
         }
 
+        private void _libraryToggle_CheckedChanged(object sender, EventArgs e)
+        {
+            ShowLibraries = _libraryToggle.Checked;
+
+            RefreshTags();
+
+            if (SelectedTag == "All" || SelectedTag == "Library")
+            {
+                RefreshPackageList();
+            }
+        }
 
         // ============ Main package list ==========
 
@@ -146,54 +193,22 @@ namespace Mefino.GUI.Models
             SetInfoboxPackage(package);
         }
 
-        public void RefreshTags()
-        {
-            s_implementedTags.Clear();
-
-            s_implementedTags.Add("All");
-
-            foreach (var package in WebManifestManager.s_cachedWebManifests.Values)
-            {
-                if (package.tags == null || !package.tags.Any())
-                    continue;
-
-                foreach (var tag in package.tags)
-                {
-                    if (string.IsNullOrEmpty(tag) || s_implementedTags.Contains(tag))
-                        continue;
-
-                    if (IsTagAccepted(tag))
-                        s_implementedTags.Add(tag);
-                }
-            }
-
-            _tagDropDown.Items.Clear();
-
-            foreach (var tag in s_implementedTags)
-                _tagDropDown.Items.Add(tag);
-
-            if (s_implementedTags.Contains(SelectedTag))
-                _tagDropDown.SelectedIndex = _tagDropDown.Items.IndexOf(SelectedTag);
-            else
-                _tagDropDown.SelectedIndex = 0;
-        }
-
         public void RefreshPackageList()
         {
             _packageList.Rows.Clear();
 
-            foreach (var pkg in WebManifestManager.s_cachedWebManifests)
+            foreach (var pkg in WebManifestManager.s_webManifests)
                 AddPackageRow(pkg.Value);
 
             void AddPackageRow(PackageManifest package)
             {
+                if (!ShowLibraries && package.HasTag("Library"))
+                    return;
+
                 if (SelectedTag != "All" && !string.IsNullOrEmpty(SelectedTag))
                 {
-                    if (package.tags == null
-                        || !package.tags.Contains(SelectedTag))
-                    {
+                    if (package.tags == null || !package.HasTag(SelectedTag))
                         return;
-                    }
                 }
 
                 _packageList.Rows.Add(new string[]
@@ -242,9 +257,19 @@ namespace Mefino.GUI.Models
             {
                 if (s_currentPackage != null)
                     Instance?.SetRowHighlight(s_currentPackage, false);
+
                 s_currentPackage = value;
-                if (value != null)
-                    Instance?.SetRowHighlight(value, true);
+               
+                if (Instance != null)
+                {
+                    if (value != null)
+                    {
+                        Instance.SetRowHighlight(value, true);
+                        Instance._packageInfoBox.Visible = true;
+                    }
+                    else
+                        Instance._packageInfoBox.Visible = false;
+                }
             }
         }
 
@@ -274,7 +299,6 @@ namespace Mefino.GUI.Models
         public void SetInfoboxPackage(PackageManifest package)
         {
             CurrentInspectedPackage = package;
-            _packageInfoBox.Visible = true;
 
             _infoBoxTitle.Text = package.name;
 
@@ -302,7 +326,7 @@ namespace Mefino.GUI.Models
             {
                 foreach (var tag in package.tags)
                 {
-                    if (!IsTagAccepted(tag))
+                    if (!IsTagAccepted(tag, true))
                         continue;
 
                     if (tags != "") tags += "\n";
@@ -337,7 +361,6 @@ namespace Mefino.GUI.Models
         private void _infoBoxCloseButton_Click(object sender, EventArgs e)
         {
             CurrentInspectedPackage = null;
-            _packageInfoBox.Visible = false;
         }
 
         private void _infoBoxWebsiteButton_Click(object sender, EventArgs e)

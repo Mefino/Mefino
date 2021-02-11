@@ -18,7 +18,7 @@
 1. Download `Mefino.exe` from the release page
 2. Run it :) 
 
-<i>For Windows users, if SmartScreen warns you able the file you can disable these warnings through Windows Security > App & Browser Control > Reputation-based protection > Off. The source code for the Mefino launcher is available in its entirety in the `src` folder should you want to rebuild it yourself.</i>
+<i>If Windows SmartScreen warns you able the file you can disable these warnings through Windows Security > App & Browser Control > Reputation-based protection > Off. The source code for the Mefino launcher is available in its entirety in the `src` folder should you want to rebuild it yourself.</i>
 
 ## Temporary Release Guide
 

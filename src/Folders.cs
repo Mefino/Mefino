@@ -32,7 +32,7 @@ namespace Mefino
         /// Mefino's folder in the AppData\Roaming\ folder.
         /// </summary>
         internal static string MEFINO_APPDATA_FOLDER =>
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Mefino");
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Mefino");
 
         /// <summary>
         /// Set the Outward folder path to the provided path.

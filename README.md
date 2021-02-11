@@ -6,11 +6,10 @@
   Mefino is a work-in-progress Mod Manager for Outward.<br><br>
 
   <a href="https://discord.gg/zKyfGmy7TR">
-    <img src="https://img.shields.io/badge/Discord-chat-blue?style=social&logo=discord" />
+    <img src="https://img.shields.io/discord/293810842225606656.svg?color=7289da&label=Discord&logo=discord&style=flat-square" />
   </a>
   
 </p>
-
 
 ## How to use
 

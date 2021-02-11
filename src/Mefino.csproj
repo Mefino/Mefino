@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="Core\AppDataManager.cs" />
     <Compile Include="Core\OutwardHelper.cs" />
+    <Compile Include="Core\PackageTags.cs" />
     <Compile Include="Core\Profiles\MefinoProfile.cs" />
     <Compile Include="Core\Profiles\ProfileManager.cs" />
     <Compile Include="Core\SelfUpdater.cs" />

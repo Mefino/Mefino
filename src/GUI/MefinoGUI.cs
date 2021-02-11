@@ -37,7 +37,11 @@ namespace Mefino.GUI
             if (Instance == null)
                 return;
 
-            Instance.Invoke(new MethodInvoker(() => { Instance._loadingSplash.Visible = visible; }));
+            Instance.Invoke(new MethodInvoker(() => 
+            {
+                Instance._loadingSplash.Visible = visible;
+                Instance._tabView.Enabled = !visible;
+            }));
             Application.DoEvents();
         }
 

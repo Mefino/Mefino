@@ -32,6 +32,16 @@ namespace Mefino.Core
             }
         }
 
+        public DateTime RepoManifestCacheTime
+        {
+            get
+            {
+                var repoGuid = $"{author} {repository}";
+                WebManifestManager.s_repoCacheTimes.TryGetValue(repoGuid, out DateTime time);
+                return time;
+            }
+        }
+
         /// <summary>
         /// Is a packge with this GUID installed? (May not literally be this package instance that is installed, if this is a web manifest)
         /// </summary>
@@ -111,6 +121,8 @@ namespace Mefino.Core
                     return "Missing dependencies";
                 case InstallState.NotInstalled:
                     return "Not installed";
+                case InstallState.NotWorking:
+                    return "Not working";
                 case InstallState.HasConflict:
                     return "Has conflicts";
                 case InstallState.Outdated:

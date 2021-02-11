@@ -12,6 +12,7 @@ namespace Mefino.Core
     public enum InstallState
     {
         NotInstalled,
+        NotWorking,
         Outdated,
         MissingDependency,
         HasConflict,

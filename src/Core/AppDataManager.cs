@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Mefino.GUI.Models;
 
 namespace Mefino.Core
 {
@@ -36,14 +37,19 @@ namespace Mefino.Core
                 return false;
 
             if (jsonObject[nameof(Folders.OUTWARD_FOLDER)].AsString is string path)
-            {
                 Folders.SetOutwardFolderPath(path);
-            }
 
             if (jsonObject[nameof(ProfileManager.ActiveProfile)].AsString is string activeProfile)
-            {
                 ProfileManager.s_activeProfile = activeProfile;
-            }
+
+            if (jsonObject[nameof(BrowseModsPage.ShowInstalledPackages)].AsBoolean is bool showInstalled)
+                BrowseModsPage.ShowInstalledPackages = showInstalled;
+
+            if (jsonObject[nameof(BrowseModsPage.OnlyShowTrusted)].AsBoolean is bool onlyTrusted)
+                BrowseModsPage.OnlyShowTrusted = onlyTrusted;
+
+            if (jsonObject[nameof(BrowseModsPage.ShowLibraries)].AsBoolean is bool showLibrary)
+                BrowseModsPage.ShowLibraries = showLibrary;
 
             return true;
         }
@@ -63,6 +69,9 @@ namespace Mefino.Core
             {
                 { nameof(Folders.OUTWARD_FOLDER), Folders.OUTWARD_FOLDER },
                 { nameof(ProfileManager.ActiveProfile), ProfileManager.s_activeProfile },
+                { nameof(BrowseModsPage.ShowInstalledPackages), BrowseModsPage.ShowInstalledPackages },
+                { nameof(BrowseModsPage.OnlyShowTrusted), BrowseModsPage.OnlyShowTrusted },
+                { nameof(BrowseModsPage.ShowLibraries), BrowseModsPage.ShowLibraries },
             };
 
             File.WriteAllText(MEFINO_CONFIG_PATH, jsonObject.ToString(true));

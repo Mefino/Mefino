@@ -32,6 +32,69 @@ namespace Mefino.Core
             SaveWebManifestCache();
         }
 
+        public static HashSet<string> AcceptedTags
+        {
+            get
+            {
+                if (s_acceptedTags == null)
+                {
+                    s_acceptedTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var value in Enum.GetValues(typeof(PackageTags)))
+                        s_acceptedTags.Add(value.ToString());
+                }
+                return s_acceptedTags;
+            }
+        }
+        private static HashSet<string> s_acceptedTags;
+
+        public static bool IsValidTag(string tag, bool showLibraries = true)
+        {
+            if (!showLibraries && string.Equals(tag, "library", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            return AcceptedTags.Contains(tag);
+        }
+
+        public enum GuidFilterState
+        {
+            NONE,
+            Whitelist,
+            Blacklist,
+            BrokenList
+        }
+
+        public static GuidFilterState GetStateForGuid(string guid)
+        {
+            if (s_authorWhitelist.Contains(guid.Split(' ')[0]))
+                return GuidFilterState.Whitelist;
+
+            if (s_guidBlacklist.Contains(guid))
+                return GuidFilterState.Blacklist;
+
+            if (s_guidBrokenList.Contains(guid))
+                return GuidFilterState.BrokenList;
+
+            return GuidFilterState.NONE;
+        }
+
+        internal static HashSet<string> s_authorWhitelist = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Mefino",
+            "sinai-dev",
+            "random-facades",
+            "Jaakko Kantojärvi",
+            "raphendyr",
+            "ehaugw",
+            "IggyTheMad",
+            "SpicerXD",
+            "deathrat",
+            "Vheos",
+            "Zalamaur"
+        };
+
+        internal static HashSet<string> s_guidBlacklist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        internal static HashSet<string> s_guidBrokenList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
         // ======= github Package query ======= //
 
         internal const string GITHUB_PACKAGE_QUERY_URL = @"https://api.github.com/search/repositories?q=""outward mefino mod""%20in:readme&sort=stars&order=desc";
@@ -89,8 +152,8 @@ namespace Mefino.Core
                         var query = s_webManifests.Values.Where(it => it.author == author && it.repository == repoName);
                         if (query.Any())
                         {
-                            foreach (var entry in query)
-                                s_webManifests.Remove(entry.GUID);
+                            for (int i = query.Count() - 1; i >= 0; i--)
+                                s_webManifests.Remove(query.ElementAt(i).GUID);
                         }
                     }
                     else
@@ -166,6 +229,14 @@ namespace Mefino.Core
 
             manifest.author = author;
             manifest.repository = repoName;
+
+            var state = GetStateForGuid(manifest.GUID);
+
+            if (state == GuidFilterState.Blacklist)
+                return;
+
+            if (state == GuidFilterState.BrokenList)
+                manifest.m_installState = InstallState.NotWorking;
 
             if (s_webManifests.ContainsKey(manifest.GUID))
             {

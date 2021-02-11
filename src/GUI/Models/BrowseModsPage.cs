@@ -21,6 +21,10 @@ namespace Mefino.GUI.Models
             Instance = this;
             InitializeComponent();
 
+            _showInstalledCheck.Checked = ShowInstalledPackages;
+            _showOnlyTrustedCheck.Checked = OnlyShowTrusted;
+            _libraryToggle.Checked = ShowLibraries;
+
             MefinoGUI.SensitiveControls.AddRange(new Control[] { this._infoBoxInstallButton, this._updateButton });
 
             // init some states
@@ -42,36 +46,100 @@ namespace Mefino.GUI.Models
             RefreshPackageList();
         }
 
-        private static readonly HashSet<string> s_acceptedTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        public string SelectedTag = "All";
+        private readonly HashSet<string> s_implementedTags = new HashSet<string>();
+
+        public static bool ShowInstalledPackages = true;
+        public static bool ShowLibraries;
+        public static bool OnlyShowTrusted;
+        
+        // ====== misc buttons ======
+
+        // Button to refresh the package list
+        private void _refreshButton_Click(object sender, EventArgs e)
         {
-            "Balancing",
-            "Characters",
-            "Classes",
-            "Items",
-            "Library",
-            "Mechanics",
-            "Quests",
-            "Skills",
-            "Utility",
-            "UI",
-        };
+            MefinoApp.RefreshAllPackages(true);
 
-        public static bool IsTagAccepted(string tag, bool showLibraries)
-        {
-            tag = tag.ToLower();
-
-            if (string.Equals(tag, "Library", StringComparison.OrdinalIgnoreCase) && !showLibraries)
-                return false;
-
-            return s_acceptedTags.Contains(tag);
+            RefreshPackageList();
         }
 
-        public static string SelectedTag = "All";
-        private static readonly HashSet<string> s_implementedTags = new HashSet<string>();
+        private void _showInstalledCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            ShowInstalledPackages = _showInstalledCheck.Checked;
 
-        public static bool ShowLibraries;
+            RefreshTags();
+            RefreshPackageList();
+        }
 
-        // ======= helpers ==========
+        private void _libraryToggle_CheckedChanged(object sender, EventArgs e)
+        {
+            ShowLibraries = _libraryToggle.Checked;
+
+            RefreshTags();
+
+            if (SelectedTag == "All" || SelectedTag == "Library")
+            {
+                RefreshPackageList();
+            }
+        }
+
+        private void _showOnlyTrustedCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            OnlyShowTrusted = _showOnlyTrustedCheck.Checked;
+
+            RefreshTags();
+            RefreshPackageList();
+        }
+
+        // ===== tags dropdown =====
+
+        // When user selects a tag from dropdown
+        private void _tagDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var idx = _tagDropDown.SelectedIndex;
+            SelectedTag = _tagDropDown.Items[idx].ToString();
+
+            RefreshPackageList();
+        }
+
+        public void RefreshTags()
+        {
+            s_implementedTags.Clear();
+
+            s_implementedTags.Add("All");
+
+            foreach (var package in WebManifestManager.s_webManifests.Values)
+            {
+                if (package.tags == null || !package.tags.Any())
+                    continue;
+
+                foreach (var tag in package.tags)
+                {
+                    if (string.IsNullOrEmpty(tag) || s_implementedTags.Contains(tag))
+                        continue;
+
+                    if (WebManifestManager.IsValidTag(tag, ShowLibraries))
+                        s_implementedTags.Add(tag);
+                }
+            }
+
+            _tagDropDown.Items.Clear();
+
+            foreach (var tag in s_implementedTags)
+            {
+                if (!ShowLibraries && string.Equals(tag, "Library", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                _tagDropDown.Items.Add(tag);
+            }
+
+            if (s_implementedTags.Contains(SelectedTag))
+                _tagDropDown.SelectedIndex = _tagDropDown.Items.IndexOf(SelectedTag);
+            else
+                _tagDropDown.SelectedIndex = 0;
+        }
+
+        // ============ Main package list ==========
 
         internal int TryGetIndexOfPackage(PackageManifest package)
         {
@@ -112,76 +180,6 @@ namespace Mefino.GUI.Models
             return package;
         }
 
-        public void RefreshTags()
-        {
-            s_implementedTags.Clear();
-
-            s_implementedTags.Add("All");
-
-            foreach (var package in WebManifestManager.s_webManifests.Values)
-            {
-                if (package.tags == null || !package.tags.Any())
-                    continue;
-
-                foreach (var tag in package.tags)
-                {
-                    if (string.IsNullOrEmpty(tag) || s_implementedTags.Contains(tag))
-                        continue;
-
-                    if (IsTagAccepted(tag, ShowLibraries))
-                        s_implementedTags.Add(tag);
-                }
-            }
-
-            _tagDropDown.Items.Clear();
-
-            foreach (var tag in s_implementedTags)
-            {
-                if (!ShowLibraries && string.Equals(tag, "Library", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                _tagDropDown.Items.Add(tag);
-            }
-
-            if (s_implementedTags.Contains(SelectedTag))
-                _tagDropDown.SelectedIndex = _tagDropDown.Items.IndexOf(SelectedTag);
-            else
-                _tagDropDown.SelectedIndex = 0;
-        }
-
-        // ====== misc buttons ======
-
-        // Button to refresh the package list
-        private void _refreshButton_Click(object sender, EventArgs e)
-        {
-            MefinoApp.RefreshAllPackages(true);
-
-            RefreshPackageList();
-        }
-
-        // When user selects a tag from dropdown
-        private void _tagDropDown_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var idx = _tagDropDown.SelectedIndex;
-            SelectedTag = _tagDropDown.Items[idx].ToString();
-
-            RefreshPackageList();
-        }
-
-        private void _libraryToggle_CheckedChanged(object sender, EventArgs e)
-        {
-            ShowLibraries = _libraryToggle.Checked;
-
-            RefreshTags();
-
-            if (SelectedTag == "All" || SelectedTag == "Library")
-            {
-                RefreshPackageList();
-            }
-        }
-
-        // ============ Main package list ==========
-
         // ANY part of a row clicked
         private void _packageList_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -202,6 +200,9 @@ namespace Mefino.GUI.Models
 
             void AddPackageRow(PackageManifest package)
             {
+                if (!ShowInstalledPackages && package.IsInstalled)
+                    return;
+
                 if (!ShowLibraries && package.HasTag("Library"))
                     return;
 
@@ -210,6 +211,13 @@ namespace Mefino.GUI.Models
                     if (package.tags == null || !package.HasTag(SelectedTag))
                         return;
                 }
+
+                var state = WebManifestManager.GetStateForGuid(package.GUID);
+                if (OnlyShowTrusted && state != WebManifestManager.GuidFilterState.Whitelist)
+                    return;
+
+                if (state == WebManifestManager.GuidFilterState.Blacklist)
+                    return;
 
                 _packageList.Rows.Add(new string[]
                 {
@@ -235,6 +243,8 @@ namespace Mefino.GUI.Models
             RefreshRow(TryGetIndexOfPackage(package), package);
         }
 
+        private const decimal AVG_MONTH = 30.4375m;
+
         internal void RefreshRow(int index, PackageManifest package)
         {
             if (index < 0 || index >= _packageList.Rows.Count)
@@ -242,9 +252,42 @@ namespace Mefino.GUI.Models
 
             var row = _packageList.Rows[index];
 
-            row.Cells[3].Value = !package.IsInstalled
-                                    ? "No"
-                                    : "Yes";
+            var time = package.RepoManifestCacheTime;
+            string timeString;
+            if (time == default)
+                timeString = $"Unknown";
+            else
+            {
+                var diff = DateTime.Now - package.RepoManifestCacheTime;
+                if ((decimal)diff.TotalDays >= AVG_MONTH)
+                {
+                    int mths = (int)Math.Floor((decimal)diff.TotalDays / AVG_MONTH);
+                    timeString = $"{mths:F0} month";
+                }
+                else if (diff.TotalDays >= 1)
+                    timeString = $"{diff.TotalDays:F0} day";
+                else if (diff.TotalHours >= 1)
+                    timeString = $"{diff.TotalHours:F0} hour";
+                else
+                    timeString = $"{Math.Ceiling(diff.TotalMinutes):F0} minute";
+
+                if (int.Parse(timeString.Substring(0, timeString.LastIndexOf(' '))) != 1)
+                    timeString += "s";
+                timeString += " ago";
+            }
+            row.Cells[3].Value = timeString;
+
+            var state = WebManifestManager.GetStateForGuid(package.GUID);
+            switch (state)
+            {
+                case WebManifestManager.GuidFilterState.BrokenList:
+                    Console.WriteLine("TODO");
+                    break;
+                case WebManifestManager.GuidFilterState.Whitelist:
+                    row.DefaultCellStyle.ForeColor = Color.Goldenrod;
+                    row.DefaultCellStyle.SelectionForeColor = Color.Goldenrod;
+                    break;
+            }
 
             if (CurrentInspectedPackage == package)
                 SetInfoboxPackage(package);
@@ -304,6 +347,19 @@ namespace Mefino.GUI.Models
 
             _infoBoxVersionAuthor.Text = $"v{package.version} | {package.author}";
 
+            var state = WebManifestManager.GetStateForGuid(package.GUID);
+            switch (state)
+            {
+                case WebManifestManager.GuidFilterState.Blacklist:
+                    break;
+                case WebManifestManager.GuidFilterState.BrokenList:
+                    Console.WriteLine("TODO");
+                    break;
+                case WebManifestManager.GuidFilterState.Whitelist:
+                    _infoBoxVersionAuthor.Text += " [Trusted]";
+                    break;
+            }
+
             _infoBoxDescription.Text = package.description;
 
             if (!package.IsInstalled)
@@ -326,7 +382,7 @@ namespace Mefino.GUI.Models
             {
                 foreach (var tag in package.tags)
                 {
-                    if (!IsTagAccepted(tag, true))
+                    if (!WebManifestManager.IsValidTag(tag, true))
                         continue;
 
                     if (tags != "") tags += "\n";

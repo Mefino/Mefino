@@ -22,7 +22,7 @@ namespace Mefino
 
     public class MefinoApp
     {
-        public const string VERSION = "0.2.3.0";
+        public const string VERSION = "0.2.4.0";
 
         public static MefinoContext CurrentContext;
 

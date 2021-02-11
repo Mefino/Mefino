@@ -43,25 +43,25 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 
 ```json
 {
-	"author": "",
-	"repository": "",
-	"name": "",
-	"version": "",
-	"description": "",
-	"tags": [
-		"Mechanics",
-		"UI",
-		"Skills"
-	],
-	"dependencies": [
-		"someAuthor someRepository",
-		"someAuthor someRepository"
-	],
-	"conflicts_with": [
-		"someGuy someMod"
-	],
-	"require_sync": false,
-	"download_filename": ""
+  "author": "",
+  "repository": "",
+  "name": "",
+  "version": "",
+  "description": "",
+  "tags": [
+    "Mechanics",
+    "UI",
+    "Skills"
+  ],
+  "dependencies": [
+    "someAuthor someRepository",
+    "someAuthor someRepository"
+  ],
+  "conflicts_with": [
+    "someGuy someMod"
+  ],
+  "require_sync": false,
+  "download_filename": ""
 }
 ```
 
@@ -110,17 +110,17 @@ Notes:
 * `//`-Comments are not valid JSON.
 * You will need to set a unique `download_filename` for each package.
 
-```json
+```
 {
   "packages": [
     {
       "name": "MyPlugin1",
       // ... etc, fill out manifest as normal here
     },
-	{
-	  "name": "MyOtherPlugin",
-	  // etc...
-	} // remember to NOT put a comma after your last package.
+    {
+      "name": "MyOtherPlugin",
+      // etc...
+    } // remember to NOT put a comma after your last package.
   ]
 }
 ```

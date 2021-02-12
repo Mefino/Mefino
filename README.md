@@ -81,6 +81,7 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 
 `author` and `repository` (string)
 * Your GitHub Username and the Repository name where this package is hosted. They are <b>not required</b> to be set for web releases, but if you install a local package manually you <b>do</b> need to set `author` for Mefino to work properly.
+* <b>If you make a fork of a repository</b>, you <b>do</b> need to set the `author` to your own username. By default, forks are hidden from search results until you set that.
 
 `tags` (list of strings)
 * A list of tags for your package, used for filtering on the "Browse Mods" tab of Mefino.
@@ -109,9 +110,11 @@ You can do this by defining a `packages` list in your JSON instead, your `mefino
 Notes: 
 * `//`-Comments are not valid JSON.
 * You will need to set a unique `download_filename` for each package.
+* You are allowed to set the `author` as a base entry in the JSON, you don't have to set it for each package individually.
 
 ```
 {
+  "author": "",
   "packages": [
     {
       "name": "MyPlugin1",

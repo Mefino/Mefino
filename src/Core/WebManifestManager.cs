@@ -17,6 +17,7 @@ namespace Mefino.Core
         internal static readonly Dictionary<string, PackageManifest> s_webManifests = new Dictionary<string, PackageManifest>();
 
         internal static readonly Dictionary<string, DateTime> s_repoCacheTimes = new Dictionary<string, DateTime>();
+        internal static readonly HashSet<string> s_reposInLastResult = new HashSet<string>();
 
         internal static string MANIFEST_CACHE_FILEPATH => Folders.MEFINO_APPDATA_FOLDER + @"\manifest-cache.json";
 
@@ -27,7 +28,22 @@ namespace Mefino.Core
         {
             LoadWebManifestCache();
 
-            TryFetchMefinoGithubPackages();
+            if (TryFetchMefinoGithubPackages())
+            {
+                // remove packages if repo is missing now
+                for (int i = s_webManifests.Count - 1; i >= 0; i--)
+                {
+                    if (!s_webManifests.Any())
+                        break;
+
+                    var pkg = s_webManifests.Values.ElementAt(i);
+
+                    if (s_reposInLastResult.Contains($"{pkg.author} {pkg.repository}"))
+                        continue;
+
+                    s_webManifests.Remove(pkg.GUID);
+                }
+            }
 
             SaveWebManifestCache();
         }
@@ -83,24 +99,23 @@ namespace Mefino.Core
         /// <summary>
         /// Actually fetch and process web packages. 
         /// </summary>
-        private static void TryFetchMefinoGithubPackages()
+        private static bool TryFetchMefinoGithubPackages()
         {
             var githubQuery = GithubHelper.QueryForMefinoPackages();
 
             if (githubQuery == null)
             {
                 Console.WriteLine("GITHUB QUERY RETURNED NULL! (are you offline?)");
-                return;
+                return false;
             }
 
             var items = ((JsonValue)githubQuery).AsJsonObject["items"].AsJsonArray;
 
             foreach (var result in items)
-            {
                 CheckRepoSearchResult(result);
-            }
 
             //Console.WriteLine($"Found {WebManifestManager.s_cachedWebManifests.Count} Mefino packages!");
+            return true;
         }
 
         /// <summary>
@@ -126,6 +141,8 @@ namespace Mefino.Core
 
                 var repoGuid = $"{hostUsername} {repoName}";
                 var updated = DateTime.Parse(updatedAt);
+
+                s_reposInLastResult.Add(repoGuid);
 
                 if (s_repoCacheTimes.ContainsKey(repoGuid))
                 {

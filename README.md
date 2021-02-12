@@ -67,7 +67,7 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 
 #### Required
 
-`name`
+`name` (string)
 * The name for your mod or library. This will affect the install folder of your package, and will be the display name in the Mefino launcher.
 
 `version` (string)

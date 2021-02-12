@@ -32,28 +32,7 @@ namespace Mefino.Core
             SaveWebManifestCache();
         }
 
-        public static HashSet<string> AcceptedTags
-        {
-            get
-            {
-                if (s_acceptedTags == null)
-                {
-                    s_acceptedTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var value in Enum.GetValues(typeof(PackageTags)))
-                        s_acceptedTags.Add(value.ToString());
-                }
-                return s_acceptedTags;
-            }
-        }
-        private static HashSet<string> s_acceptedTags;
-
-        public static bool IsValidTag(string tag, bool showLibraries = true)
-        {
-            if (!showLibraries && string.Equals(tag, "library", StringComparison.OrdinalIgnoreCase))
-                return false;
-
-            return AcceptedTags.Contains(tag);
-        }
+        #region WHITELIST/BLACKLIST/ETC
 
         public enum GuidFilterState
         {
@@ -95,9 +74,11 @@ namespace Mefino.Core
         internal static HashSet<string> s_guidBlacklist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         internal static HashSet<string> s_guidBrokenList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // ======= github Package query ======= //
+        #endregion
 
-        internal const string GITHUB_PACKAGE_QUERY_URL = @"https://api.github.com/search/repositories?q=""outward mefino mod""%20in:readme&sort=stars&order=desc";
+        #region MEFINO PACKAGE QUERY
+
+        internal const string GITHUB_PACKAGE_QUERY_URL = @"https://api.github.com/search/repositories?q=%22outward%20mefino%20mod%22%20fork:true%20in:readme&sort=stars&order=desc";
 
         /// <summary>
         /// Actually fetch and process web packages. 
@@ -132,16 +113,18 @@ namespace Mefino.Core
                 var repoUrl = queryResult["html_url"].AsString;
                 var updatedAt = queryResult["updated_at"].AsString;
 
-                var author = queryResult["owner"].AsJsonObject["login"].AsString;
+                var hostUsername = queryResult["owner"].AsJsonObject["login"].AsString;
                 var repoName = queryResult["name"].AsString;
 
-                //Console.WriteLine("checking repo " + author + " " + repoName);
+                bool isFork = queryResult["fork"].AsBoolean;
+
+                //Console.WriteLine("Checking repository: " + hostUsername + "/" + repoName + " (fork: " + isFork + ")");
 
                 // Mefino itself might be a result, ignore it.
-                if (author == "Mefino" && repoName == "Mefino")
+                if (hostUsername == "Mefino" && repoName == "Mefino")
                     return;
 
-                var repoGuid = $"{author} {repoName}";
+                var repoGuid = $"{hostUsername} {repoName}";
                 var updated = DateTime.Parse(updatedAt);
 
                 if (s_repoCacheTimes.ContainsKey(repoGuid))
@@ -149,7 +132,7 @@ namespace Mefino.Core
                     if (updated > s_repoCacheTimes[repoGuid])
                     {
                         s_repoCacheTimes[repoGuid] = updated;
-                        var query = s_webManifests.Values.Where(it => it.author == author && it.repository == repoName);
+                        var query = s_webManifests.Values.Where(it => it.author == hostUsername && it.repository == repoName);
                         if (query.Any())
                         {
                             for (int i = query.Count() - 1; i >= 0; i--)
@@ -173,7 +156,7 @@ namespace Mefino.Core
                 if (string.IsNullOrEmpty(manifestString))
                     return;
 
-                ProcessManifestFile(manifestString, author, repoName);
+                ProcessManifestFile(manifestString, hostUsername, repoName, isFork);
             }
             //catch (IOException) { } // 404
             catch (Exception ex)
@@ -186,48 +169,70 @@ namespace Mefino.Core
         /// <summary>
         /// Process a `mefino-manifest.json` file, which may be a list of manifests or just one.
         /// </summary>
-        internal static void ProcessManifestFile(string manifestString, string authorName, string repoName)
+        internal static void ProcessManifestFile(string manifestString, string hostUsername, string repoName, bool isFork)
         {
-            var json = JsonReader.Parse(manifestString);
-
-            if (json == default)
+            var jsonVal = JsonReader.Parse(manifestString);
+            if (jsonVal == default)
                 return;
 
-            try
+            var json = jsonVal.AsJsonObject;
+            if (json == null)
+                return;
+
+            var array = json["packages"];
+            if (array != JsonValue.Null && array.AsJsonArray is JsonArray packages)
             {
-                var list = json["packages"].AsJsonArray;
-                if (list != null)
+                string definedAuthor;
+                var name = json["author"];
+                if (name != JsonValue.Null && name.AsString is string)
+                    definedAuthor = name.AsString;
+                else
+                    definedAuthor = null;
+
+                foreach (var entry in packages)
                 {
-                    foreach (var entry in list)
-                    {
-                        var manifest = PackageManifest.FromManifestJson(entry.ToString());
-                        if (manifest != null)
-                        {
-                            ProcessManifest(manifest, authorName, repoName);
-                        }
-                    }
+                    var manifest = PackageManifest.FromManifestJson(entry.ToString());
+
+                    if (isFork && !CheckFork(hostUsername, manifest, definedAuthor))
+                        continue;
+
+                    if (manifest != null)
+                        ProcessManifest(manifest, hostUsername, repoName);
                 }
-                else throw new Exception();
             }
-            catch
+            else
             {
                 var manifest = PackageManifest.FromManifestJson(manifestString);
+
+                if (isFork && !CheckFork(hostUsername, manifest))
+                    return;
+
                 if (manifest != null)
-                {
-                    ProcessManifest(manifest, authorName, repoName);
-                }
+                    ProcessManifest(manifest, hostUsername, repoName);
             }
+        }
+
+        private static bool CheckFork(string hostUsername, PackageManifest manifest, string definedAuthor = null)
+        {
+            if (string.IsNullOrEmpty(hostUsername))
+                return false;
+
+            definedAuthor = definedAuthor ?? manifest.author;
+
+            return string.Equals(hostUsername, definedAuthor, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
         /// Process an actual PackageManifest result, either from a list or just a standalone one.
         /// </summary>
-        internal static void ProcessManifest(PackageManifest manifest, string author, string repoName)
+        internal static void ProcessManifest(PackageManifest manifest, string hostUsername, string repoName)
         {
             if (manifest == null)
                 return;
 
-            manifest.author = author;
+            if (string.IsNullOrEmpty(manifest.author) || !string.Equals(hostUsername, manifest.author, StringComparison.OrdinalIgnoreCase))
+                manifest.author = hostUsername;
+
             manifest.repository = repoName;
 
             var state = GetStateForGuid(manifest.GUID);
@@ -341,5 +346,7 @@ namespace Mefino.Core
 
             File.WriteAllText(MANIFEST_CACHE_FILEPATH, output.ToString(true));
         }
+
+        #endregion
     }
 }

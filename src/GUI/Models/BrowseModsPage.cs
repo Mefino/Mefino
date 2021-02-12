@@ -118,7 +118,7 @@ namespace Mefino.GUI.Models
                     if (string.IsNullOrEmpty(tag) || s_implementedTags.Contains(tag))
                         continue;
 
-                    if (WebManifestManager.IsValidTag(tag, ShowLibraries))
+                    if (PackageTags.IsValidTag(tag, ShowLibraries))
                         s_implementedTags.Add(tag);
                 }
             }
@@ -382,7 +382,7 @@ namespace Mefino.GUI.Models
             {
                 foreach (var tag in package.tags)
                 {
-                    if (!WebManifestManager.IsValidTag(tag, true))
+                    if (!PackageTags.IsValidTag(tag, true))
                         continue;
 
                     if (tags != "") tags += "\n";

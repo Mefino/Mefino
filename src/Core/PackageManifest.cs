@@ -32,13 +32,46 @@ namespace Mefino.Core
             }
         }
 
-        public DateTime RepoManifestCacheTime
+        public DateTime RepoLastUpdatedTime
         {
             get
             {
                 var repoGuid = $"{author} {repository}";
                 WebManifestManager.s_repoCacheTimes.TryGetValue(repoGuid, out DateTime time);
                 return time;
+            }
+        }
+
+        private const decimal AVG_MONTH = 30.4375m;
+
+        public string TimeSinceRepoUpdatedPretty
+        {
+            get
+            {
+                var time = RepoLastUpdatedTime;
+                string timeString;
+                if (time == default)
+                    timeString = $"Unknown";
+                else
+                {
+                    var diff = DateTime.Now - RepoLastUpdatedTime;
+                    if ((decimal)diff.TotalDays >= AVG_MONTH)
+                    {
+                        int mths = (int)Math.Floor((decimal)diff.TotalDays / AVG_MONTH);
+                        timeString = $"{mths:F0} month";
+                    }
+                    else if (diff.TotalDays >= 1)
+                        timeString = $"{diff.TotalDays:F0} day";
+                    else if (diff.TotalHours >= 1)
+                        timeString = $"{diff.TotalHours:F0} hour";
+                    else
+                        timeString = $"{Math.Ceiling(diff.TotalMinutes):F0} minute";
+
+                    if (int.Parse(timeString.Substring(0, timeString.LastIndexOf(' '))) != 1)
+                        timeString += "s";
+                    timeString += " ago";
+                }
+                return timeString;
             }
         }
 

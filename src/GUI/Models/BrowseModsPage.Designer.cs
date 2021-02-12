@@ -40,7 +40,7 @@ namespace Mefino.GUI.Models
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             this._packageList = new System.Windows.Forms.DataGridView();
-            this._updateButton = new MetroFramework.Controls.MetroButton();
+            this._refreshButton = new MetroFramework.Controls.MetroButton();
             this._packageInfoBox = new MetroFramework.Controls.MetroPanel();
             this._infoBoxTabs = new MetroFramework.Controls.MetroTabControl();
             this._descTab = new MetroFramework.Controls.MetroTabPage();
@@ -62,6 +62,7 @@ namespace Mefino.GUI.Models
             this._listColName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._listColVersion = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._listColAuthor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._hiddenColDateUpdated = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._listColUpdated = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this._packageList)).BeginInit();
             this._packageInfoBox.SuspendLayout();
@@ -94,6 +95,7 @@ namespace Mefino.GUI.Models
             this._listColName,
             this._listColVersion,
             this._listColAuthor,
+            this._hiddenColDateUpdated,
             this._listColUpdated});
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
@@ -107,6 +109,7 @@ namespace Mefino.GUI.Models
             this._packageList.GridColor = System.Drawing.Color.Black;
             this._packageList.Location = new System.Drawing.Point(16, 82);
             this._packageList.Name = "_packageList";
+            this._packageList.ReadOnly = true;
             this._packageList.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._packageList.RowHeadersVisible = false;
             this._packageList.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
@@ -126,18 +129,18 @@ namespace Mefino.GUI.Models
             this._packageList.Size = new System.Drawing.Size(540, 360);
             this._packageList.TabIndex = 13;
             // 
-            // _updateButton
+            // _refreshButton
             // 
-            this._updateButton.ForeColor = System.Drawing.Color.LightGreen;
-            this._updateButton.Location = new System.Drawing.Point(417, 18);
-            this._updateButton.Name = "_updateButton";
-            this._updateButton.Size = new System.Drawing.Size(139, 29);
-            this._updateButton.TabIndex = 14;
-            this._updateButton.Text = "Refresh";
-            this._updateButton.Theme = MetroFramework.MetroThemeStyle.Dark;
-            this._updateButton.UseCustomForeColor = true;
-            this._updateButton.UseSelectable = true;
-            this._updateButton.Click += new System.EventHandler(this._refreshButton_Click);
+            this._refreshButton.ForeColor = System.Drawing.Color.LightGreen;
+            this._refreshButton.Location = new System.Drawing.Point(417, 18);
+            this._refreshButton.Name = "_refreshButton";
+            this._refreshButton.Size = new System.Drawing.Size(139, 29);
+            this._refreshButton.TabIndex = 14;
+            this._refreshButton.Text = "Refresh";
+            this._refreshButton.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._refreshButton.UseCustomForeColor = true;
+            this._refreshButton.UseSelectable = true;
+            this._refreshButton.Click += new System.EventHandler(this._refreshButton_Click);
             // 
             // _packageInfoBox
             // 
@@ -444,12 +447,20 @@ namespace Mefino.GUI.Models
             this._listColAuthor.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this._listColAuthor.Width = 149;
             // 
+            // _hiddenColDateUpdated
+            // 
+            this._hiddenColDateUpdated.HeaderText = "HIDDEN datetime";
+            this._hiddenColDateUpdated.Name = "_hiddenColDateUpdated";
+            this._hiddenColDateUpdated.ReadOnly = true;
+            this._hiddenColDateUpdated.Visible = false;
+            // 
             // _listColUpdated
             // 
             this._listColUpdated.HeaderText = "Details Updated";
             this._listColUpdated.Name = "_listColUpdated";
             this._listColUpdated.ReadOnly = true;
             this._listColUpdated.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this._listColUpdated.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
             this._listColUpdated.Width = 127;
             // 
             // BrowseModsPage
@@ -462,7 +473,7 @@ namespace Mefino.GUI.Models
             this.Controls.Add(this._tagDropDown);
             this.Controls.Add(this._packagesTitle);
             this.Controls.Add(this._packageInfoBox);
-            this.Controls.Add(this._updateButton);
+            this.Controls.Add(this._refreshButton);
             this.Controls.Add(this._packageList);
             this.Name = "BrowseModsPage";
             this.Size = new System.Drawing.Size(925, 460);
@@ -482,7 +493,7 @@ namespace Mefino.GUI.Models
         #endregion
 
         private System.Windows.Forms.DataGridView _packageList;
-        private MetroFramework.Controls.MetroButton _updateButton;
+        private MetroFramework.Controls.MetroButton _refreshButton;
         private MetroFramework.Controls.MetroPanel _packageInfoBox;
         private MetroFramework.Controls.MetroTabControl _infoBoxTabs;
         private MetroFramework.Controls.MetroTabPage _descTab;
@@ -504,6 +515,7 @@ namespace Mefino.GUI.Models
         private System.Windows.Forms.DataGridViewTextBoxColumn _listColName;
         private System.Windows.Forms.DataGridViewTextBoxColumn _listColVersion;
         private System.Windows.Forms.DataGridViewTextBoxColumn _listColAuthor;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _hiddenColDateUpdated;
         private System.Windows.Forms.DataGridViewTextBoxColumn _listColUpdated;
     }
 }

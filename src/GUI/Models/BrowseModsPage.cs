@@ -1,6 +1,7 @@
 ﻿using Mefino.Core;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
@@ -20,12 +21,13 @@ namespace Mefino.GUI.Models
         {
             Instance = this;
             InitializeComponent();
+            _packageList.ColumnHeaderMouseClick += _packageList_ColumnHeaderMouseClick;
 
             _showInstalledCheck.Checked = ShowInstalledPackages;
             _showOnlyTrustedCheck.Checked = OnlyShowTrusted;
             _libraryToggle.Checked = ShowLibraries;
 
-            MefinoGUI.SensitiveControls.AddRange(new Control[] { this._infoBoxInstallButton, this._updateButton });
+            MefinoGUI.SensitiveControls.AddRange(new Control[] { this._infoBoxInstallButton, this._refreshButton });
 
             // init some states
             _packageInfoBox.Visible = false;
@@ -52,17 +54,26 @@ namespace Mefino.GUI.Models
         public static bool ShowInstalledPackages = true;
         public static bool ShowLibraries;
         public static bool OnlyShowTrusted;
-        
-        // ====== misc buttons ======
+
+        //internal static readonly ObservableCollection<WebPackageDisplay> s_packageList = new ObservableCollection<WebPackageDisplay>();
+
+        #region MISC BUTTONS
 
         // Button to refresh the package list
         private void _refreshButton_Click(object sender, EventArgs e)
         {
+            _refreshButton.Enabled = false;
+            _refreshButton.Text = "Refreshing...";
+            Application.DoEvents();
+
             MefinoApp.RefreshAllPackages(true);
 
             RefreshTags();
 
             RefreshPackageList();
+
+            _refreshButton.Enabled = true;
+            _refreshButton.Text = "Refresh";
         }
 
         private void _showInstalledCheck_CheckedChanged(object sender, EventArgs e)
@@ -93,7 +104,9 @@ namespace Mefino.GUI.Models
             RefreshPackageList();
         }
 
-        // ===== tags dropdown =====
+        #endregion
+
+        #region TAGS DROPDOWN
 
         // When user selects a tag from dropdown
         private void _tagDropDown_SelectedIndexChanged(object sender, EventArgs e)
@@ -141,7 +154,36 @@ namespace Mefino.GUI.Models
                 _tagDropDown.SelectedIndex = 0;
         }
 
-        // ============ Main package list ==========
+        #endregion
+
+        #region MAIN PACKAGE LIST
+
+        internal static SortOrder s_lastDateSortDir;
+
+        private void _packageList_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            // Custom sort if user clicks the "Details Updated" row.
+            // Use hidden column 'hiddenColDateUpdated' which is UTC date time strings.
+            if (e.ColumnIndex == 4)
+            {
+                ListSortDirection dir;
+                switch (s_lastDateSortDir)
+                {
+                    case SortOrder.None:
+                    case SortOrder.Ascending:
+                        dir = ListSortDirection.Descending; break;
+                    case SortOrder.Descending:
+                        dir = ListSortDirection.Ascending; break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                s_lastDateSortDir = (SortOrder)((int)dir + 1);
+                _packageList.Sort(_hiddenColDateUpdated, dir);
+            }
+            else
+                s_lastDateSortDir = SortOrder.None;
+        }
 
         internal int TryGetIndexOfPackage(PackageManifest package)
         {
@@ -196,6 +238,7 @@ namespace Mefino.GUI.Models
         public void RefreshPackageList()
         {
             _packageList.Rows.Clear();
+            //s_packageList.Clear();
 
             foreach (var pkg in WebManifestManager.s_webManifests)
                 AddPackageRow(pkg.Value);
@@ -226,15 +269,13 @@ namespace Mefino.GUI.Models
                     package.name,
                     package.version,
                     package.author,
-                    LocalPackageManager.TryGetInstalledPackage(package.GUID) == null
-                        ? "No" 
-                        : "Yes",
+                    package.RepoLastUpdatedTime.ToString()
                 });
 
                 RefreshRow(_packageList.Rows.Count - 1, package);
             }
 
-            _packageList.Sort(_listColName, ListSortDirection.Ascending);
+            //_packageList.Sort(_listColName, ListSortDirection.Ascending);
 
             if (s_currentPackage != null)
                 SetInfoboxPackage(s_currentPackage);
@@ -245,39 +286,12 @@ namespace Mefino.GUI.Models
             RefreshRow(TryGetIndexOfPackage(package), package);
         }
 
-        private const decimal AVG_MONTH = 30.4375m;
-
         internal void RefreshRow(int index, PackageManifest package)
         {
             if (index < 0 || index >= _packageList.Rows.Count)
                 return;
 
             var row = _packageList.Rows[index];
-
-            var time = package.RepoManifestCacheTime;
-            string timeString;
-            if (time == default)
-                timeString = $"Unknown";
-            else
-            {
-                var diff = DateTime.Now - package.RepoManifestCacheTime;
-                if ((decimal)diff.TotalDays >= AVG_MONTH)
-                {
-                    int mths = (int)Math.Floor((decimal)diff.TotalDays / AVG_MONTH);
-                    timeString = $"{mths:F0} month";
-                }
-                else if (diff.TotalDays >= 1)
-                    timeString = $"{diff.TotalDays:F0} day";
-                else if (diff.TotalHours >= 1)
-                    timeString = $"{diff.TotalHours:F0} hour";
-                else
-                    timeString = $"{Math.Ceiling(diff.TotalMinutes):F0} minute";
-
-                if (int.Parse(timeString.Substring(0, timeString.LastIndexOf(' '))) != 1)
-                    timeString += "s";
-                timeString += " ago";
-            }
-            row.Cells[3].Value = timeString;
 
             var state = WebManifestManager.GetStateForGuid(package.GUID);
             switch (state)
@@ -290,6 +304,8 @@ namespace Mefino.GUI.Models
                     row.DefaultCellStyle.SelectionForeColor = Color.Goldenrod;
                     break;
             }
+
+            row.Cells[4].Value = package.TimeSinceRepoUpdatedPretty;
 
             if (CurrentInspectedPackage == package)
                 SetInfoboxPackage(package);
@@ -304,7 +320,7 @@ namespace Mefino.GUI.Models
                     Instance?.SetRowHighlight(s_currentPackage, false);
 
                 s_currentPackage = value;
-               
+
                 if (Instance != null)
                 {
                     if (value != null)
@@ -339,7 +355,9 @@ namespace Mefino.GUI.Models
             }
         }
 
-        // ============== Infobox ==============
+        #endregion
+
+        #region INFOBOX
 
         public void SetInfoboxPackage(PackageManifest package)
         {
@@ -425,7 +443,7 @@ namespace Mefino.GUI.Models
         {
             var url = CurrentInspectedPackage.GithubURL;
 
-            if (Uri.IsWellFormedUriString(url, UriKind.Absolute)) 
+            if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
             {
                 Process.Start(url);
             }
@@ -452,5 +470,7 @@ namespace Mefino.GUI.Models
                 SetInfoboxPackage(s_currentPackage);
             }
         }
+
+        #endregion
     }
 }

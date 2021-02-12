@@ -60,6 +60,8 @@ namespace Mefino.GUI.Models
         {
             MefinoApp.RefreshAllPackages(true);
 
+            RefreshTags();
+
             RefreshPackageList();
         }
 

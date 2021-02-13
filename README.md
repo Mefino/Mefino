@@ -44,7 +44,6 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 ```json
 {
   "author": "",
-  "repository": "",
   "name": "",
   "version": "",
   "description": "",
@@ -79,8 +78,8 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 
 #### Optional
 
-`author` and `repository` (string)
-* Your GitHub Username and the Repository name where this package is hosted. They are <b>not required</b> to be set for web releases, but if you install a local package manually you <b>do</b> need to set `author` for Mefino to work properly.
+`author` (string)
+* Your GitHub Username where this package is hosted. This is <b>not required</b> to be set for web releases, but if you install a local package manually you <b>do</b> need to set this for Mefino to work properly.
 * <b>If you make a fork of a repository</b>, you <b>do</b> need to set the `author` to your own username. By default, forks are hidden from search results until you set that.
 
 `tags` (list of strings)

@@ -127,6 +127,12 @@ namespace Mefino
             // These will probably go through the CLI handler.
 
             // All CLI arguments should check if context is CLI or GUI before executing?
+
+            // ...
+
+            // Delete the tempargs.txt file after reading it.
+            if (File.Exists(ExternalArgumentPath))
+                File.Delete(ExternalArgumentPath);
         }
 
         /// <summary>

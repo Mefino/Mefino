@@ -1,9 +1,8 @@
-﻿using Mefino.Core;
-using Mefino.Core.IO;
+﻿using Mefino.Core.IO;
 using System;
 using System.IO;
 
-namespace Mefino
+namespace Mefino.Core
 {
     public static class Folders
     {

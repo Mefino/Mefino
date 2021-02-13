@@ -128,7 +128,7 @@ namespace Mefino.GUI.Models
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Outward Game (*.exe)|Outward.exe";
+                openFileDialog.Filter = "Outward Game (Outward.exe)|Outward.exe";
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)

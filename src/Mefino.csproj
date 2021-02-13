@@ -85,12 +85,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\AppDataManager.cs" />
+    <Compile Include="Core\NativeMethods.cs" />
     <Compile Include="Core\OutwardHelper.cs" />
     <Compile Include="Core\PackageTags.cs" />
     <Compile Include="Core\Profiles\MefinoProfile.cs" />
     <Compile Include="Core\Profiles\ProfileManager.cs" />
     <Compile Include="Core\SelfUpdater.cs" />
-    <Compile Include="Folders.cs" />
+    <Compile Include="Core\Folders.cs" />
     <Compile Include="GUI\MefinoGUI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -108,6 +109,18 @@
     </Compile>
     <Compile Include="GUI\Models\ProfileCreationForm.Designer.cs">
       <DependentUpon>ProfileCreationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Models\ProfileImportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Models\ProfileImportForm.Designer.cs">
+      <DependentUpon>ProfileImportForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Models\ProfileExportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Models\ProfileExportForm.Designer.cs">
+      <DependentUpon>ProfileExportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Models\SetupPage.cs">
       <SubType>UserControl</SubType>
@@ -166,6 +179,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Models\ProfileCreationForm.resx">
       <DependentUpon>ProfileCreationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Models\ProfileImportForm.resx">
+      <DependentUpon>ProfileImportForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Models\ProfileExportForm.resx">
+      <DependentUpon>ProfileExportForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Models\SetupPage.resx">
       <DependentUpon>SetupPage.cs</DependentUpon>

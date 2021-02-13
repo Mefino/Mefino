@@ -174,6 +174,25 @@ namespace Mefino.GUI.Models
             ProfileManager.SaveProfiles();
         }
 
+        private void _importButton_Click(object sender, EventArgs e)
+        {
+            ProfileManager.SavePrompt();
+
+            using (var import = new ProfileImportForm())
+            {
+                import.ShowDialog();
+            }
+        }
+
+        private void _exportButton_Click(object sender, EventArgs e)
+        {
+            using (var export = new ProfileExportForm())
+            {
+                export._exportDescText.Text = $"Exporting profile: '{ProfileManager.s_activeProfile}'";
+                export.ShowDialog();
+            }
+        }
+
         private void _deleteProfileButton_Click(object sender, EventArgs e)
         {
             if (OutwardHelper.IsOutwardRunning())

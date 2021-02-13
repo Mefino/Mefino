@@ -219,9 +219,6 @@ namespace Mefino.Core
 
             if (IOHelper.TryMoveDirectory(fromDir, toDir))
             {
-                //s_disabledPackages.Remove(guid);
-                //s_enabledPackages.Add(guid, package);
-
                 RefreshInstalledPackages();
 
                 OnPackageEnabled?.Invoke(package);
@@ -349,6 +346,7 @@ namespace Mefino.Core
             if (!DownloadAndInstallPackage(webManifest))
             {
                 MessageBox.Show("Failed to download and install " + guid + "!");
+                RefreshInstalledPackages();
                 return false;
             }
 

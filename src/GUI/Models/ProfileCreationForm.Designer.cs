@@ -41,7 +41,7 @@ namespace Mefino.GUI.Models
             // 
             // 
             this._enterNameField.CustomButton.Image = null;
-            this._enterNameField.CustomButton.Location = new System.Drawing.Point(199, 1);
+            this._enterNameField.CustomButton.Location = new System.Drawing.Point(217, 1);
             this._enterNameField.CustomButton.Name = "";
             this._enterNameField.CustomButton.Size = new System.Drawing.Size(21, 21);
             this._enterNameField.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
@@ -60,7 +60,7 @@ namespace Mefino.GUI.Models
             this._enterNameField.SelectionLength = 0;
             this._enterNameField.SelectionStart = 0;
             this._enterNameField.ShortcutsEnabled = true;
-            this._enterNameField.Size = new System.Drawing.Size(221, 23);
+            this._enterNameField.Size = new System.Drawing.Size(239, 23);
             this._enterNameField.TabIndex = 0;
             this._enterNameField.UseSelectable = true;
             this._enterNameField.WaterMark = "Enter a name...";
@@ -71,7 +71,7 @@ namespace Mefino.GUI.Models
             // 
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this._cancelButton.ForeColor = System.Drawing.Color.IndianRed;
-            this._cancelButton.Location = new System.Drawing.Point(153, 107);
+            this._cancelButton.Location = new System.Drawing.Point(171, 107);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(91, 23);
             this._cancelButton.TabIndex = 1;
@@ -85,7 +85,7 @@ namespace Mefino.GUI.Models
             this._createButton.ForeColor = System.Drawing.Color.LightGreen;
             this._createButton.Location = new System.Drawing.Point(23, 107);
             this._createButton.Name = "_createButton";
-            this._createButton.Size = new System.Drawing.Size(84, 23);
+            this._createButton.Size = new System.Drawing.Size(142, 23);
             this._createButton.TabIndex = 2;
             this._createButton.Text = "Create";
             this._createButton.Theme = MetroFramework.MetroThemeStyle.Dark;

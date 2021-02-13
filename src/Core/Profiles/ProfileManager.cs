@@ -222,13 +222,14 @@ namespace Mefino.Core.Profiles
         {
             if (AllProfiles.Count < 2)
             {
-                Console.WriteLine("Cannot delete the only profile. Clearing instead");
-                // cannot delete your only profile. wipe it instead and rename it to 'default'.
-                ActiveProfile.name = DEFAULT_PROFILE_NAME;
-                s_activeProfile = DEFAULT_PROFILE_NAME;
-                ActiveProfile.packages.Clear();
-                SaveProfiles();
-                LoadProfiles();
+                MessageBox.Show("Sorry, you cannot delete your only profile!");
+                //Console.WriteLine("Cannot delete the only profile. Clearing instead");
+                //// cannot delete your only profile. wipe it instead and rename it to 'default'.
+                //ActiveProfile.name = DEFAULT_PROFILE_NAME;
+                //s_activeProfile = DEFAULT_PROFILE_NAME;
+                //ActiveProfile.packages.Clear();
+                //SaveProfiles();
+                //LoadProfiles();
                 return;
             }
 

@@ -44,7 +44,6 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 ```json
 {
   "author": "",
-  "repository": "",
   "name": "",
   "version": "",
   "description": "",

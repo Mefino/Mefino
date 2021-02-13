@@ -26,7 +26,7 @@ namespace Mefino
 
         // Use a Mutex to limit the number of app instances to 1.
         internal static Mutex appMutex = new Mutex(true, MUTEX_STRING);
-        internal const string MUTEX_STRING = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"; // our project GUID
+        internal const string MUTEX_STRING = "{42FA6537-1C93-48EF-88CB-0B6ADF1220A2}"; // our project GUID
 
         public static MefinoContext CurrentContext;
 

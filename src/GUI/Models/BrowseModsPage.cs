@@ -49,7 +49,7 @@ namespace Mefino.GUI.Models
         }
 
         public string SelectedTag = "All";
-        private readonly HashSet<string> s_implementedTags = new HashSet<string>();
+        private readonly List<string> s_implementedTags = new List<string>();
 
         public static bool ShowInstalledPackages = true;
         public static bool ShowLibraries;
@@ -123,6 +123,8 @@ namespace Mefino.GUI.Models
 
             s_implementedTags.Add("All");
 
+            var tempList = new List<string>();
+
             foreach (var package in WebManifestManager.s_webManifests.Values)
             {
                 if (package.tags == null || !package.tags.Any())
@@ -130,13 +132,17 @@ namespace Mefino.GUI.Models
 
                 foreach (var tag in package.tags)
                 {
-                    if (string.IsNullOrEmpty(tag) || s_implementedTags.Contains(tag))
+                    if (string.IsNullOrEmpty(tag) || tempList.Contains(tag))
                         continue;
 
                     if (PackageTags.IsValidTag(tag, ShowLibraries))
-                        s_implementedTags.Add(tag);
+                        tempList.Add(tag);
                 }
             }
+
+            tempList.Sort();
+
+            s_implementedTags.AddRange(tempList);
 
             _tagDropDown.Items.Clear();
 

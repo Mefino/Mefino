@@ -146,14 +146,27 @@ namespace Mefino.Core
 
                 if (s_repoCacheTimes.ContainsKey(repoGuid))
                 {
+                    if ((DateTime.Now - updated).TotalMinutes < 5)
+                    {
+                        // This repo was updated less than 5 minutes ago.
+                        // GitHub caches the "Raw" CDN for 5 minutes, so we need to wait for it to refresh.
+
+                        return;
+                    }
+
                     if (updated > s_repoCacheTimes[repoGuid])
                     {
+                        // Console.WriteLine("Updating manifests in repo " + repoGuid);
+
                         s_repoCacheTimes[repoGuid] = updated;
                         var query = s_webManifests.Values.Where(it => it.author == hostUsername && it.repository == repoName);
                         if (query.Any())
                         {
                             for (int i = query.Count() - 1; i >= 0; i--)
+                            {
+                                Console.WriteLine("removing package " + query.ElementAt(i).GUID);
                                 s_webManifests.Remove(query.ElementAt(i).GUID);
+                            }
                         }
                     }
                     else
@@ -195,6 +208,8 @@ namespace Mefino.Core
             var json = jsonVal.AsJsonObject;
             if (json == null)
                 return;
+
+            // Console.WriteLine("processing json " + manifestString);
 
             var array = json["packages"];
             if (array != JsonValue.Null && array.AsJsonArray is JsonArray packages)
@@ -268,10 +283,9 @@ namespace Mefino.Core
 
             s_webManifests.Add(manifest.GUID, manifest);
 
-            if (LocalPackageManager.TryGetInstalledPackage(manifest.GUID) is PackageManifest installed
-                    && manifest.IsGreaterVersionThan(installed))
+            if (LocalPackageManager.TryGetInstalledPackage(manifest.GUID) is PackageManifest installed)
             {
-                installed.m_installState = InstallState.Outdated;
+                installed.m_installState = installed.CompareVersionAgainst(manifest);
             }
         }
 

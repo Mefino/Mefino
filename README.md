@@ -13,12 +13,9 @@
 
 ## How to use
 
-* NOTE: <b>For now, please remove (or make a backup of) all existing mods before installing / testing Mefino.</b> This is not technically required, but the safety of your non-Mefino files is not guaranteed while using Mefino in alpha phase.
-
+0. Recommended to remove all existing mods first.
 1. Download `Mefino.exe` from the release page
 2. Run it :) 
-
-<i>If Windows SmartScreen warns you about the file you can disable these warnings through Windows Security > App & Browser Control > Reputation-based protection > Off. The source code for the Mefino launcher is available in its entirety in the `src` folder should you want to rebuild it yourself.</i>
 
 ## Temporary Release Guide
 

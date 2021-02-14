@@ -190,5 +190,15 @@ namespace Mefino.GUI.Models
             LocalPackageManager.RefreshInstalledPackages();
             LauncherPage.Instance.RebuildPackageList();
         }
+
+        private void _appDataFolderButton_Click(object sender, EventArgs e)
+        {
+            var dir = Folders.MEFINO_APPDATA_FOLDER;
+
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            Process.Start(dir);
+        }
     }
 }

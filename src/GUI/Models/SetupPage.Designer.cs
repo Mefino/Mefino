@@ -40,6 +40,7 @@ namespace Mefino.GUI.Models
             this._bepInstallButton = new MetroFramework.Controls.MetroButton();
             this._bepPanel = new MetroFramework.Controls.MetroPanel();
             this._uninstallButton = new MetroFramework.Controls.MetroButton();
+            this._appDataFolderButton = new MetroFramework.Controls.MetroButton();
             this._bepPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -207,10 +208,24 @@ namespace Mefino.GUI.Models
             this._uninstallButton.UseSelectable = true;
             this._uninstallButton.Click += new System.EventHandler(this._uninstallButton_Click);
             // 
+            // _appDataFolderButton
+            // 
+            this._appDataFolderButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
+            this._appDataFolderButton.Location = new System.Drawing.Point(293, 410);
+            this._appDataFolderButton.Name = "_appDataFolderButton";
+            this._appDataFolderButton.Size = new System.Drawing.Size(190, 30);
+            this._appDataFolderButton.TabIndex = 11;
+            this._appDataFolderButton.Text = "Open Mefino AppData Folder";
+            this._appDataFolderButton.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this._appDataFolderButton.UseCustomBackColor = true;
+            this._appDataFolderButton.UseSelectable = true;
+            this._appDataFolderButton.Click += new System.EventHandler(this._appDataFolderButton_Click);
+            // 
             // SetupPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this._appDataFolderButton);
             this.Controls.Add(this._uninstallButton);
             this.Controls.Add(this._otwPathStatus);
             this.Controls.Add(this._otwPathStatusTitle);
@@ -243,5 +258,6 @@ namespace Mefino.GUI.Models
         private MetroFramework.Controls.MetroButton _bepInstallButton;
         private MetroFramework.Controls.MetroPanel _bepPanel;
         private MetroFramework.Controls.MetroButton _uninstallButton;
+        private MetroFramework.Controls.MetroButton _appDataFolderButton;
     }
 }

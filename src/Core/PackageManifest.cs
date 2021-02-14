@@ -76,14 +76,19 @@ namespace Mefino.Core
         }
 
         /// <summary>
-        /// Is a packge with this GUID installed? (May not literally be this package instance that is installed, if this is a web manifest)
+        /// Is a packge with this GUID installed?
         /// </summary>
         public bool IsInstalled => LocalPackageManager.TryGetInstalledPackage(GUID) != null;
 
         /// <summary>
-        /// Is this package installed and disabled?
+        /// Is a packge with this GUID installed and disabled?
         /// </summary>
         internal bool IsDisabled => LocalPackageManager.s_disabledPackages.ContainsKey(GUID);
+
+        /// <summary>
+        /// Only used in C# by Mefino. The install state of the package.
+        /// </summary>
+        internal InstallState m_installState;
 
         #region JSON
 
@@ -98,6 +103,9 @@ namespace Mefino.Core
 
         /// <summary>Version of the package, eg. 1.0.0.0</summary>
         public string version;
+
+        /// <summary>Minimum required version of the package that works with current version (ie, if updates are optional then this can stay the same for that update)</summary>
+        public string required_version;
 
         /// <summary>Short description of the package</summary>
         public string description;
@@ -121,7 +129,6 @@ namespace Mefino.Core
 
         #endregion
 
-        private HashSet<string> m_tags;
         public bool HasTag(string tag)
         {
             if (m_tags == null)
@@ -135,11 +142,7 @@ namespace Mefino.Core
 
             return m_tags.Contains(tag);
         }
-
-        /// <summary>
-        /// Only used in C# by Mefino. The install state of the package.
-        /// </summary>
-        internal InstallState m_installState;
+        private HashSet<string> m_tags;
 
         /// <summary>
         /// Returns a more human-readable form of <see cref="m_installState"/>.
@@ -160,38 +163,63 @@ namespace Mefino.Core
                     return "Has conflicts";
                 case InstallState.Outdated:
                     return "Outdated";
+                case InstallState.OptionalUpdate:
+                    return "Optional update";
                 default:
                     throw new NotImplementedException($"Not implemented: {m_installState}");
             }
         }
 
-        /// <summary>
-        /// Check if the version of this package instance is greater than the version of the other package instance, or optionally check if equal version.
-        /// </summary>
-        /// <param name="other">The other package to check against, presumably the same GUID.</param>
-        /// <param name="greaterOrEqual">Allow equal to return true?</param>
-        /// <returns><see langword="true"/> if this version is greater than the other package (or equal when <paramref name="greaterOrEqual"/> is <see langword="true"/>), 
-        /// otherwise <see langword="false"/>.</returns>
-        public bool IsGreaterVersionThan(PackageManifest other, bool greaterOrEqual = false)
+        public InstallState CompareVersionAgainst(PackageManifest otherManifest)
         {
-            Version otherVersion;
-            try
-            {
-                otherVersion = new Version(other.version);
-            }
-            catch { return true; }
+            if (!Version.TryParse(otherManifest.version, out Version otherVersion))
+                return InstallState.Installed; // default to updated if cannot parse web manifest version
 
-            Version thisVersion;
-            try
-            {
-                thisVersion = new Version(this.version);
-            }
-            catch { return false; }
+            if (!Version.TryParse(this.version, out Version thisVersion))
+                return InstallState.Outdated; // default to outdated if cannot parse this version
 
-            return greaterOrEqual
-                    ? thisVersion >= otherVersion
-                    : thisVersion > otherVersion;
+            if (!Version.TryParse(otherManifest.required_version, out Version requiredVersion))
+                requiredVersion = otherVersion; // set 'required_version' to 'version' if cannot parse or not set.
+
+            // Check if our version is completely up to date
+            if (thisVersion >= otherVersion)
+                return InstallState.Installed; // this package is up to date
+
+            // Else, check if we at least have the required version:
+            if (thisVersion >= requiredVersion)
+                return InstallState.OptionalUpdate;
+
+            // Else we must be hard-outdated.
+            return InstallState.Outdated;
         }
+
+        ///// <summary>
+        ///// Check if the version of this package instance is greater than the version of the other package instance, or optionally check if equal version.
+        ///// </summary>
+        ///// <param name="other">The other package to check against, presumably the same GUID.</param>
+        ///// <param name="greaterOrEqual">Allow equal to return true?</param>
+        ///// <returns><see langword="true"/> if this version is greater than the other package (or equal when <paramref name="greaterOrEqual"/> is <see langword="true"/>), 
+        ///// otherwise <see langword="false"/>.</returns>
+        //public bool IsGreaterVersionThan(PackageManifest other, bool greaterOrEqual = false)
+        //{
+        //    Version otherVersion;
+        //    try
+        //    {
+        //        otherVersion = new Version(other.version);
+        //    }
+        //    catch { return true; }
+
+        //    Version thisVersion;
+        //    try
+        //    {
+        //        thisVersion = new Version(this.version);
+        //    }
+        //    catch { return false; }
+
+        //    return greaterOrEqual
+        //            ? thisVersion >= otherVersion
+        //            : thisVersion > otherVersion;
+        //}
 
         /// <summary>
         /// Try to enable this package, and optionally all dependencies too.
@@ -415,10 +443,10 @@ namespace Mefino.Core
                 { nameof(author),               this.author },
                 { nameof(name),                 this.name },
                 { nameof(version),              this.version },
+                { nameof(required_version),     this.required_version },
                 { nameof(description),          this.description },
                 { nameof(download_filename),    this.download_filename },
                 { nameof(require_sync),         this.require_sync },
-                //{ nameof(m_manifestCachedTime), this.m_manifestCachedTime },
             };
 
             AddJsonStringArraySafe(ret, nameof(this.tags), this.tags);
@@ -453,6 +481,7 @@ namespace Mefino.Core
                     repository = json[nameof(repository)].AsString,
                     name = json[nameof(name)].AsString,
                     version = json[nameof(version)].AsString,
+                    required_version = json[nameof(required_version)].AsString,
                     description = json[nameof(description)].AsString,
                     download_filename = json[nameof(download_filename)].AsString,
                     require_sync = json[nameof(require_sync)].AsBoolean,

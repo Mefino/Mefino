@@ -456,7 +456,7 @@ namespace Mefino.GUI.Models
             // 
             // _listColUpdated
             // 
-            this._listColUpdated.HeaderText = "Details Updated";
+            this._listColUpdated.HeaderText = "Repository Updated";
             this._listColUpdated.Name = "_listColUpdated";
             this._listColUpdated.ReadOnly = true;
             this._listColUpdated.Resizable = System.Windows.Forms.DataGridViewTriState.False;

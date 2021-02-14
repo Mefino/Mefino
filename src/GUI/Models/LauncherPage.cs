@@ -386,6 +386,11 @@ namespace Mefino.GUI.Models
                         style.SelectionForeColor = warningCol;
                         break;
 
+                    case InstallState.OptionalUpdate:
+                        style.ForeColor = Color.YellowGreen;
+                        style.SelectionForeColor = Color.YellowGreen;
+                        break;
+
                     case InstallState.Installed:
                         style.ForeColor = Color.LightGreen;
                         style.SelectionForeColor = Color.LightGreen;
@@ -448,7 +453,7 @@ namespace Mefino.GUI.Models
 
             _infoBoxDescription.Text = package.description;
 
-            _infoBoxUpdateButton.Visible = package.m_installState == InstallState.Outdated;
+            _infoBoxUpdateButton.Visible = package.m_installState == InstallState.Outdated || package.m_installState == InstallState.OptionalUpdate;
 
             _infoBoxUninstallButton.Enabled = package.IsDisabled;
             _infoBoxUninstallButton.Text = package.IsDisabled

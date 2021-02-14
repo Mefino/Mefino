@@ -80,18 +80,25 @@ namespace Mefino.Core
             bool enabledPacksAreOk = true;
             foreach (var package in s_enabledPackages.Values)
             {
-                if (WebManifestManager.s_webManifests.ContainsKey(package.GUID))
+                if (WebManifestManager.s_webManifests.TryGetValue(package.GUID, out PackageManifest web))
                 {
-                    var web = WebManifestManager.s_webManifests[package.GUID];
-                    if (web.IsGreaterVersionThan(package))
+                    package.m_installState = package.CompareVersionAgainst(web);
+
+                    if (package.m_installState == InstallState.Outdated)
                     {
-                        package.m_installState = InstallState.Outdated;
                         enabledPacksAreOk = false;
+                        continue;
                     }
+
+                    //if (web.IsGreaterVersionThan(package))
+                    //{
+                    //    package.m_installState = InstallState.Outdated;
+                    //    enabledPacksAreOk = false;
+                    //}
                 }
 
-                if (package.m_installState == InstallState.Outdated)
-                    continue;
+                //if (package.m_installState == InstallState.Outdated)
+                //    continue;
 
                 if (package.HasAnyEnabledConflicts(out _))
                 {
@@ -249,8 +256,11 @@ namespace Mefino.Core
             if (!WebManifestManager.s_webManifests.TryGetValue(guid, out PackageManifest webManifest))
                 return false;
 
-            if (installed.IsGreaterVersionThan(webManifest))
+            if (installed.CompareVersionAgainst(webManifest) != InstallState.Outdated)
                 return true;
+
+            //if (installed.IsGreaterVersionThan(webManifest))
+            //    return true;
 
             string dir = installed.IsDisabled
                             ? Folders.MEFINO_DISABLED_FOLDER
@@ -306,12 +316,13 @@ namespace Mefino.Core
 
             var existing = TryGetInstalledPackage(guid);
 
-            if (existing != null && existing.IsGreaterVersionThan(webManifest))
+            if (existing != null && existing.CompareVersionAgainst(webManifest) != InstallState.Outdated)
             {
-                if (existing.IsDisabled)
-                    TryEnablePackage(guid);
-
                 //Console.WriteLine("Installed package is already greater or equal version, skipping install.");
+
+                if (existing.IsDisabled)
+                    return TryEnablePackage(guid);
+
                 return true;
             }
 
@@ -338,7 +349,7 @@ namespace Mefino.Core
 
             // check that the package itself wasn't one of the dependencies.
             existing = TryGetInstalledPackage(guid);
-            if (!webManifest.IsGreaterVersionThan(existing))
+            if (existing.CompareVersionAgainst(webManifest) != InstallState.Outdated)
                 return true;
 
             MefinoGUI.SetProgressMessage($"Downloading package '{webManifest.GUID}'");

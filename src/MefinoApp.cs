@@ -22,7 +22,7 @@ namespace Mefino
 
     public class MefinoApp
     {
-        public const string VERSION = "0.2.5.0";
+        public const string VERSION = "0.2.6.0";
 
         // Use a Mutex to limit the number of app instances to 1.
         internal static Mutex appMutex = new Mutex(true, MUTEX_STRING);

@@ -164,7 +164,7 @@ namespace Mefino.Core
                         {
                             for (int i = query.Count() - 1; i >= 0; i--)
                             {
-                                Console.WriteLine("removing package " + query.ElementAt(i).GUID);
+                                //Console.WriteLine("removing package " + query.ElementAt(i).GUID);
                                 s_webManifests.Remove(query.ElementAt(i).GUID);
                             }
                         }
@@ -285,7 +285,23 @@ namespace Mefino.Core
 
             if (LocalPackageManager.TryGetInstalledPackage(manifest.GUID) is PackageManifest installed)
             {
-                installed.m_installState = installed.CompareVersionAgainst(manifest);
+                if (installed.version == manifest.version)
+                {
+                    // Same version, but manifest may have been updated.
+                    // Ensure the local manifest matches the web one.
+
+                    var path = installed.IsDisabled ? Folders.MEFINO_DISABLED_FOLDER : Folders.OUTWARD_PLUGINS;
+                    path += $@"\{installed.GUID}\{LocalPackageManager.PKG_MANIFEST_FILENAME}";
+
+                    if (File.Exists(path))
+                        File.Delete(path);
+
+                    File.WriteAllText(path, manifest.ToJsonObject().ToString(true));
+
+                    //LocalPackageManager.RefreshInstalledPackages();
+                }
+                else
+                    installed.m_installState = installed.CompareVersionAgainst(manifest);
             }
         }
 

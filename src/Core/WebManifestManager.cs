@@ -144,16 +144,16 @@ namespace Mefino.Core
 
                 s_reposInLastResult.Add(repoGuid);
 
+                if ((DateTime.Now - updated).TotalMinutes < 5)
+                {
+                    // This repo was updated less than 5 minutes ago.
+                    // GitHub caches the "Raw" CDN for 5 minutes, so we need to wait for it to refresh.
+
+                    return;
+                }
+
                 if (s_repoCacheTimes.ContainsKey(repoGuid))
                 {
-                    if ((DateTime.Now - updated).TotalMinutes < 5)
-                    {
-                        // This repo was updated less than 5 minutes ago.
-                        // GitHub caches the "Raw" CDN for 5 minutes, so we need to wait for it to refresh.
-
-                        return;
-                    }
-
                     if (updated > s_repoCacheTimes[repoGuid])
                     {
                         // Console.WriteLine("Updating manifests in repo " + repoGuid);

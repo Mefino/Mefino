@@ -19,6 +19,11 @@
 
 ## Temporary Release Guide
 
+NOTES:
+* Mefino will not refresh manifests in a repository if the repo has been updated in the last 5 minutes, due to how GitHub caches its `raw` CDN.
+* For this reason, please wait 5 minutes after publishing your manifest for it to appear in Mefino.
+
+Release process:
 1. Create a new repository on GitHub for your package, or use an existing one if you have one for the mod already.
 2. Create a file called `mefino-manifest.json` in the root folder of the repository using the example below, and push it to GitHub.
 3. Put the contents of your release inside a zip file. <b>The name of the zip is important, it must match the `download_filename` of the package (or the `name` if you do not set a filename).</b>

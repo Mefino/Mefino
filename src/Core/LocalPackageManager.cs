@@ -349,7 +349,7 @@ namespace Mefino.Core
 
             // check that the package itself wasn't one of the dependencies.
             existing = TryGetInstalledPackage(guid);
-            if (existing.CompareVersionAgainst(webManifest) != InstallState.Outdated)
+            if (existing != null && existing.CompareVersionAgainst(webManifest) != InstallState.Outdated)
                 return true;
 
             MefinoGUI.SetProgressMessage($"Downloading package '{webManifest.GUID}'");

@@ -36,8 +36,8 @@ namespace Mefino.GUI.Models
             // Register callbacks
             _packageList.CellClick += _packageList_CellClick;
 
-            LocalPackageManager.OnPackageInstalled += RefreshRow;
-            LocalPackageManager.OnPackageUninstalled += RefreshRow;
+            LocalPackageManager.OnPackageInstalled += (_) => { RefreshPackageList(); };
+            LocalPackageManager.OnPackageUninstalled += (_) => { RefreshPackageList(); };
 
             // Force an update of web manifests on launch
             WebManifestManager.UpdateWebManifests();

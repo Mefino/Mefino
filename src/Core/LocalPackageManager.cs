@@ -353,6 +353,7 @@ namespace Mefino.Core
                 return true;
 
             MefinoGUI.SetProgressMessage($"Downloading package '{webManifest.GUID}'");
+            MefinoApp.SendAsyncProgress(0);
 
             if (!DownloadAndInstallPackage(webManifest))
             {

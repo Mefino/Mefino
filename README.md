@@ -38,23 +38,19 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 * Please use a JSON validator such as [this](https://jsonlint.com/) to ensure your JSON is valid before a release or update. Be careful with the commas on your dependency and conflict lists.
 * The file must be called `mefino-manifest.json`
 
+Empty JSON template:
 ```json
 {
   "author": "",
   "name": "",
   "version": "",
+  "required_version": "",
   "description": "",
   "tags": [
-    "Mechanics",
-    "UI",
-    "Skills"
   ],
   "dependencies": [
-    "someAuthor someRepository",
-    "someAuthor someRepository"
   ],
   "conflicts_with": [
-    "someGuy someMod"
   ],
   "require_sync": false,
   "download_filename": ""
@@ -69,6 +65,13 @@ The format of the GUID is `{author} {name}`. <i>Note the space between the autho
 `version` (string)
 * The version of your latest release, eg `1.0.0.0`
 * You must use Semantic versioning (`Major.Minor.Patch.Build`), though only `Major` is required.
+
+`required_version` (string)
+* Any versions more recent than this version will be <b>optional</b> updates.
+* You can change this whenever you want, for example if you release a big update you can set this value to the same version, and all users will be required to update.
+* Likewise, if you make a minor update and don't want to force all users to re-download your entire package, you can leave this on the previous value.
+* Like `version`, this must be a semantic version string (eg `1.0.0`)
+* If not set at all, it will default to the same as `version` (ie, every update will be required).
 
 `description` (string)
 * A short description for your package, just one or two sentences.

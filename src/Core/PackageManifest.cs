@@ -25,9 +25,16 @@ namespace Mefino.Core
         {
             get
             {
-                string ret = string.IsNullOrEmpty(download_filename) ? $"{name}" : $"{download_filename}";
+                string ret = string.IsNullOrEmpty(download_filename) 
+                    ? $"{name}" 
+                    : $"{download_filename}";
+
                 if (ret.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
                     ret = ret.Substring(0, ret.Length - 4);
+
+                // github does not allow spaces in file names, they are replaced by a '.'
+                ret = ret.Replace(' ', '.');
+
                 return $"{ret}.zip";
             }
         }

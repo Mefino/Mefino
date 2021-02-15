@@ -21,6 +21,8 @@ namespace Mefino.Core
 
         public string GithubDownloadURL => $"{GithubURL}/releases/latest/download/{DownloadFileName}";
 
+        public string GithubReadmeURL => $"{GithubURL}#{name.ToLower().Replace(' ', '-')}";
+
         public string DownloadFileName
         {
             get

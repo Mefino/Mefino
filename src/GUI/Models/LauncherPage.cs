@@ -505,7 +505,7 @@ namespace Mefino.GUI.Models
 
         private void _infoBoxWebsiteButton_Click(object sender, EventArgs e)
         {
-            var url = CurrentInspectedPackage.GithubURL;
+            var url = CurrentInspectedPackage.GithubReadmeURL;
 
             if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
             {
